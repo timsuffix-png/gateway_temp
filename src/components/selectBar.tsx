@@ -32,13 +32,17 @@ export default function SelectBar({ projects }: SelectBarProps) {
         />
       </div>
       <ul
-        className="flex flex-col justify-between items-center p-4 gap-2 text-lg
-       md:flex-row md:gap-10 "
+        className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg font-['Sarabun']
+       md:flex-row md:gap-10 md:items-center "
       >
         <li
-          className="flex flex-col justify-center items-center text-center 
+          className="flex flex-col justify-center items-center text-center whitespace-nowrap
         md:basis-40"
         >
+          <h4 className="flex-nowrap text-lg xl:text-xl font-normal font-['Sarabun']">
+            Temperature port
+            <span className="text-red-600">&nbsp;*</span>
+          </h4>
           <div className="text-black text-lg xl:text-xl flex place-content-start w-full lg:mt-3">
             {currentCOMPort ? <h1>{"COM" + currentCOMPort}</h1> : null}
             <button className="ml-5" onClick={openPopup}>
@@ -50,28 +54,22 @@ export default function SelectBar({ projects }: SelectBarProps) {
               <SerialCommunicationPort />
             </Popup>
           )}
-          {/* <div className="flex">
-            <p>Temperature Port</p>
-            <span className="text-red-600">&nbsp;*</span>
-          </div>
-          <button onClick={() => setClickPort((prev) => !prev)} className="">
-            เลือก
-          </button> */}
         </li>
-        <li className=" md:basis-60">
+        <li className="w-full md:basis-60">
           <div className="flex">
             <p className="">โปรเจคการทดสอบ</p>
             <span className="text-red-600">&nbsp;*</span>
           </div>
 
           <Select
+          className="rounded-sm border"
             options={projects?.map((data) => ({
               value: data.id,
               label: data.name,
             }))}
           />
         </li>
-        <li className="md:flex-grow">
+        <li className="w-full md:flex-grow md:w-auto">
           <div className="flex">
             <p>รหัสสินค้า</p>
             <span className="text-red-600">&nbsp;*</span>

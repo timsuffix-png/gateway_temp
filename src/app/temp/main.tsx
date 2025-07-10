@@ -1,9 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import SelectBar from "@/components/selectbar";
+import SelectBar from "@/components/selectBar";
 import axios from "axios";
 import Footer from "@/components/footer";
-import SelectPort from "@/components/selectPort";
 import Popup from "@/components/popup";
 import SerialCommunicationPort from "@/components/serialCommunicationPort";
 
@@ -13,7 +12,7 @@ export interface Option {
 }
 
 const ops: Option[] = [
-   {
+  {
     id: 1,
     name: "class1(3legs)",
   },
@@ -31,9 +30,30 @@ const ops: Option[] = [
   },
 ];
 
-
 export default function MainTempTest() {
   // const [data, setData] = useState<object | null>(null);
+  const [clickTest, setClickTest] = useState(false);
+
+  const Testing = () => {
+    // Import dependencies
+    const SerialPort = require("serialport");
+    const Readline = require("@serialport/parser-readline");
+
+    // Defining the serial port
+    const port = new SerialPort("COM3", {
+      baudRate: 9600,
+    });
+
+    // The Serial port parser
+    const parser = new Readline();
+    port.pipe(parser);
+
+    // Read the data from the serial port
+    parser.on("data", (line: string) => console.log(line));
+
+    // Write the data to the serial port
+    port.write("on");
+  };
 
   async function fetchData() {
     try {
@@ -107,10 +127,12 @@ export default function MainTempTest() {
 
         <div className="flex flex-col h-full items-center gap-10 border">
           <button
+            id="test"
             className="w-40 h-15  rounded-lg bg-blue-900 hover:bg-blue-950
           md:w-45 md:h-20"
+            onClick={Testing}
           >
-            <label className="text-xl text-white font-semibold">ทดสอบ</label>
+            <label className="text-xl text-white font-semibold">ทดสอบ</label>    
           </button>
           <button
             className="w-40 h-15  rounded-lg bg-red-600 hover:bg-red-700
@@ -121,7 +143,6 @@ export default function MainTempTest() {
         </div>
       </div>
 
-     
       <div className="flex flex-col-reverse m-2 place-content-center">
         <Footer />
       </div>

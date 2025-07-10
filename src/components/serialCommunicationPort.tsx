@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import SubmitButton from "./submitButton";
 import Select from "react-select";
+import Swal from "sweetalert2";
 
 export default function SerialCommunicationPort() {
   type SerialPort = {
@@ -12,13 +13,14 @@ export default function SerialCommunicationPort() {
   const [currentWidth, setCurrentWidth] = useState(0); //ขนาดความกว้างของหน้าจอ
 
   useEffect(() => {
-    
-    const fetchData = async () => {
-      window.electronAPI.portlist(setPortList); //ดึงรายชื่อSerial Portsทั้งหมด ผ่าน Electron preload script แล้วอัปเดต portList
-      serialPortList();
-      setCOMPort(Number(await window.electronAPI.getPort()));
-    };
-    fetchData();
+    if (typeof window !== "undefined" && window.electronAPI) {
+      const fetchData = async () => {
+        window.electronAPI.portlist(setPortList);
+        await serialPortList();
+        setCOMPort(Number(await window.electronAPI.getPort()));
+      };
+      fetchData();
+    }
 
     const handleResize = () => {
       setCurrentWidth(window.innerWidth);
@@ -37,7 +39,7 @@ export default function SerialCommunicationPort() {
   };
 
   return (
-    <div className="bg-white p-5 sm:p-10 2xl:p-20 border-black border-2 rounded-2xl flex flex-col">
+    <div className="text-start bg-white p-5 sm:p-10 2xl:p-20 border-black border-2 rounded-2xl flex flex-col">
       <label className="flex flex-col w-full">
         <h1 className="text-lg lg:text-2xl text-black font-['Sarabun'] mb-2">
           พอร์ตในเครื่องทั้งหมด
@@ -67,7 +69,7 @@ export default function SerialCommunicationPort() {
                   title: "ตรวจสอบข้อมูลใหม่อีกครั้ง",
                   text: "กรุณาเลือกพอร์ตก่อนบันทึก",
                 });
-              await window.electronAPI.setSeawardCOMPort(COMPort);
+              await window.electronAPI.setPort(COMPort);
               setCOMPort(await window.electronAPI.getAPIPath());
               return Swal.fire({
                 position: "top-end",
