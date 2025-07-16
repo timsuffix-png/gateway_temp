@@ -1,10 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SelectBar from "@/components/selectBar";
 import axios from "axios";
 import Footer from "@/components/footer";
 import Popup from "@/components/popup";
 import SerialCommunicationPort from "@/components/serialCommunicationPort";
+import { error } from "console";
+import { ipcRenderer } from "electron";
 
 export interface Option {
   id: number;
@@ -31,35 +33,64 @@ const ops: Option[] = [
 ];
 
 export default function MainTempTest() {
-  // const [data, setData] = useState<object | null>(null);
-  const [clickTest, setClickTest] = useState(false);
 
-  const Testing = () => {
-    // Import dependencies
-    const SerialPort = require("serialport");
-    const Readline = require("@serialport/parser-readline");
+  const [temp1, setTemp1] = useState<number >(0);
+  const [temp2, setTemp2] = useState<number >(0);
+  const [temp3, setTemp3] = useState<number >(0);
+  const [current, setCurrent] = useState<number >(0);
+  const [time, setTime] = useState<number>(0);
+  const [serialData, setSerialData] = useState<string[]>([]);
 
-    // Defining the serial port
-    const port = new SerialPort("COM3", {
-      baudRate: 9600,
-    });
+  const [state, setState] = useState("off");
 
-    // The Serial port parser
-    const parser = new Readline();
-    port.pipe(parser);
 
-    // Read the data from the serial port
-    parser.on("data", (line: string) => console.log(line));
-
-    // Write the data to the serial port
-    port.write("on");
+  const serialPort = async () => {
+    try {
+      const port = await window.electronAPI.getPort();
+      await window.electronAPI.openPort(port);
+      const data =  await window.electronAPI.writeData({port, command:state});
+      console.log("State command : " + state);
+      console.log("Data  : " + data);
+    } catch (error) {
+      console.error("Failed to open/write port:", error);
+    }
   };
 
-  async function fetchData() {
-    try {
-      const res = await axios.get("");
-    } catch {}
-  }
+  useEffect(() => {
+    const handleSerialData = (data: string) => {
+      console.log("Received data:", data); // เช็คข้อมูลที่รับมา
+      setSerialData((prev) => [...prev, data]);
+      const parts = data.split(",");
+      if (parts.length === 5) {
+        // const [t1, t2, t3, curr, tm] = parts;
+        setTemp1(parseFloat(parts[0]));
+        setTemp2(parseFloat(parts[1]));
+        setTemp3(parseFloat(parts[2]));
+        setCurrent(parseFloat(parts[3]));
+        setTime(parseInt(parts[4]));
+      }
+    };
+
+     const handlePortClosed = () => {
+    console.log('Serial port ถูกปิดแล้ว');  // แจ้งสถานะ port ถูกปิด
+    // TODO: อัพเดต UI แจ้งเตือนผู้ใช้ว่า port ปิดแล้ว เช่น ปิดปุ่ม หรือแสดงข้อความ
+  };
+
+
+ window.electronAPI.onSerialData(handleSerialData);
+  window.electronAPI.onSerialPortClosed(handlePortClosed); //ฟังพอตปิด
+
+  // ล้าง listener เมื่อ component ถูก unmount
+  return () => {
+    window.electronAPI.removeSerialDataListener(handleSerialData); 
+    window.electronAPI.removeSerialPortClosedListener(handlePortClosed); 
+  };
+  }, []);
+
+
+  useEffect(() => {
+    serialPort();
+  }, [state]);
 
   return (
     <div className="w-screen h-auto min-h-screen flex flex-col">
@@ -75,10 +106,13 @@ export default function MainTempTest() {
           className="flex flex-col h-full gap-10 items-center text-lg  border
         md:items-end md:pr-[15%]"
         >
+         
+
           <li className="flex items-center gap-4">
             <p>ตัววัดอุณหภูมิตัวที่ 1 :</p>
             <input
               type="text"
+              value={temp1}
               readOnly
               className="w-35 h-10 border rounded-sm"
             ></input>
@@ -87,6 +121,7 @@ export default function MainTempTest() {
             <p>ตัววัดอุณหภูมิตัวที่ 2 :</p>
             <input
               type="text"
+              value={temp2}
               readOnly
               className="w-35 h-10 border rounded-sm"
             ></input>
@@ -95,6 +130,7 @@ export default function MainTempTest() {
             <p>ตัววัดอุณหภูมิตัวที่ 3 :</p>
             <input
               type="text"
+              value={temp3}
               readOnly
               className="w-35 h-10 border rounded-sm"
             ></input>
@@ -110,6 +146,7 @@ export default function MainTempTest() {
               <p>กระแสไฟฟ้า :</p>
               <input
                 type="text"
+              value={current}
                 readOnly
                 className="w-35 h-10 border rounded-sm"
               ></input>
@@ -118,10 +155,17 @@ export default function MainTempTest() {
               <p>เวลา :</p>
               <input
                 type="text"
+              value={time}
                 readOnly
                 className="w-35 h-10 border rounded-sm"
               ></input>
             </li>
+
+             {/* ------------------------------------------- */}
+          {serialData.map((data, idx) => (
+            <li className="w-30 h-50 border-4"key={idx}>{data}</li>
+          ))}
+          {/* ------------------------------------------- */}
           </ul>
         </div>
 
@@ -130,13 +174,14 @@ export default function MainTempTest() {
             id="test"
             className="w-40 h-15  rounded-lg bg-blue-900 hover:bg-blue-950
           md:w-45 md:h-20"
-            onClick={Testing}
+            onClick={() => setState("on")}
           >
-            <label className="text-xl text-white font-semibold">ทดสอบ</label>    
+            <label className="text-xl text-white font-semibold">ทดสอบ</label>
           </button>
           <button
             className="w-40 h-15  rounded-lg bg-red-600 hover:bg-red-700
           md:w-45 md:h-20"
+            onClick={() => setState("off")}
           >
             <label className="text-xl text-white font-semibold">หยุด</label>
           </button>

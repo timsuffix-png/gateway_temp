@@ -2,13 +2,17 @@
   "name": "gateway_temp",
   "version": "0.1.0",
   "private": true,
-  "main": "electron/main.js",
+   "type": "module",
+  "main": "src/electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+  "build:preload": "tsc src/electron/preload.ts --outDir electron/dist/electron",
+  "watch:preload": "tsc -p tsconfig.json --watch",
+    "start": "next start", 
+    
     "lint": "next lint",
-    "start-electron": "electron .",
+    "start-electron": "electron src/electron/main.js",
     "e": "concurrently \"npm run dev\" \"npm run start-electron\"",
     "builder": "npm run build && electron ."
   },

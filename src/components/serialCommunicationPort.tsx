@@ -12,6 +12,12 @@ export default function SerialCommunicationPort() {
   const [COMPort, setCOMPort] = useState<number | null>(); //พอร์ตที่ user เลือก เช่น COM3
   const [currentWidth, setCurrentWidth] = useState(0); //ขนาดความกว้างของหน้าจอ
 
+  const serialPortList = async () => {
+    try {
+      await navigator.serial.requestPort();
+    } catch {}
+  };
+
   useEffect(() => {
     if (typeof window !== "undefined" && window.electronAPI) {
       const fetchData = async () => {
@@ -32,12 +38,6 @@ export default function SerialCommunicationPort() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const serialPortList = async () => {
-    try {
-      await navigator.serial.requestPort();
-    } catch {}
-  };
-
   return (
     <div className="text-start bg-white p-5 sm:p-10 2xl:p-20 border-black border-2 rounded-2xl flex flex-col">
       <label className="flex flex-col w-full">
@@ -56,8 +56,11 @@ export default function SerialCommunicationPort() {
               label: data.portName + " " + data.displayName,
             }))}
             defaultMenuIsOpen
-            onChange={(e) => setCOMPort(Number(e.value.replace("COM", "")))}
+                      // onChange={(e) => setCOMPort(e.value)}
+            onChange={e => setCOMPort(e ? Number(e.value.replace("COM", "")) : null)}
+
           />
+          
         </div>
         <div className="mt-10 flex place-content-end">
           <SubmitButton
