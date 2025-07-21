@@ -21,16 +21,7 @@ export default function SelectBar({ projects }: SelectBarProps) {
   };
 
   return (
-    <>
-      <div className="flex border-b">
-        <img
-          src="/logo.png"
-          alt="โลโก้"
-          className="w-[227px] h-[52px] block 2xl:hidden"
-          width={260}
-          height={60}
-        />
-      </div>
+    <div className="flex flex-col 2x:flex-row">
       <ul
         className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg font-['Sarabun']
        md:flex-row md:gap-10 md:items-center "
@@ -85,6 +76,6 @@ export default function SelectBar({ projects }: SelectBarProps) {
           ></input>
         </li>
       </ul>
-    </>
+    </div>
   );
 }

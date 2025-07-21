@@ -21,7 +21,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
    openPort: (portName: string) => ipcRenderer.invoke("openPort", portName),
   //ปิดพอต  	Renderer → Main
   closePort: () => ipcRenderer.invoke("closePort"),
-  writeData: (args:{port:string, command: string}) => ipcRenderer.invoke("writeData", args),
+  writeData: (args:{port:string, command:{ state:string, tempLim:number , currentLim:number ,timeLim:number}}) => ipcRenderer.invoke("writeData", args),
 })
 console.log("✅ Preload script loaded");
 
