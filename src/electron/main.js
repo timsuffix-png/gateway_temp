@@ -118,7 +118,6 @@ app.on("ready", () => {
 
   let port; //ใช้เช็กว่า พอร์ตเปิดอยู่มั้ย
   let parser = null; //ฟังรอข้อมูลเข้ามา มีข้อมูลเมื่อไหร่ จะยิง 'data' event
-  let isOn = false; // ตัวควบคุมสถานะ ว่า ตอนนี้กำลังสั่ง Arduino ทำงานอยู่มั้ย
 
   ipcMain.handle("openPort", async (event, portName) => {
     return new Promise((resolve, reject) => {
@@ -180,19 +179,19 @@ app.on("ready", () => {
   }
 
   ipcMain.handle("writeData", async (event, args) => {
-    console.log("writeData2 called with port:", args.port);
-    // console.log("Port status in writeData2:", port, port?.isOpen);
+    // console.log("writeData2 called with port:", args.port);
+    // // console.log("Port status in writeData2:", port, port?.isOpen);
     return new Promise(async (resolve, reject) => {
       const win = BrowserWindow.getAllWindows()[0];
       const state_command = args.command.state.trim();
       const cleanCmd = `${args.command.state.trim()},${args.command.tempLim},${
         args.command.currentLim
       },${args.command.timeLim}`;
-  
+
       if (state_command === "stop") {
-        isOn = false;
         if (port && port.isOpen) {
           port.write(cleanCmd + "\n");
+          console.log("State stop : " + cleanCmd);
         } else {
           console.log("Stop received but port not open — skip write");
         }
@@ -218,8 +217,6 @@ app.on("ready", () => {
       const dataArray = [];
 
       const onData = (data) => {
-        console.log("writeData2 called with command:", args.command);
-        console.log("Port status in writeData2:", port, port?.isOpen);
         console.log("Data from Arduino:", data.toString());
         data = data.trim();
         dataArray.push(data);
@@ -229,20 +226,17 @@ app.on("ready", () => {
 
         const index_data = data.split(",");
         if (index_data.length >= 3) {
-          const state_data = Number(index_data[5]);
+          const state_data = index_data[8].trim();
 
           //ถ้าstate ไม่เท่ากับ In process
-          if (state_data !== 1) {
+          if (state_data !== "on") {
             parser.removeListener("data", onData);
-            isOn = false;
             resolve(dataArray);
           }
         }
       };
 
       parser.on("data", onData);
-      console.log("writeData2 called with command:", args.command);
-      console.log("Port status in writeData2:", port, port?.isOpen);
       // resolve("Open port in writeSerial func.");
     });
   });
@@ -259,6 +253,7 @@ app.on("ready", () => {
         }
         port = null; // เคลียร์ตัวแปรหลังปิด
         resolve("Port closed");
+        console.log("Port is closing...................");
       });
     });
   });

@@ -41,36 +41,35 @@ const ops: Option[] = [
 ];
 
 export default function MainTempTest() {
-  const [temp1, setTemp1] = useState<number>(0);
-  const [temp2, setTemp2] = useState<number>(0);
-  const [temp3, setTemp3] = useState<number>(0);
-  const [current, setCurrent] = useState<number>(0);
-  const [time, setTime] = useState<number>(0);
-  const [serialData, setSerialData] = useState<string[]>([]);
-  const [case_precess, setCaseProcess] = useState<number>(0);
+  const [temp1, setTemp1] = useState<number | null>(null);
+  const [temp2, setTemp2] = useState<number | null>(null);
+  const [temp3, setTemp3] = useState<number | null>(null);
+  const [current, setCurrent] = useState<number | null>(null);
+  const [time, setTime] = useState<number | null>(null);
+  const [case_precess, setCaseProcess] = useState<string>("stop");
 
   const [sendData, setSendData] = useState<SendCommand>({
-    state: "stop",
-    tempLim: 34.5,
-    currentLim: 12.9,
-    timeLim: 10,
-
-    // state: "stop",
-    // tempLim: 50.0,
-    // currentLim: 6.0,
+    // state: "",
+    // tempLim: 34.5,
+    // currentLim: 12.9,
     // timeLim: 10,
+
+    state: "",
+    tempLim: 60.0,
+    currentLim: 6.0,
+    timeLim: 10,
   });
 
   const { css, stateName } = useMemo(() => {
     switch (case_precess) {
-      case 0:
+      case "stop":
         return { css: "bg-red-600", stateName: "STOP" };
-      case 1:
+      case "on":
         return { css: "bg-yellow-600", stateName: "IN PROCESS" };
-      case 2:
+      case "pass":
         return { css: "bg-green-600", stateName: "PASS" };
-      case 3:
-        return { css: "bg-red-400", stateName: "NOT PASS" };
+      case "fail":
+        return { css: "bg-red-400", stateName: "Fail" };
       default:
         return { css: "bg-gray-400", stateName: "OFF" };
     }
@@ -93,25 +92,24 @@ export default function MainTempTest() {
 
   useEffect(() => {
     const handleSerialData = (data: string) => {
-      console.log("Received data:", data); // เช็คข้อมูลที่รับมา
-      setSerialData((prev) => [...prev, data]);
+      console.log("Received data:", data); // เช็คข้อมูลที่รับมาใน console app
       const parts = data.split(",");
-      if (parts.length >= 3) {
+      if (parts.length > 1) {
         // const [t1, t2, t3, curr, tm, sendData] = parts;
-
-        setTemp1(parseFloat(parts[0]));
-        setTemp2(parseFloat(parts[1]));
-        setTemp3(parseFloat(parts[2]));
-        setCurrent(parseFloat(parts[3]));
-        setTime(parseInt(parts[4]));
-        setCaseProcess(parseInt(parts[5]));
 
         // setTemp1(parseFloat(parts[0]));
         // setTemp2(parseFloat(parts[1]));
         // setTemp3(parseFloat(parts[2]));
-        // setCurrent(parseFloat(parts[4]));
-        // setTime(parseInt(parts[3]));
-        // setCaseProcess(parseInt(parts[10]));
+        // setCurrent(parseFloat(parts[3]));
+        // setTime(parseInt(parts[4]));
+        // setCaseProcess(parseInt(parts[5]));
+
+        setTemp1(parseFloat(parts[0]));
+        setTemp2(parseFloat(parts[1]));
+        setTemp3(parseFloat(parts[2]));
+        setCurrent(parseFloat(parts[4]));
+        setTime(parseInt(parts[3]));
+        setCaseProcess(parts[8].trim());
       }
     };
 
@@ -152,7 +150,7 @@ export default function MainTempTest() {
             <input
               className="w-25 h-10 text-center border rounded-sm "
               type="text"
-              value={temp1}
+              value={temp1 ? temp1 : 0}
               readOnly
             ></input>
           </li>
@@ -162,7 +160,7 @@ export default function MainTempTest() {
             <input
               className="w-25 h-10 text-center border rounded-sm "
               type="text"
-              value={temp2}
+              value={temp2 ? temp2 : 0}
               readOnly
             ></input>
           </li>
@@ -171,7 +169,7 @@ export default function MainTempTest() {
             <input
               className="w-25 h-10 text-center border rounded-sm "
               type="text"
-              value={temp3}
+              value={temp3 ? temp3 : 0}
               readOnly
             ></input>
           </li>
@@ -190,7 +188,7 @@ export default function MainTempTest() {
               <input
                 className="w-25 h-10 text-center border rounded-sm "
                 type="text"
-                value={current}
+                value={current ? current : 0}
                 readOnly
               ></input>
             </li>
@@ -199,7 +197,7 @@ export default function MainTempTest() {
               <input
                 className="w-25 h-10 text-center border rounded-sm "
                 type="text"
-                value={time}
+                value={time ? time : 0}
                 readOnly
               ></input>
             </li>
