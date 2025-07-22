@@ -182,14 +182,14 @@ app.on("ready", () => {
   ipcMain.handle("writeData", async (event, args) => {
     console.log("writeData2 called with port:", args.port);
     // console.log("Port status in writeData2:", port, port?.isOpen);
-    return await new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const win = BrowserWindow.getAllWindows()[0];
-      const State_now = args.command.state.trim();
+      const state_command = args.command.state.trim();
       const cleanCmd = `${args.command.state.trim()},${args.command.tempLim},${
         args.command.currentLim
       },${args.command.timeLim}`;
-
-      if (State_now === "stop") {
+  
+      if (state_command === "stop") {
         isOn = false;
         if (port && port.isOpen) {
           port.write(cleanCmd + "\n");
@@ -228,10 +228,11 @@ app.on("ready", () => {
         // 👉 ฝั่ง renderer จะได้ทีละรอบ เรียลไทม์
 
         const index_data = data.split(",");
-        if (index_data.length === 6) {
-          const timeValue = Number(index_data[4]);
+        if (index_data.length >= 3) {
+          const state_data = Number(index_data[5]);
 
-          if (timeValue === args.command.timeLim) {
+          //ถ้าstate ไม่เท่ากับ In process
+          if (state_data !== 1) {
             parser.removeListener("data", onData);
             isOn = false;
             resolve(dataArray);

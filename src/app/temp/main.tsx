@@ -52,8 +52,13 @@ export default function MainTempTest() {
   const [sendData, setSendData] = useState<SendCommand>({
     state: "stop",
     tempLim: 34.5,
-    currentLim: 12.3,
-    timeLim: 5,
+    currentLim: 12.9,
+    timeLim: 10,
+
+    // state: "stop",
+    // tempLim: 50.0,
+    // currentLim: 6.0,
+    // timeLim: 10,
   });
 
   const { css, stateName } = useMemo(() => {
@@ -91,14 +96,22 @@ export default function MainTempTest() {
       console.log("Received data:", data); // เช็คข้อมูลที่รับมา
       setSerialData((prev) => [...prev, data]);
       const parts = data.split(",");
-      if (parts.length === 6) {
+      if (parts.length >= 3) {
         // const [t1, t2, t3, curr, tm, sendData] = parts;
+
         setTemp1(parseFloat(parts[0]));
         setTemp2(parseFloat(parts[1]));
         setTemp3(parseFloat(parts[2]));
         setCurrent(parseFloat(parts[3]));
         setTime(parseInt(parts[4]));
         setCaseProcess(parseInt(parts[5]));
+
+        // setTemp1(parseFloat(parts[0]));
+        // setTemp2(parseFloat(parts[1]));
+        // setTemp3(parseFloat(parts[2]));
+        // setCurrent(parseFloat(parts[4]));
+        // setTime(parseInt(parts[3]));
+        // setCaseProcess(parseInt(parts[10]));
       }
     };
 
