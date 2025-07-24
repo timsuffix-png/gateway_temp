@@ -8,6 +8,7 @@ import SerialCommunicationPort from "@/components/serialCommunicationPort";
 import { error } from "console";
 import { useMemo } from "react";
 import { ipcRenderer } from "electron";
+import Swal from "sweetalert2";
 
 export interface Option {
   id: number;
@@ -40,14 +41,13 @@ const ops: Option[] = [
   },
 ];
 
-export default function MainTempTest() {
+export default function MainTempTest_page() {
   const [temp1, setTemp1] = useState<number | null>(null);
   const [temp2, setTemp2] = useState<number | null>(null);
   const [temp3, setTemp3] = useState<number | null>(null);
   const [current, setCurrent] = useState<number | null>(null);
   const [time, setTime] = useState<number | null>(null);
   const [case_precess, setCaseProcess] = useState<string>("stop");
-
   const [sendData, setSendData] = useState<SendCommand>({
     // state: "",
     // tempLim: 34.5,
@@ -86,7 +86,7 @@ export default function MainTempTest() {
       console.log("State command : " + sendData);
       console.log("Data  : " + data);
     } catch (error) {
-      console.error("Failed to open/write port:", error);
+      throw new Error("Error in serialPort: " + error);
     }
   };
 
@@ -133,7 +133,7 @@ export default function MainTempTest() {
   }, [sendData]);
 
   return (
-    <div className="w-full h-auto border min-h-screen flex flex-col">
+    <div className="w-full h-full flex flex-col">
       <div>
         <SelectBar projects={ops} />
       </div>
@@ -215,20 +215,30 @@ export default function MainTempTest() {
           </div>
           <button
             id="test"
-            className="w-40 h-15  rounded-lg bg-blue-900 hover:bg-blue-950
+            className="w-40 h-15  rounded-lg bg-[#001F3F] hover:cursor-pointer
           md:w-45 md:h-20"
-            onClick={() => {
+            onClick={async () => {
+              const port = await window.electronAPI.getPort();
+
+              if (!port) {
+                Swal.fire({
+                  icon: "error",
+                  title: "เกิดข้อผิดพลาด",
+                  text: "กรุณาเลือกพอร์ตให้ถูกต้อง",
+                });
+                return;
+              }
+
               setSendData((prev) => ({
                 ...prev,
                 state: "on",
               }));
-              return;
             }}
           >
             <label className="text-xl text-white font-semibold">ทดสอบ</label>
           </button>
           <button
-            className="w-40 h-15  rounded-lg bg-red-600 hover:bg-red-700
+            className="w-40 h-15  rounded-lg bg-red-600 hover:cursor-pointer
           md:w-45 md:h-20"
             onClick={() => {
               setSendData((prev) => ({

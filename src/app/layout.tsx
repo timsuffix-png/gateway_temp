@@ -10,14 +10,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex flex-col 2xl:flex-row min-h-screen box-border">
-        <header className="w-full  h-auto 2xl:w-[20%] 2xl:h-full ">
+        <header className="w-full 2xl:w-[20%] 2xl:h-screen ">
           <Navbar />
         </header>
 
-        <main className="flex-1 h-full overflow-y-auto box-border 2xl:w-[80%] border border-amber-600">
+        <main className="flex flex-col overflow-y-auto box-border 2xl:w-[80%] 2xl:border-l-2 2xl:h-screen">
           {children}
-          <div className="w-full p-2">
-            <Footer />
+          <div className="">
+         <Footer />
           </div>
         </main>
       </body>

@@ -190,7 +190,7 @@ app.on("ready", () => {
 
       if (state_command === "stop") {
         if (port && port.isOpen) {
-          port.write(cleanCmd + "\n");
+          port.write("stop" + "\n");
           console.log("State stop : " + cleanCmd);
         } else {
           console.log("Stop received but port not open — skip write");

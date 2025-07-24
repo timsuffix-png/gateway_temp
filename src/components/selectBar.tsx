@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Option } from "@/app/temp/main";
+import { Option } from "@/app/temp/page";
 import Select from "react-select";
 import Popup from "./popup";
 import SerialCommunicationPort from "./serialCommunicationPort";

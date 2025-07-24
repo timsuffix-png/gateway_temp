@@ -38,7 +38,7 @@
     "src/electron/**/*.tsx",
     "src/electron/main.js",
     ".next/types/**/*.ts"
-  ],
+, "src/app/pages/index.js"  ],
   "exclude": [
     "node_modules"
   ]

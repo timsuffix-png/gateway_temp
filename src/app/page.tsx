@@ -1,5 +1,5 @@
 
-import MainTempTest from "./temp/main";
+import MainTempTest from "./temp/page";
 
 export default function Home() {
   return (
