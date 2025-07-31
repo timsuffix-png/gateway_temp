@@ -9,46 +9,33 @@ import { error } from "console";
 import { useMemo } from "react";
 import { ipcRenderer } from "electron";
 import Swal from "sweetalert2";
-
-export interface Option {
-  id: number;
-  name: string;
-}
-
-interface SendCommand {
-  state: string;
-  tempLim: number;
-  currentLim: number;
-  timeLim: number;
-}
-
-const ops: Option[] = [
-  {
-    id: 1,
-    name: "class1(3legs)",
-  },
-  {
-    id: 2,
-    name: "class2(2legs)",
-  },
-  {
-    id: 3,
-    name: "class3(4legs)",
-  },
-  {
-    id: 4,
-    name: "iron",
-  },
-];
+import { resolve } from "path";
+import Select from "react-select";
 
 export default function MainTempTest_page() {
+  // Selectbar
+  const [productId, setProductId] = useState<number | null>(null);
+  const [currentCOMPort, setCurrentCOMPort] = useState<number | null>();
+  const [popup, setPopup] = useState(false);
+  const openPopup = () => setPopup(true);
+  const closePopup = async () => {
+    setPopup(false);
+    setCurrentCOMPort(Number(await window.electronAPI.getPort()));
+  };
+
+  const [qcTest, setQcTest] = useState("");
   const [temp1, setTemp1] = useState<number | null>(null);
   const [temp2, setTemp2] = useState<number | null>(null);
   const [temp3, setTemp3] = useState<number | null>(null);
   const [current, setCurrent] = useState<number | null>(null);
   const [time, setTime] = useState<number | null>(null);
   const [case_precess, setCaseProcess] = useState<string>("stop");
-  const [sendData, setSendData] = useState<SendCommand>({
+  const [sendData, setSendData] = useState<{
+    state: string;
+    tempLim: number;
+    currentLim: number;
+    timeLim: number;
+  }>({
     // state: "",
     // tempLim: 34.5,
     // currentLim: 12.9,
@@ -59,6 +46,28 @@ export default function MainTempTest_page() {
     currentLim: 6.0,
     timeLim: 10,
   });
+  const [qcProjectList, setQcProjectList] = useState<{
+    error: boolean;
+    message: string;
+    data: [
+      {
+        ID: string;
+        projectName: string;
+        detail: string;
+        qcItemProject: [
+          {
+            ID: string;
+            qcMain: {
+              ID: string;
+              testName: string;
+              detail: string;
+            };
+          }
+        ];
+      }
+    ];
+    allPage: number;
+  } | null>();
 
   const { css, stateName } = useMemo(() => {
     switch (case_precess) {
@@ -83,10 +92,10 @@ export default function MainTempTest_page() {
         port,
         command: sendData,
       });
-      console.log("State command : " + sendData);
+      console.log("State command : " + JSON.stringify(sendData));
       console.log("Data  : " + data);
     } catch (error) {
-      throw new Error("Error in serialPort: " + error);
+      console.log("Error in serialPort: " + error);
     }
   };
 
@@ -132,10 +141,133 @@ export default function MainTempTest_page() {
     serialPort();
   }, [sendData]);
 
+  //fetch API
+  const fetchQcProjectList = async () => {
+    const data = await window.electronAPI.fetchAPI({
+      method: "GET",
+      URL: `qc/project/extend?limit=100&page=1`,
+    });
+    if (!data) {
+      throw new Error("Failed to fetch data");
+    }
+    return data;
+  };
+
+  const fetchScript = async (idProject: string) => {
+    console.log("ID Project: " + idProject);
+    const rawData = await window.electronAPI.fetchAPI({
+      method: "GET",
+      URL: `qc/itemProject/${idProject}`,
+    });
+
+    if (!rawData) {
+      throw new Error("Failed to fetch data");
+    }
+    const format_script = await rawData?.data?.find(
+      //หาทดสอบอุณภูมิเตารีด
+      (data: any) => data.qcMain.ID === "23c853da-0d4d-4605-b242-0c13731dfb29"
+    );
+
+    console.log("format_script"+ JSON.stringify(format_script))
+
+    console.log("temp : "+ format_script?.qcMain?.qcScript?.script?.TemperatureMax);
+    console.log("current : " +format_script?.qcMain?.qcScript?.script?.CurrentMax);
+    console.log("time : "+format_script?.qcMain?.qcScript?.script?.Time);
+    setSendData((prev) => ({
+      ...prev,
+      tempLim: format_script?.qcMain?.qcScript?.script?.TemperatureMax,
+      currentLim: format_script?.qcMain?.qcScript?.script?.CurrentMax,
+      timeLim: format_script?.qcMain?.qcScript?.script?.Time,
+    }));
+  };
+
+  const refreshData = async () => {
+    const data = await fetchQcProjectList();
+    setQcProjectList(data);
+    console.log("QcProjectList: ", data);
+  };
+
+  useEffect(() => {
+    refreshData();
+  }, []);
+
+  useEffect(() => {
+    fetchScript(qcTest);
+  }, [qcTest]);
+
   return (
     <div className="w-full h-full flex flex-col">
-      <div>
-        <SelectBar projects={ops} />
+      {/* Select Bar */}
+      <div className="flex flex-col 2x:flex-row">
+        <ul
+          className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg font-['Sarabun']
+       md:flex-row md:gap-10 md:items-center "
+        >
+          <li
+            className="flex flex-col justify-center items-center text-center whitespace-nowrap
+        md:basis-40"
+          >
+            <h4 className="flex-nowrap text-lg xl:text-xl font-normal font-['Sarabun']">
+              Temperature port
+              <span className="text-red-600">&nbsp;*</span>
+            </h4>
+            <div className="text-black text-lg xl:text-xl flex place-content-start w-full lg:mt-3">
+              {currentCOMPort ? <h1>{"COM" + currentCOMPort}</h1> : null}
+              <button className="ml-5" onClick={openPopup}>
+                {currentCOMPort ? "เปลี่ยน" : "เลือก"}
+              </button>
+            </div>
+            {popup && (
+              <Popup onClose={closePopup}>
+                <SerialCommunicationPort />
+              </Popup>
+            )}
+          </li>
+          <li className="w-full md:basis-60">
+            <div className="flex">
+              <p className="">โปรเจคการทดสอบ</p>
+              <span className="text-red-600">&nbsp;*</span>
+            </div>
+
+            <Select
+              className="rounded-sm border"
+              options={
+                qcProjectList?.data
+                  ? qcProjectList.data
+                      //1) filter
+                      .filter((project) =>
+                        project.qcItemProject?.some(
+                          (item) =>
+                            item.qcMain.ID ===
+                            "23c853da-0d4d-4605-b242-0c13731dfb29"
+                        )
+                      )
+                      //2) map
+                      .map((project) => ({
+                        value: project.ID,
+                        label: project.projectName,
+                      }))
+                  : []
+              }
+              onChange={(e) => setQcTest(e ? e.value : "")}
+            />
+          </li>
+          <li className="w-full md:flex-grow md:w-auto">
+            <div className="flex">
+              <p>รหัสสินค้า</p>
+              <span className="text-red-600">&nbsp;*</span>
+            </div>
+            <input
+              required
+              className="w-full px-2 py-1 rounded-sm border"
+              placeholder="รหัสสินค้า"
+              onChange={(e) => {
+                const value = e.target.value;
+                setProductId(value ? Number(value) : null);
+              }}
+            ></input>
+          </li>
+        </ul>
       </div>
       <div className="w-full h-10 my-4"> </div>
       <div
@@ -228,11 +360,12 @@ export default function MainTempTest_page() {
                 });
                 return;
               }
-
+              
               setSendData((prev) => ({
                 ...prev,
                 state: "on",
               }));
+            
             }}
           >
             <label className="text-xl text-white font-semibold">ทดสอบ</label>

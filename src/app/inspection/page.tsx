@@ -14,7 +14,7 @@ export default function Inspection_page() {
             
             <ButtonBlue name="ตั้งค่าการทดสอบ" href="/inspection/settingTest"/>
       
-            <ButtonBlue name="โปรเจ็คการทดสอบ"/>
+            <ButtonBlue name="โปรเจ็คการทดสอบ" href="/inspection/projectTest"/>
            
           </div>
         </div>

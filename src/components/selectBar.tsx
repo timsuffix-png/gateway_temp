@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Option } from "@/app/temp/page";
 import Select from "react-select";
 import Popup from "./popup";
 import SerialCommunicationPort from "./serialCommunicationPort";
 
 interface SelectBarProps {
-  projects: Option[];
+  projects: any[];
 }
 
 export default function SelectBar({ projects }: SelectBarProps) {
@@ -19,6 +18,7 @@ export default function SelectBar({ projects }: SelectBarProps) {
     setPopup(false);
     setCurrentCOMPort(Number(await window.electronAPI.getPort()));
   };
+  
 
   return (
     <div className="flex flex-col 2x:flex-row">

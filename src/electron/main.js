@@ -51,7 +51,7 @@ app.on("ready", () => {
       }
     } catch {
       // file not found error
-      writeFileSync("config.cnf", "API=http://localhost:3000/api/v1/");
+      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
       COM = null;
     }
     return COM;
@@ -73,8 +73,85 @@ app.on("ready", () => {
       writeFileSync("config.cnf", newConfig.substring(0, newConfig.length - 1));
     } catch {
       // file not found error
-      writeFileSync("config.cnf", "API=http://localhost:3000/api/v1/");
+      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
     }
+  });
+
+  ipcMain.handle("fetchAPI", async (event, args) => {
+    var API = "";
+    try {
+      const config = readFileSync("config.cnf").toString("utf-8");
+      for (let data of config.split("\n")) {
+        if (data.includes("API")) {
+          API = data.split("=")[1].trim().replaceAll('"', "");
+          break;
+        }
+      }
+    } catch {
+      // file not found error
+      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
+      API = "API=https://api.mephistopheles.live/api/v1/";
+    }
+    if (args.method === "POST") {
+      try {
+        const res = await fetch(API + args.URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...args.body }),
+        });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
+      }
+    } else if (args.method === "GET") {
+      try {
+        const res = await fetch(API + args.URL, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
+      }
+    } else if (args.method === "PATCH") {
+      try {
+        const res = await fetch(API + args.URL, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...args.body }),
+        });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
+      }
+    } else if (args.method === "PUT") {
+      try {
+        const res = await fetch(API + args.URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...args.body }),
+        });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
+      }
+    } else if (args.method === "DELETE") {
+      try {
+        const res = await fetch(API + args.URL, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...args.body }),
+        });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
+      }
+    } else return null;
   });
 
   //-----------------------------------------------------------Arduino----------------------------------------------------------
@@ -90,7 +167,7 @@ app.on("ready", () => {
       }
     } catch {
       // file not found error
-      writeFileSync("config.cnf", "API=http://localhost:3000/api/v1/");
+      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
       COM = null;
     }
     return COM;
@@ -112,7 +189,7 @@ app.on("ready", () => {
       writeFileSync("config.cnf", newConfig.substring(0, newConfig.length - 1));
     } catch {
       // file not found error
-      writeFileSync("config.cnf", "API=http://localhost:3000/api/v1/");
+      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
     }
   });
 
