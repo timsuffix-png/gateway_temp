@@ -51,7 +51,10 @@ app.on("ready", () => {
       }
     } catch {
       // file not found error
-      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
+      writeFileSync(
+        "config.cnf",
+        "API=https://api.mephistopheles.live/api/v1/"
+      );
       COM = null;
     }
     return COM;
@@ -73,7 +76,10 @@ app.on("ready", () => {
       writeFileSync("config.cnf", newConfig.substring(0, newConfig.length - 1));
     } catch {
       // file not found error
-      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
+      writeFileSync(
+        "config.cnf",
+        "API=https://api.mephistopheles.live/api/v1/"
+      );
     }
   });
 
@@ -89,7 +95,10 @@ app.on("ready", () => {
       }
     } catch {
       // file not found error
-      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
+      writeFileSync(
+        "config.cnf",
+        "API=https://api.mephistopheles.live/api/v1/"
+      );
       API = "API=https://api.mephistopheles.live/api/v1/";
     }
     if (args.method === "POST") {
@@ -167,7 +176,10 @@ app.on("ready", () => {
       }
     } catch {
       // file not found error
-      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
+      writeFileSync(
+        "config.cnf",
+        "API=https://api.mephistopheles.live/api/v1/"
+      );
       COM = null;
     }
     return COM;
@@ -189,7 +201,10 @@ app.on("ready", () => {
       writeFileSync("config.cnf", newConfig.substring(0, newConfig.length - 1));
     } catch {
       // file not found error
-      writeFileSync("config.cnf", "API=https://api.mephistopheles.live/api/v1/");
+      writeFileSync(
+        "config.cnf",
+        "API=https://api.mephistopheles.live/api/v1/"
+      );
     }
   });
 
@@ -283,6 +298,7 @@ app.on("ready", () => {
         }
       }
 
+      console.log("State on : " + cleanCmd);
       //เขียนคำสั่งไปarduino
       port.write(cleanCmd + "\n", (err) => {
         if (err) return reject(err);
@@ -337,9 +353,20 @@ app.on("ready", () => {
 });
 
 app.on("window-all-closed", () => {
-  if (port && port.isOpen) {
-    port.close();
-    console.log("Serial port closed on app exit.");
+  if (port) {
+    if (port.isOpen) {
+      port.close((err) => {
+        if (err) {
+          console.error("Error closing serial port on app exit:", err.message);
+        } else {
+          console.log("Serial port closed on app exit.");
+        }
+        port = null; // << เพิ่มตรงนี้
+      });
+    } else {
+      console.log("Serial port was not open on app exit.");
+      port = null; // << เพิ่มตรงนี้
+    }
   }
   if (process.platform !== "darwin") app.quit();
 });

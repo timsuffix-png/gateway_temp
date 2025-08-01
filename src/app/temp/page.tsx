@@ -36,11 +36,6 @@ export default function MainTempTest_page() {
     currentLim: number;
     timeLim: number;
   }>({
-    // state: "",
-    // tempLim: 34.5,
-    // currentLim: 12.9,
-    // timeLim: 10,
-
     state: "",
     tempLim: 60.0,
     currentLim: 6.0,
@@ -159,20 +154,25 @@ export default function MainTempTest_page() {
       method: "GET",
       URL: `qc/itemProject/${idProject}`,
     });
-
+    console.log("rawData is:", rawData);
     if (!rawData) {
       throw new Error("Failed to fetch data");
     }
     const format_script = await rawData?.data?.find(
-      //หาทดสอบอุณภูมิเตารีด
-      (data: any) => data.qcMain.ID === "23c853da-0d4d-4605-b242-0c13731dfb29"
+      //หาที่ qcType = temperature
+      (data: any) =>
+        data.qcMain?.qcType?.ID === "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600"
     );
 
-    console.log("format_script"+ JSON.stringify(format_script))
+    console.log("format_script" + JSON.stringify(format_script));
 
-    console.log("temp : "+ format_script?.qcMain?.qcScript?.script?.TemperatureMax);
-    console.log("current : " +format_script?.qcMain?.qcScript?.script?.CurrentMax);
-    console.log("time : "+format_script?.qcMain?.qcScript?.script?.Time);
+    console.log(
+      "temp : " + format_script?.qcMain?.qcScript?.script?.TemperatureMax
+    );
+    console.log(
+      "current : " + format_script?.qcMain?.qcScript?.script?.CurrentMax
+    );
+    console.log("time : " + format_script?.qcMain?.qcScript?.script?.Time);
     setSendData((prev) => ({
       ...prev,
       tempLim: format_script?.qcMain?.qcScript?.script?.TemperatureMax,
@@ -238,8 +238,8 @@ export default function MainTempTest_page() {
                       .filter((project) =>
                         project.qcItemProject?.some(
                           (item) =>
-                            item.qcMain.ID ===
-                            "23c853da-0d4d-4605-b242-0c13731dfb29"
+                            item.qcMain?.ID ===
+                            "acc87125-5fd2-4035-aba6-3e45ef49e893"
                         )
                       )
                       //2) map
@@ -360,12 +360,11 @@ export default function MainTempTest_page() {
                 });
                 return;
               }
-              
+
               setSendData((prev) => ({
                 ...prev,
                 state: "on",
               }));
-            
             }}
           >
             <label className="text-xl text-white font-semibold">ทดสอบ</label>
