@@ -159,7 +159,10 @@ export default function MainTempTest_page() {
       throw new Error("Failed to fetch data");
     }
     const format_script = await rawData?.data?.find(
-      //หาที่ qcType = temperature
+      // หาที่ "qcType": {
+      //     "ID": "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600",
+      //     "name": "temperature"
+      //   },
       (data: any) =>
         data.qcMain?.qcType?.ID === "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600"
     );
@@ -192,6 +195,7 @@ export default function MainTempTest_page() {
   }, []);
 
   useEffect(() => {
+    if (!qcTest) return;
     fetchScript(qcTest);
   }, [qcTest]);
 
@@ -347,7 +351,8 @@ export default function MainTempTest_page() {
           </div>
           <button
             id="test"
-            className="w-40 h-15  rounded-lg bg-[#001F3F] hover:cursor-pointer
+            className="w-40 h-15  rounded-lg bg-[#001F3F] hover:cursor-pointer text-xl text-white font-semibold
+
           md:w-45 md:h-20"
             onClick={async () => {
               const port = await window.electronAPI.getPort();
@@ -367,10 +372,10 @@ export default function MainTempTest_page() {
               }));
             }}
           >
-            <label className="text-xl text-white font-semibold">ทดสอบ</label>
+            ทดสอบ
           </button>
           <button
-            className="w-40 h-15  rounded-lg bg-red-600 hover:cursor-pointer
+            className="w-40 h-15  rounded-lg bg-red-600 hover:cursor-pointer text-xl text-white font-semibold
           md:w-45 md:h-20"
             onClick={() => {
               setSendData((prev) => ({
@@ -380,7 +385,7 @@ export default function MainTempTest_page() {
               return;
             }}
           >
-            <label className="text-xl text-white font-semibold">หยุด</label>
+            หยุด
           </button>
         </div>
       </div>

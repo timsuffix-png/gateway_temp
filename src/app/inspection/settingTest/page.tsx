@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { Translator } from "@/components/translator";
 
 export default function SettingTest_page() {
   // const [qcMain, setData] = useState([]);
@@ -61,7 +62,103 @@ export default function SettingTest_page() {
 
       <div className="mx-10 mt-10 p-5 rounded-xl border border-gray-300">
         <div className="overflow-hidden rounded-t-3xl w-full">
-          <table className=" w-full">
+          <div className="mt-5">
+            <div className="text-black font-bold">
+              <div className="bg-[#6494d3] rounded-t-3xl flex flex-row h-10 place-items-center">
+                <div className="w-2/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  ประเภท
+                </div>
+                <div className="w-3/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  ชื่อการทดสอบ
+                </div>
+                <div className="w-5/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  รายละเอียด
+                </div>
+                <div className="w-1/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  แก้ไข
+                </div>
+                <div className="w-1/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  ลบ
+                </div>
+              </div>
+            </div>
+            <div className="text-black">
+              {qcMain?.data?.map((data) => {
+                return (
+                  <div
+                    key={data.ID}
+                    className="flex flex-row w-full h-12 hover:bg-gray-200"
+                  >
+                    <div className="w-2/12 text-start text-base lg:text-lg font-['Sarabun'] flex place-content-start place-items-center">
+                      <div className="hidden sm:block">
+                        {Translator.type.icon}
+                      </div>
+                      <h5 className="sm:ml-1 text-ellipsis overflow-hidden">
+                        {data.qcType.name}
+                      </h5>
+                    </div>
+                    <div className="w-3/12 text-center text-base lg:text-lg font-['Sarabun'] flex place-content-start place-items-center">
+                      <h5 className="text-ellipsis overflow-hidden">
+                        {data.testName}
+                      </h5>
+                    </div>
+                    <div className="w-5/12 text-center text-base lg:text-lg font-['Sarabun'] flex place-content-start place-items-center">
+                      <h5 className="text-ellipsis overflow-hidden">
+                        {data.detail}
+                      </h5>
+                    </div>
+                    <div className="w-1/12 text-center text-base lg:text-lg font-['Sarabun'] flex place-content-center place-items-center text-ellipsis overflow-hidden">
+                      <button
+                        onClick={() => {
+                          localStorage.setItem(
+                            "currentUrl",
+                            "qc/testSetting/edit"
+                          );
+                          localStorage.setItem("param", data.ID);
+                          window.location.reload();
+                        }}
+                      >
+                        {Translator.edit.icon}
+                      </button>
+                    </div>
+                    <div className="w-1/12 text-center text-base lg:text-lg font-['Sarabun'] flex place-content-center place-items-center text-ellipsis overflow-hidden">
+                      <button
+                        onClick={() => {
+                          Swal.fire({
+                            title: `ลบข้อมูล "${data.testName}" จริงหรือไม่`,
+                            text: "หลังจากลบไปแล้วข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#d33",
+                            cancelButtonColor: "#3085d6",
+                            confirmButtonText: "ตกลง",
+                            cancelButtonText: "ยกเลิก",
+                          }).then(async (result) => {
+                            if (result.isConfirmed) {
+                              await window.electronAPI.fetchAPI({
+                                method: "DELETE",
+                                URL: `qc/main/${data.ID}`,
+                              });
+                              await refreshData();
+                              Swal.fire({
+                                title: "ลบข้อมูลสำเร็จ",
+                                text: `ข้อมูลเกี่ยวกับ "${data.testName}" ถูกลบสำเร็จ`,
+                                icon: "success",
+                              });
+                            }
+                          });
+                        }}
+                      >
+                        {Translator.delete.icon}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* <table className=" w-full">
             <thead>
               <tr className="bg-blue-400 rounded-t-lg lg:text-lg xl:text-xl">
                 <th className="px-4 py-1">ประเภท</th>
@@ -142,7 +239,7 @@ export default function SettingTest_page() {
                   </tr>
                 ))}
             </tbody>
-          </table>
+          </table> */}
         </div>
       </div>
     </div>
