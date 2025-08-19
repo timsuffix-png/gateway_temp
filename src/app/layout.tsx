@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import AuthProvider from "@/components/auth/authProvider";
 
 export default function RootLayout({
   children,
@@ -22,13 +23,15 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="flex flex-col 2xl:flex-row  h-screen min-h-screen box-border">
+      <body className="flex flex-col 2xl:flex-row h-auto min-h-screen box-border">
         <header className="w-full 2xl:w-[20%] 2xl:h-screen ">
           <Navbar />
         </header>
 
-        <main className="flex flex-col h-full overflow-y-auto box-border 2xl:w-[80%] 2xl:border-l-2 2xl:h-screen">
-          {children}
+        <main className="flex flex-col h-auto min-h-screen overflow-y-auto box-border 2xl:w-[80%] 2xl:border-l-2 ">
+          <div>
+           <AuthProvider>{children}</AuthProvider>
+          </div>
           <div>
             <Footer />
           </div>

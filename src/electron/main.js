@@ -39,13 +39,109 @@ const createWindow = () => {
 
 app.on("ready", () => {
   createWindow();
-  ipcMain.handle("getAPIPath", async (event, args) => {
-    var COM;
+  
+  //-----------------------------------------------------------Image----------------------------------------------------------
+  ipcMain.handle("loadImg", (event, args) => {
+    const ext = path.extname(args);
+    try {
+      const image = readFileSync(path.join(process.cwd(), "resources", args));
+      return `data:image/${ext};base64,${image.toString("base64")}`;
+    } catch {
+      const image = readFileSync(path.join(process.cwd(), "public", args));
+      return `data:image/${ext};base64,${image.toString("base64")}`;
+    }
+  });
+
+  ipcMain.handle("uploadImg", async (event, args) => {
+    event.preventDefault();
+    var API = "";
     try {
       const config = readFileSync("config.cnf").toString("utf-8");
       for (let data of config.split("\n")) {
-        if (data.includes("TemperatureCOM")) {
-          COM = data.split("=")[1].trim().replaceAll('"', "");
+        if (data.includes("API")) {
+          API = data.split("=")[1].trim().replaceAll('"', "");
+          break;
+        }
+      }
+    } catch {
+      // file not found error
+      writeFileSync("config.cnf", "API=http://localhost:3021/api/v1/");
+      API = "http://localhost:3021/api/v1/";
+    }
+
+    const fileDialog = dialog.showOpenDialog({
+      properties: ["openFile"],
+      filters: [
+        {
+          name: "image/png,jpg,jpeg,bmp,webp",
+          extensions: ["png", "jpg", "jpeg", "bmp", "webp"],
+        },
+      ],
+    });
+    if ((await fileDialog).canceled) return await fileDialog;
+    const file = readFileSync((await fileDialog).filePaths[0]);
+    const filePath = (await fileDialog).filePaths[0].split("\\");
+    const formData = new FormData();
+    formData.append(
+      "file",
+      new Blob([file], {
+        type: `image/${
+          path.extname(filePath[filePath.length - 1]).split(".")[1]
+        }`,
+      }),
+      filePath[filePath.length - 1]
+    );
+    try {
+      const res = await fetch(API + args.URL, {
+        method: args.method,
+        body: formData,
+      });
+      if (!res.ok) return await fileDialog;
+      return file;
+    } catch {
+      return await fileDialog;
+    }
+  });
+
+  ipcMain.handle("getImg", async (event, args) => {
+    event.preventDefault();
+    var API = "";
+    try {
+      const config = readFileSync("config.cnf").toString("utf-8");
+      for (let data of config.split("\n")) {
+        if (data.includes("API")) {
+          API = data.split("=")[1].trim().replaceAll('"', "");
+          break;
+        }
+      }
+    } catch {
+      // file not found error
+      writeFileSync("config.cnf", "API=http://localhost:3021/api/v1/");
+      API = "http://localhost:3021/api/v1/";
+    }
+
+    try {
+      const res = await fetch(API + args.URL, {
+        method: args.method,
+        body: args.body,
+      });
+      if (!res.ok) return null;
+      return await res.arrayBuffer();
+    } catch {
+      return null;
+    }
+  });
+
+  //-----------------------------------------------------------API----------------------------------------------------------
+
+
+  ipcMain.handle("getAPIPath", async (event, args) => {
+    var API;
+    try {
+      const config = readFileSync("config.cnf").toString("utf-8");
+      for (let data of config.split("\n")) {
+        if (data.includes("API")) {
+          API = data.split("=")[1].trim().replaceAll('"', "");
           break;
         }
       }
@@ -55,20 +151,19 @@ app.on("ready", () => {
         "config.cnf",
         "API=https://api.mephistopheles.live/api/v1/"
       );
-      COM = null;
+      API = null;
     }
-    return COM;
+    return API;
   });
 
-  ipcMain.on("setAPIPath", async (event, port) => {
+  ipcMain.handle("setAPIPath", async (event, port) => {
     let newConfig = "";
     try {
       const config = readFileSync("config.cnf").toString("utf-8");
-      if (!config.includes("TemperatureCOM"))
-        newConfig += `TemperatureCOM=${port}\n`;
+      if (!config.includes("API")) newConfig += `API=${port}\n`;
       for (let data of config.split("\n")) {
-        if (data.includes("TemperatureCOM")) {
-          newConfig += `TemperatureCOM=${port}\n`;
+        if (data.includes("API")) {
+          newConfig += `API=${port}\n`;
         } else {
           newConfig += data + "\n";
         }
@@ -323,6 +418,7 @@ app.on("ready", () => {
 
           //ถ้าstate ไม่เท่ากับ In process
           if (state_data !== "on") {
+            win.webContents.send("serial-data-complete", dataArray);
             parser.removeListener("data", onData);
             resolve(dataArray);
           }

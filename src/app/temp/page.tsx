@@ -11,10 +11,18 @@ import { ipcRenderer } from "electron";
 import Swal from "sweetalert2";
 import { resolve } from "path";
 import Select from "react-select";
+import ChartTemp from "@/components/chartTemp";
+
+const statusMap: Record<string, { css: string; stateName: string }> = {
+  stop: { css: "bg-red-600", stateName: "STOP" },
+  on: { css: "bg-yellow-600", stateName: "IN PROCESS" },
+  pass: { css: "bg-green-600", stateName: "PASS" },
+  fail: { css: "bg-red-400", stateName: "FAIL" },
+};
 
 export default function MainTempTest_page() {
   // Selectbar
-  const [productId, setProductId] = useState<number | null>(null);
+  const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า
   const [currentCOMPort, setCurrentCOMPort] = useState<number | null>();
   const [popup, setPopup] = useState(false);
   const openPopup = () => setPopup(true);
@@ -23,13 +31,20 @@ export default function MainTempTest_page() {
     setCurrentCOMPort(Number(await window.electronAPI.getPort()));
   };
 
-  const [qcTest, setQcTest] = useState("");
-  const [temp1, setTemp1] = useState<number | null>(null);
-  const [temp2, setTemp2] = useState<number | null>(null);
-  const [temp3, setTemp3] = useState<number | null>(null);
+  const [qcProject, setQcProject] = useState(""); //qcProject ID
+  const [temp1, setTemp1] = useState<number | 0>(0);
+  const [temp2, setTemp2] = useState<number | 0>(0);
+  const [temp3, setTemp3] = useState<number | 0>(0);
   const [current, setCurrent] = useState<number | null>(null);
   const [time, setTime] = useState<number | null>(null);
-  const [case_precess, setCaseProcess] = useState<string>("stop");
+  const [status, setStatus] = useState<string>(""); //สถานะการทดสอบ
+  const { css, stateName } = statusMap[status] || {
+    css: "bg-gray-400",
+    stateName: "OFF",
+  };
+  const [reason, setReason] = useState("");
+  const [allResult, setAllResult] = useState<string[]>([]);
+
   const [sendData, setSendData] = useState<{
     state: string;
     tempLim: number;
@@ -41,6 +56,43 @@ export default function MainTempTest_page() {
     currentLim: 6.0,
     timeLim: 10,
   });
+  //รายละเอียดqcที่จะทดสอบ
+  const [qcMains, setQcMains] = useState<{
+    error: boolean;
+    message: string;
+    data: [
+      {
+        ID: string;
+        qcMain:
+          | {
+              qcType: {
+                ID: string;
+                name: string;
+              };
+              ID: string;
+              testName: string;
+              detail: string;
+              qcScript: {
+                ID: string;
+                script: {
+                  script_1: number;
+                  script_2: number;
+                  script_3: number;
+                };
+              };
+              status: string | null; //ค่าสถานะ
+              result: string | null; //ผลลัพธ์ล่าสุด
+              allResult: string[] | null; //ข้อมูลทั้งหมด
+            }
+          | undefined;
+        qcProject: {
+          ID: string;
+          projectName: string;
+          detail: string;
+        };
+      }
+    ];
+  } | null>();
   const [qcProjectList, setQcProjectList] = useState<{
     error: boolean;
     message: string;
@@ -64,21 +116,7 @@ export default function MainTempTest_page() {
     allPage: number;
   } | null>();
 
-  const { css, stateName } = useMemo(() => {
-    switch (case_precess) {
-      case "stop":
-        return { css: "bg-red-600", stateName: "STOP" };
-      case "on":
-        return { css: "bg-yellow-600", stateName: "IN PROCESS" };
-      case "pass":
-        return { css: "bg-green-600", stateName: "PASS" };
-      case "fail":
-        return { css: "bg-red-400", stateName: "Fail" };
-      default:
-        return { css: "bg-gray-400", stateName: "OFF" };
-    }
-  }, [case_precess]);
-
+  //ฟังก์ชันเปิดพอต
   const serialPort = async () => {
     try {
       const port = await window.electronAPI.getPort();
@@ -94,41 +132,55 @@ export default function MainTempTest_page() {
     }
   };
 
+  //ฟังชั่นรับserial Data
+  const handleSerialData = (data: string) => {
+    console.log("Received data:", data); // เช็คข้อมูลที่รับมาใน console app
+    const parts = data.split(",");
+    if (parts.length > 1) {
+      // const [t1, t2, t3, curr, tm, sendData] = parts;
+
+      // setTemp1(parseFloat(parts[0]));
+      // setTemp2(parseFloat(parts[1]));
+      // setTemp3(parseFloat(parts[2]));
+      // setCurrent(parseFloat(parts[3]));
+      // setTime(parseInt(parts[4]));
+      // setStatus(parseInt(parts[5]));
+
+      setTemp1(parseFloat(parts[0]));
+      setTemp2(parseFloat(parts[1]));
+      setTemp3(parseFloat(parts[2]));
+      setTime(parseInt(parts[3]));
+      setCurrent(parseFloat(parts[4]));
+      setStatus(parts[8].trim());
+      setReason(parts[9].trim());
+    }
+  };
+
+  const handleSerialDataComplete = (dataArray: []) => {
+    setAllResult(dataArray);
+  };
+
+  //ฟังก์ชันปิดพอต
+  const handlePortClosed = () => {
+    console.log("Serial port ถูกปิดแล้ว"); // แจ้งสถานะ port ถูกปิด
+    // TODO: อัพเดต UI แจ้งเตือนผู้ใช้ว่า port ปิดแล้ว เช่น ปิดปุ่ม หรือแสดงข้อความ
+  };
+
   useEffect(() => {
-    const handleSerialData = (data: string) => {
-      console.log("Received data:", data); // เช็คข้อมูลที่รับมาใน console app
-      const parts = data.split(",");
-      if (parts.length > 1) {
-        // const [t1, t2, t3, curr, tm, sendData] = parts;
+    // ส่ง callback เดิมเข้าไปทั้งตอน on และตอน remove)
+    const serialDataListener = handleSerialData;
+    const serialPortClosedListener = handlePortClosed;
+    const serialDataCompleteListener = handleSerialDataComplete;
 
-        // setTemp1(parseFloat(parts[0]));
-        // setTemp2(parseFloat(parts[1]));
-        // setTemp3(parseFloat(parts[2]));
-        // setCurrent(parseFloat(parts[3]));
-        // setTime(parseInt(parts[4]));
-        // setCaseProcess(parseInt(parts[5]));
-
-        setTemp1(parseFloat(parts[0]));
-        setTemp2(parseFloat(parts[1]));
-        setTemp3(parseFloat(parts[2]));
-        setCurrent(parseFloat(parts[4]));
-        setTime(parseInt(parts[3]));
-        setCaseProcess(parts[8].trim());
-      }
-    };
-
-    const handlePortClosed = () => {
-      console.log("Serial port ถูกปิดแล้ว"); // แจ้งสถานะ port ถูกปิด
-      // TODO: อัพเดต UI แจ้งเตือนผู้ใช้ว่า port ปิดแล้ว เช่น ปิดปุ่ม หรือแสดงข้อความ
-    };
-
-    window.electronAPI.onSerialData(handleSerialData);
-    window.electronAPI.onSerialPortClosed(handlePortClosed); //ฟังพอตปิด
+    window.electronAPI.onSerialData(serialDataListener); // เมื่อมีข้อมูล Serial Data เข้ามา ให้เรียกใช้ฟังก์ชัน handleSerialData
+    window.electronAPI.onSerialPortClosed(serialPortClosedListener); // เมื่อพอร์ตถูกปิด ให้เรียกใช้ฟังก์ชัน handlePortClosed
+    window.electronAPI.onSerialDataComplete(serialDataCompleteListener); // เมื่อข้อมูล Serial Data ถูกส่งมาครบถ้วน ให้เรียกใช้ฟังก์ชัน handleSerialDataComplete
 
     // ล้าง listener เมื่อ component ถูก unmount
     return () => {
-      window.electronAPI.removeSerialDataListener(handleSerialData);
-      window.electronAPI.removeSerialPortClosedListener(handlePortClosed);
+      window.electronAPI.removeSerialDataListener(serialDataListener);
+      window.electronAPI.removeSerialPortClosedListener(serialPortClosedListener);
+      window.electronAPI.removeSerialDataCompleteListener(serialDataCompleteListener);
     };
   }, []);
 
@@ -154,7 +206,7 @@ export default function MainTempTest_page() {
       method: "GET",
       URL: `qc/itemProject/${idProject}`,
     });
-    console.log("rawData is:", rawData);
+    setQcMains(rawData);
     if (!rawData) {
       throw new Error("Failed to fetch data");
     }
@@ -167,14 +219,14 @@ export default function MainTempTest_page() {
         data.qcMain?.qcType?.ID === "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600"
     );
 
-    console.log("format_script" + JSON.stringify(format_script));
+    // console.log("format_script" + JSON.stringify(format_script));
 
-    console.log(
-      "temp : " + format_script?.qcMain?.qcScript?.script?.TemperatureMax
-    );
-    console.log(
-      "current : " + format_script?.qcMain?.qcScript?.script?.CurrentMax
-    );
+    // console.log(
+    //   "temp : " + format_script?.qcMain?.qcScript?.script?.TemperatureMax
+    // );
+    // console.log(
+    //   "current : " + format_script?.qcMain?.qcScript?.script?.CurrentMax
+    // );
     console.log("time : " + format_script?.qcMain?.qcScript?.script?.Time);
     setSendData((prev) => ({
       ...prev,
@@ -182,6 +234,70 @@ export default function MainTempTest_page() {
       currentLim: format_script?.qcMain?.qcScript?.script?.CurrentMax,
       timeLim: format_script?.qcMain?.qcScript?.script?.Time,
     }));
+  };
+
+  const clickTest = async () => {
+    const port = await window.electronAPI.getPort();
+    if (!qcProject) {
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: "กรุณาเลือกโปรเจ็คการทดสอบ",
+      });
+      return;
+    }
+
+    if (!port) {
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: "กรุณาเลือกพอร์ตให้ถูกต้อง",
+      });
+      return;
+    }
+
+    setSendData((prev) => ({
+      ...prev,
+      state: "on",
+    }));
+
+    //ใส่ทำไม??????????????????????????????????????????????/
+    // let newQcMains = { ...qcMains };
+    // if (newQcMains.data?.[0]?.qcMain) {
+    //   newQcMains.data[0].qcMain.status = null;
+    //   newQcMains.data[0].qcMain.result = null;
+    //   newQcMains.data[0].qcMain.allResult = null;
+    // }
+    // เซ็ตให้ result allresult status = null เมื่อกด test
+    // setQcMains(newQcMains);
+
+    const splitData = allResult.map((line) => line.split(","));
+    //       [
+    //   ["15", "1", "3", "in process"],
+    //   ["45", "2", "3", "in process"],
+    //   ["45", "3", "4", "in process"]
+    // ]
+    let splitResultArray = splitData[splitData.length - 1]; // ผลลัพธ์: [" 8.4S", " 249", " 500.000000","Passed",""Cus termostate is cut in time.]
+
+    //ใส่ทำไม??????????????????????????????????????????????
+    // const qcMain = newQcMains?.data?.[0]?.qcMain;
+    // if (qcMain) {
+    //   qcMain.status = splitResultArray.includes("Pass") ? "Passed" : "Failed";
+    //   qcMain.result = splitResultArray.slice(1).join(",");
+    //   qcMain.allResult = allResult;
+    //   setQcMains(newQcMains);
+    // }
+
+    await window.electronAPI.fetchAPI({
+      method: "POST",
+      URL: "qc/status",
+      body: {
+        qcRecordID: qcMains?.data[0].ID,
+        qcMainID: qcMains?.data[0].qcMain?.ID,
+        status: status,
+        detail: status === "Pass" ? "" : splitResultArray[3].trim(),
+      },
+    });
   };
 
   const refreshData = async () => {
@@ -195,9 +311,9 @@ export default function MainTempTest_page() {
   }, []);
 
   useEffect(() => {
-    if (!qcTest) return;
-    fetchScript(qcTest);
-  }, [qcTest]);
+    if (!qcProject) return;
+    fetchScript(qcProject);
+  }, [qcProject]);
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -253,7 +369,7 @@ export default function MainTempTest_page() {
                       }))
                   : []
               }
-              onChange={(e) => setQcTest(e ? e.value : "")}
+              onChange={(e) => setQcProject(e ? e.value : "")}
             />
           </li>
           <li className="w-full md:flex-grow md:w-auto">
@@ -265,128 +381,126 @@ export default function MainTempTest_page() {
               required
               className="w-full px-2 py-1 rounded-sm border"
               placeholder="รหัสสินค้า"
-              onChange={(e) => {
-                const value = e.target.value;
-                setProductId(value ? Number(value) : null);
+              onClick={(e: any) => {
+                e.target.value = "";
+                setSerialNumber("");
               }}
-            ></input>
+              onChange={(e) => setSerialNumber(e.target.value)}
+            />
           </li>
         </ul>
       </div>
       <div className="w-full h-10 my-4"> </div>
+
+      {/* ----------- Body -------------*/}
       <div
-        className="flex-grow grid grid-cols-1 gap-10 
-      md:grid-cols-3 md:gap-0"
+        className="flex mx-[20%] flex-col justify-between gap-10 
+      lg:gap-10 lg:mx-[10%]"
       >
-        <ul className="flex flex-col h-full gap-10 items-center text-lg">
-          <div>ตัววัดอุณหภูมิ</div>
-          <li className="flex items-center gap-4">
-            <div className="whitespace-nowrap">ตัวที่ 1 :</div>
-
-            <input
-              className="w-25 h-10 text-center border rounded-sm "
-              type="text"
-              value={temp1 ? temp1 : 0}
-              readOnly
-            ></input>
-          </li>
-          <li className="flex items-center gap-4">
-            <div className="whitespace-nowrap">ตัวที่ 2 :</div>
-
-            <input
-              className="w-25 h-10 text-center border rounded-sm "
-              type="text"
-              value={temp2 ? temp2 : 0}
-              readOnly
-            ></input>
-          </li>
-          <li className="flex items-center gap-4">
-            <div className="whitespace-nowrap">ตัวที่ 3 :</div>
-            <input
-              className="w-25 h-10 text-center border rounded-sm "
-              type="text"
-              value={temp3 ? temp3 : 0}
-              readOnly
-            ></input>
-          </li>
-        </ul>
-
-        <div className="h-full">
-          <ul
-            className="flex flex-col h-full gap-10 items-center text-lg 
-        md:items-end md:pr-[15%]"
+        {/* charTemp */}
+        <div
+          className="flex flex-col py-6 gap-10 w-full items-center justify-between rounded-[10%] bg-gray-100
+         lg:flex-row lg:rounded-full lg:px-[5%] lg:py-10 "
+        >
+          <div
+            className="flex flex-row items-center gap-4 text-center
+          lg:flex-col"
           >
-            <div className="hidden md:inline">
-              <br />
-            </div>
-            <li className="flex items-center gap-4">
-              <p>กระแสไฟฟ้า :</p>
-              <input
-                className="w-25 h-10 text-center border rounded-sm "
-                type="text"
-                value={current ? current : 0}
-                readOnly
-              ></input>
-            </li>
-            <li className="flex items-center gap-4">
-              <p>เวลา :</p>
-              <input
-                className="w-25 h-10 text-center border rounded-sm "
-                type="text"
-                value={time ? time : 0}
-                readOnly
-              ></input>
-            </li>
-          </ul>
+            <ChartTemp maxTemp={sendData.tempLim} values={temp1} />
+            <label className="text-3xl">{temp1} °C</label>
+            <label>ตัวที่ 1</label>
+          </div>
+          <div
+            className="flex flex-row items-center gap-4 text-center
+          lg:flex-col"
+          >
+            <ChartTemp maxTemp={sendData.tempLim} values={temp2} />
+            <label className="text-3xl ">{temp2} °C </label>
+            <label>ตัวที่ 2</label>
+          </div>
+          <div
+            className="flex flex-row items-center gap-4 text-center
+          lg:flex-col"
+          >
+            <ChartTemp maxTemp={sendData.tempLim} values={temp3} />
+            <label className="text-3xl ">{temp3} °C</label>
+            <label>ตัวที่ 3</label>
+          </div>
         </div>
 
-        <div className="flex flex-col h-full items-center gap-10">
-          <div className="flex h-auto w-auto items-center justify-center gap-4 ">
-            <p>ผลลัพธ์ : </p>
-            <div
-              className={`w-24 flex py-2 justify-center items-center whitespace-nowrap rounded-lg text-white ${css}`}
-            >
-              {stateName}
+        <div
+          className="flex flex-col justify-between gap-10
+        lg:flex-row lg:gap-0"
+        >
+          {/* กระแส อุณหภูมิ */}
+          <div
+            className="flex flex-col w-full justify-between text-lg border
+          lg:items-start lg:pl-10 "
+          >
+            <div className="flex gap-10">
+              <div className="flex items-center gap-4">
+                <p>กระแสไฟฟ้า :</p>
+                <input
+                  className="w-25 h-10 text-center border rounded-sm "
+                  type="text"
+                  value={current ? current : 0}
+                  readOnly
+                ></input>
+              </div>
+              <div className="flex items-center gap-4">
+                <p>เวลา :</p>
+                <input
+                  className="w-25 h-10 text-center border rounded-sm "
+                  type="text"
+                  value={time ? time : 0}
+                  readOnly
+                ></input>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 border">
+              <div className="flex h-auto w-auto items-center justify-center gap-4 ">
+                <p>ผลลัพธ์ : </p>
+                <div
+                  className={`w-24 flex py-2 justify-center items-center whitespace-nowrap rounded-lg text-white ${css}`}
+                >
+                  {stateName}
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <p>หมายเหตุ :</p>
+                <p>Over Temp</p>
+              </div>
             </div>
           </div>
-          <button
-            id="test"
-            className="w-40 h-15  rounded-lg bg-[#001F3F] hover:cursor-pointer text-xl text-white font-semibold
+
+          {/* ปุ่มกดทดสอบ หยุด */}
+          <div
+            className="flex flex-col h-full items-center gap-10
+          lg:items-end"
+          >
+            <button
+              id="test"
+              className="w-40 h-15  rounded-lg bg-[#001F3F] hover:cursor-pointer text-xl text-white font-semibold
 
           md:w-45 md:h-20"
-            onClick={async () => {
-              const port = await window.electronAPI.getPort();
-
-              if (!port) {
-                Swal.fire({
-                  icon: "error",
-                  title: "เกิดข้อผิดพลาด",
-                  text: "กรุณาเลือกพอร์ตให้ถูกต้อง",
-                });
+              onClick={clickTest}
+            >
+              ทดสอบ
+            </button>
+            <button
+              className="w-40 h-15  rounded-lg bg-red-600 hover:cursor-pointer text-xl text-white font-semibold
+          md:w-45 md:h-20"
+              onClick={() => {
+                setSendData((prev) => ({
+                  ...prev,
+                  state: "stop",
+                }));
                 return;
-              }
-
-              setSendData((prev) => ({
-                ...prev,
-                state: "on",
-              }));
-            }}
-          >
-            ทดสอบ
-          </button>
-          <button
-            className="w-40 h-15  rounded-lg bg-red-600 hover:cursor-pointer text-xl text-white font-semibold
-          md:w-45 md:h-20"
-            onClick={() => {
-              setSendData((prev) => ({
-                ...prev,
-                state: "stop",
-              }));
-              return;
-            }}
-          >
-            หยุด
-          </button>
+              }}
+            >
+              หยุด
+            </button>
+          </div>
         </div>
       </div>
     </div>
