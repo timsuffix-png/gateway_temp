@@ -19,9 +19,18 @@ export default function AuthProvider({
 
   useEffect(() => {
     setStatus("loading");
+    //ถ้า isAuthenticated != null
     if (isAuthenticated) {
       const fetchData = async () => {
-        const id = localStorage.getItem("ID") ?? ""; 
+        const id = localStorage.getItem("ID"); 
+        //ถ้าไม่มีID
+        if (!id) {
+          setStatus("unauthenticated");
+          setUserData(null);
+          window.location.reload();
+          return;
+        }
+
         const data = await getProfile(id);
         if (!data) {
           setStatus("unauthenticated");
@@ -68,6 +77,13 @@ export default function AuthProvider({
     localStorage.removeItem("ID");
     window.location.reload();
   };
+
+  // interface valueType {
+  //   user: any;
+  //   status: "loading" | "unauthenticated" | "authenticated";
+  //   handleLogin: (credentials: { username: string; password: string }) => Promise<void>;
+  //   handleLogout: (ID: string) => Promise<void>;
+  // }
 
   return (
     <AuthContext.Provider

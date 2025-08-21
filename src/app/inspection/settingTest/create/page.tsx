@@ -4,8 +4,10 @@ import React from "react";
 import BackButton from "@/components/backButton";
 import Link from "next/link";
 import Swal from "sweetalert2";
+import Navbar from "@/components/navbar";
+import Breadcrumb from "@/components/breadcrumb";
 
-export default function Create_page() {
+export default function CreateSettingTest() {
   const [name, setName] = useState("");
   const [detail, setDetail] = useState("");
   const [qcType, setQcType] = useState({ name: "", value: "" });
@@ -97,8 +99,21 @@ export default function Create_page() {
 
   return (
     <div>
+      <Navbar />
+      <Breadcrumb />
+
       <div className="w-full flex items-center px-20 py-5 ">
-        <BackButton href="/inspection/settingTest" />
+        <div
+          tabIndex={0}
+          onClick={() => {
+            localStorage.setItem("currentUrl", "qc/settingTest");
+            window.location.reload();
+          }}
+          className="ml-5 sm:ml-20 cursor-pointer"
+        >
+          <BackButton />
+        </div>
+
         <p className="font-bold ml-15 text-xl 2xl:text-2xl">สร้างการทดสอบ</p>
         <button
           className="ml-auto px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F] 

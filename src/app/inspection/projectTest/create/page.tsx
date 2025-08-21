@@ -5,8 +5,10 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import Select, { MultiValue } from "react-select";
 import Swal from "sweetalert2";
+import Navbar from "@/components/navbar";
+import Breadcrumb from "@/components/breadcrumb";
 
-export default function Create_page() {
+export default function CreateQcproject() {
   const [detail, setDetail] = useState("");
   const [name, setName] = useState("");
   const [qcMain, setQcMain] =
@@ -93,8 +95,20 @@ export default function Create_page() {
 
   return (
     <div>
+      <Navbar />
+      <Breadcrumb />
+
       <div className="w-full flex items-center px-20 py-5 ">
-        <BackButton href="/inspection/projectTest" />
+        <div
+          tabIndex={0}
+          onClick={() => {
+            localStorage.setItem("currentUrl", "qc/projectTest");
+            window.location.reload();
+          }}
+          className="ml-5 sm:ml-20 cursor-pointer"
+        >
+          <BackButton />
+        </div>
         <p className="font-bold ml-15 text-xl 2xl:text-2xl">
           สร้างโปรเจ็คการทดสอบ
         </p>

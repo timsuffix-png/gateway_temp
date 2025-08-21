@@ -39,7 +39,7 @@ const createWindow = () => {
 
 app.on("ready", () => {
   createWindow();
-  
+
   //-----------------------------------------------------------Image----------------------------------------------------------
   ipcMain.handle("loadImg", (event, args) => {
     const ext = path.extname(args);
@@ -133,7 +133,6 @@ app.on("ready", () => {
   });
 
   //-----------------------------------------------------------API----------------------------------------------------------
-
 
   ipcMain.handle("getAPIPath", async (event, args) => {
     var API;
@@ -418,6 +417,10 @@ app.on("ready", () => {
 
           //ถ้าstate ไม่เท่ากับ In process
           if (state_data !== "on") {
+            console.log(
+              "Data array to be sent to serial-data-complete:",
+              dataArray
+            );
             win.webContents.send("serial-data-complete", dataArray);
             parser.removeListener("data", onData);
             resolve(dataArray);

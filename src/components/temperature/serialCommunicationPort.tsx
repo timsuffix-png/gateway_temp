@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import SubmitButton from "./submitButton";
+import SubmitButton from "../submitButton";
 import Select from "react-select";
 import Swal from "sweetalert2";
 

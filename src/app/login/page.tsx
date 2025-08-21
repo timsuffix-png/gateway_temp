@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
-import { useAuth } from "@/components/auth/authProvider";
+import { useAuth } from "@/lib/auth/authProvider";
 import Popup from "@/components/popup";
 import ButtonBlue from "@/components/buttonBlue";
-import APISetting from "@/app/temp/apiSetting";
-import Index from "@/app/temp/index";
+import APISetting from "@/components/temperature/apiSetting";
+import Index from "@/components/index";
 
 export default function Login() {
   const [username, setusername] = useState("");
@@ -20,15 +20,15 @@ export default function Login() {
 
   useEffect(() => {
     if (ironsImageRef.current && logoImageRef.current) {
-      // const loadImage = async () => {
-      //   const irons = await window.electronAPI.loadImg("irons.png");
-      //   const logo = await window.electronAPI.loadImg("logo.png");
-      //   try {
-      //     ironsImageRef.current.src = irons;
-      //     logoImageRef.current.src = logo;
-      //   } catch {}
-      // };
-      // loadImage();
+      const loadImage = async () => {
+        const irons = await window.electronAPI.loadImg("irons.png");
+        const logo = await window.electronAPI.loadImg("logo.png");
+        try {
+          ironsImageRef.current.src = irons;
+          logoImageRef.current.src = logo;
+        } catch {}
+      };
+      loadImage();
     }
   }, [auth]);
 
