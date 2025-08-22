@@ -1,15 +1,17 @@
 "use client";
 import React, { use } from "react";
 import BackButton from "@/components/backButton";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { Translator } from "@/components/translator";
 import Navbar from "@/components/navbar";
 import Breadcrumb from "@/components/breadcrumb";
+import { useAuth } from "@/lib/auth/authProvider";
+import Pagination from "@/components/pagination";
 
 export default function SettingTest_page() {
-  // const [qcMain, setData] = useState([]);
+  const auth = useAuth();
+  const [page, setPage] = useState(1);
   const [qcMain, setQcMain] = useState<{
     error: boolean;
     message: string;
@@ -29,7 +31,7 @@ export default function SettingTest_page() {
   const fetchQcMainData = async () => {
     const data = await window.electronAPI.fetchAPI({
       method: "GET",
-      URL: `qc/main?limit=50&page=1`,
+      URL: `qc/main?limit=10&page=${page}`,
     });
     if (!data) {
       throw new Error("Failed to fetch data");
@@ -39,11 +41,24 @@ export default function SettingTest_page() {
 
   useEffect(() => {
     refreshData();
-  }, []);
+  }, [auth, page]);
 
   const refreshData = async () => {
     const data = await fetchQcMainData();
     setQcMain(data);
+  };
+
+  const increasePage = () => {
+    setPage(qcMain && page >= qcMain.allPage ? qcMain.allPage : page + 1);
+  };
+  const decreasePage = () => {
+    setPage(page <= 1 ? 1 : page - 1);
+  };
+  const firstPage = () => {
+    setPage(1);
+  };
+  const lastPage = () => {
+    setPage(qcMain?.allPage || 1);
   };
 
   return (
@@ -83,19 +98,19 @@ export default function SettingTest_page() {
             <div className="mt-5">
               <div className="text-black font-bold">
                 <div className="bg-[#6494d3] rounded-t-3xl flex flex-row h-10 place-items-center">
-                  <div className="w-2/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  <div className="w-2/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
                     ประเภท
                   </div>
-                  <div className="w-3/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  <div className="w-3/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
                     ชื่อการทดสอบ
                   </div>
-                  <div className="w-5/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  <div className="w-5/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
                     รายละเอียด
                   </div>
-                  <div className="w-1/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  <div className="w-1/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
                     แก้ไข
                   </div>
-                  <div className="w-1/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                  <div className="w-1/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
                     ลบ
                   </div>
                 </div>
@@ -107,7 +122,7 @@ export default function SettingTest_page() {
                       key={data.ID}
                       className="flex flex-row w-full h-12 hover:bg-gray-200"
                     >
-                      <div className="w-2/12 text-start text-base lg:text-lg font-['Sarabun'] flex place-content-start place-items-center">
+                      <div className="w-2/12 text-start text-base lg:text-lg  flex place-content-start place-items-center">
                         <div className="hidden sm:block">
                           {Translator.type.icon}
                         </div>
@@ -115,17 +130,17 @@ export default function SettingTest_page() {
                           {data.qcType.name}
                         </h5>
                       </div>
-                      <div className="w-3/12 text-center text-base lg:text-lg font-['Sarabun'] flex place-content-start place-items-center">
+                      <div className="w-3/12 text-center text-base lg:text-lg  flex place-content-start place-items-center">
                         <h5 className="text-ellipsis overflow-hidden">
                           {data.testName}
                         </h5>
                       </div>
-                      <div className="w-5/12 text-center text-base lg:text-lg font-['Sarabun'] flex place-content-start place-items-center">
+                      <div className="w-5/12 text-center text-base lg:text-lg  flex place-content-start place-items-center">
                         <h5 className="text-ellipsis overflow-hidden">
                           {data.detail}
                         </h5>
                       </div>
-                      <div className="w-1/12 text-center text-base lg:text-lg font-['Sarabun'] flex place-content-center place-items-center text-ellipsis overflow-hidden">
+                      <div className="w-1/12 text-center text-base lg:text-lg  flex place-content-center place-items-center text-ellipsis overflow-hidden">
                         <button
                           onClick={() => {
                             localStorage.setItem(
@@ -139,7 +154,7 @@ export default function SettingTest_page() {
                           {Translator.edit.icon}
                         </button>
                       </div>
-                      <div className="w-1/12 text-center text-base lg:text-lg font-['Sarabun'] flex place-content-center place-items-center text-ellipsis overflow-hidden">
+                      <div className="w-1/12 text-center text-base lg:text-lg  flex place-content-center place-items-center text-ellipsis overflow-hidden">
                         <button
                           onClick={() => {
                             Swal.fire({
@@ -173,6 +188,16 @@ export default function SettingTest_page() {
                     </div>
                   );
                 })}
+              </div>
+              <div className="flex place-content-center">
+                <Pagination
+                  currentPage={page}
+                  allPage={qcMain?.allPage}
+                  increase={increasePage}
+                  decrease={decreasePage}
+                  first={firstPage}
+                  last={lastPage}
+                />
               </div>
             </div>
 

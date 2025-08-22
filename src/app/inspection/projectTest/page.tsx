@@ -6,8 +6,12 @@ import Swal from "sweetalert2";
 import { Translator } from "@/components/translator";
 import Navbar from "@/components/navbar";
 import Breadcrumb from "@/components/breadcrumb";
+import { useAuth } from "@/lib/auth/authProvider";
+import Pagination from "@/components/pagination";
 
 export default function QcProject() {
+  const auth = useAuth();
+  const [page, setPage] = useState(1);
   const [qcProject, setQcProject] = useState<{
     error: boolean;
     message: string;
@@ -31,12 +35,12 @@ export default function QcProject() {
 
   useEffect(() => {
     refreshData();
-  }, []);
+  }, [auth, page]);
 
   const fetchData = async () => {
     const data = await window.electronAPI.fetchAPI({
       method: "GET",
-      URL: `qc/project/extend?limit=100&page=1`,
+      URL: `qc/project/extend?limit=10&page=${page}`,
     });
     if (!data) {
       throw new Error("Failed to fetch data");
@@ -47,6 +51,21 @@ export default function QcProject() {
   const refreshData = async () => {
     const data = await fetchData();
     setQcProject(data);
+  };
+
+  const increasePage = () => {
+    setPage(
+      qcProject && page >= qcProject.allPage ? qcProject.allPage : page + 1
+    );
+  };
+  const decreasePage = () => {
+    setPage(page <= 1 ? 1 : page - 1);
+  };
+  const firstPage = () => {
+    setPage(1);
+  };
+  const lastPage = () => {
+    setPage(qcProject?.allPage || 1);
   };
 
   return (
@@ -92,7 +111,7 @@ export default function QcProject() {
               >
                 <div className="w-full flex place-content-between px-5 mt-2">
                   <div className="flex place-items-end">
-                    <h3 className="text-black text-lg lg:text-xl font-bold font-['Sarabun']">
+                    <h3 className="text-black text-lg lg:text-xl font-bold ">
                       {project.projectName}
                     </h3>
                   </div>
@@ -140,7 +159,7 @@ export default function QcProject() {
                     </svg>
                   </div>
                 </div>
-                <h4 className="text-gray-500 w-full text-base font-normal font-['Sarabun'] pl-16 mt-5">
+                <h4 className="text-gray-500 w-full text-base font-normal  pl-16 mt-5">
                   รายละเอียด
                 </h4>
                 <div className="w-[92%] h-auto my-[20px] flex flex-col place-content-start">
@@ -151,10 +170,10 @@ export default function QcProject() {
                     <div className="mt-5">
                       <div className="text-black font-bold">
                         <div className="bg-[#6494d3] rounded-t-3xl flex flex-row h-10 place-items-center">
-                          <div className="w-4/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                          <div className="w-4/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
                             ชื่อการทดสอบ
                           </div>
-                          <div className="w-8/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                          <div className="w-8/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
                             รายละเอียด
                           </div>
                         </div>
@@ -163,7 +182,7 @@ export default function QcProject() {
                         return (
                           <div key={itemProject.ID} className="text-black">
                             <div className="flex flex-row w-full h-12 hover:bg-gray-200">
-                              <div className="w-4/12 text-start text-base lg:text-lg font-['Sarabun'] flex place-items-center place-content-start">
+                              <div className="w-4/12 text-start text-base lg:text-lg  flex place-items-center place-content-start">
                                 <div className="hidden sm:block">
                                   {Translator.qc.icon}
                                 </div>
@@ -171,7 +190,7 @@ export default function QcProject() {
                                   {itemProject.qcMain.testName}
                                 </h5>
                               </div>
-                              <div className="w-8/12 text-start text-base lg:text-lg font-['Sarabun'] flex place-items-center place-content-start">
+                              <div className="w-8/12 text-start text-base lg:text-lg  flex place-items-center place-content-start">
                                 <div className="hidden sm:block">
                                   {Translator.detail.icon}
                                 </div>
@@ -189,6 +208,16 @@ export default function QcProject() {
               </div>
             );
           })}
+          <div className="flex place-content-center">
+            <Pagination
+              currentPage={page}
+              allPage={qcProject?.allPage}
+              increase={increasePage}
+              decrease={decreasePage}
+              first={firstPage}
+              last={lastPage}
+            />
+          </div>
         </div>
       </div>
     </div>

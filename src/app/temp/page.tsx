@@ -25,6 +25,7 @@ const statusMap: Record<string, { css: string; stateName: string }> = {
 
 export default function MainTempTest_page() {
   // Selectbar
+
   const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า
   const [currentCOMPort, setCurrentCOMPort] = useState<number | null>();
   const [popup, setPopup] = useState(false);
@@ -50,27 +51,13 @@ export default function MainTempTest_page() {
   const [reason, setReason] = useState("");
   const [allResult, setAllResult] = useState<string[]>([]);
 
-  const qcProjectRef = React.useRef(qcProject);
-  const serialNumberRef = React.useRef(serialNumber);
-  const statusRef = React.useRef(status);
-
-  useEffect(() => {
-    qcProjectRef.current = qcProject;
-  }, [qcProject]);
-  useEffect(() => {
-    serialNumberRef.current = serialNumber;
-  }, [serialNumber]);
-  useEffect(() => {
-    statusRef.current = status;
-  }, [status]);
-
   const [sendData, setSendData] = useState<{
     state: string;
     tempLim: number;
     currentLim: number;
     timeLim: number;
   }>({
-    state: "",
+    state: "stop",
     tempLim: 60.0,
     currentLim: 6.0,
     timeLim: 10,
@@ -134,6 +121,24 @@ export default function MainTempTest_page() {
     ];
     allPage: number;
   } | null>();
+
+  const qcMainsRef = React.useRef(qcMains);
+  const qcProjectRef = React.useRef(qcProject);
+  const serialNumberRef = React.useRef(serialNumber);
+  const statusRef = React.useRef(status);
+
+  useEffect(() => {
+    qcProjectRef.current = qcProject;
+  }, [qcProject]);
+  useEffect(() => {
+    serialNumberRef.current = serialNumber;
+  }, [serialNumber]);
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
+    useEffect(() => {
+    qcMainsRef.current = qcMains;
+  }, [qcMains]);
 
   //ฟังก์ชันเปิดพอต
   const serialPort = async () => {
@@ -328,21 +333,28 @@ export default function MainTempTest_page() {
       });
 
       console.log("Record response:", record);
-      // if (!record || !record.data || record.data.length === 0) {
-      //   throw new Error("Failed to create QC record");
-      // }
 
-      await window.electronAPI.fetchAPI({
+      console.log("Record created with ID:", record.data[0].ID);
+      console.log("qcMains:", qcMainsRef.current);
+      console.log(
+        "qcMains?.data[0]?.qcMain?.ID:",
+        qcMainsRef.current?.data[0]?.qcMain?.ID
+      );
+      console.log("Result:", statusRef.current + "ed");
+      console.log("Detail lastResult:", lastResult);
+
+      const res = await window.electronAPI.fetchAPI({
         method: "POST",
         URL: "qc/status",
         body: {
           qcRecordID: record.data[0].ID,
-          qcMainID: qcMains?.data[0].qcMain?.ID,
-          status: statusRef.current,
-          detail: statusRef.current === "pass" ? "" : lastResult.join(",").trim(),
+          qcMainID: qcMainsRef.current?.data[0]?.qcMain?.ID,
+          result: statusRef.current + "ed",
+          status: statusRef.current + "ed",
+          detail: lastResult.join(",").trim(),
         },
       });
-      console.log("Data recorded successfully");
+      console.log("Record status response : ", res);
     } catch (error) {
       console.error("Error recording data:", error);
     }
@@ -351,7 +363,6 @@ export default function MainTempTest_page() {
   const refreshData = async () => {
     const data = await fetchQcProjectList();
     setQcProjectList(data);
-    console.log("QcProjectList: ", data);
   };
 
   useEffect(() => {
@@ -371,14 +382,14 @@ export default function MainTempTest_page() {
         {/* Select Bar */}
         <div className="flex flex-col 2x:flex-row">
           <ul
-            className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg font-['Sarabun']
+            className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg 
        md:flex-row md:gap-10 md:items-center "
           >
             <li
               className="flex flex-col justify-center items-center text-center whitespace-nowrap
         md:basis-40"
             >
-              <h4 className="flex-nowrap text-lg xl:text-xl font-normal font-['Sarabun']">
+              <h4 className="flex-nowrap text-lg xl:text-xl font-normal ">
                 Temperature port
                 <span className="text-red-600">&nbsp;*</span>
               </h4>

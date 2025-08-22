@@ -168,7 +168,7 @@ export default function CreateQcproject() {
           </div>
           <div className="flex gap-10 items-center">
             <textarea
-              className="bg-white border border-black w-full h-[150px] min-h-[50px] max-h-[150px] rounded-lg text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] px-2 py-2"
+              className="bg-white border border-black w-full h-[150px] min-h-[50px] max-h-[150px] rounded-lg text-base lg:text-lg xl:text-2xl font-normal  px-2 py-2"
               maxLength={200}
               onChange={(e) => setDetail(e.target.value)}
             ></textarea>

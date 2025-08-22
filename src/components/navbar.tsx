@@ -5,10 +5,9 @@ import { Translator } from "./translator";
 import { useState, useEffect, useRef } from "react";
 
 export default function SideBar() {
-
   const auth = useAuth();
   const logoImageRef = useRef<any | null>(null);
-  const nameRef = useRef(null)
+  const nameRef = useRef(null);
   const menuRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [currentWidth, setCurrentWidth] = useState(0);
@@ -29,15 +28,15 @@ export default function SideBar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useEffect(()=>{
-    if (logoImageRef.current){
+  useEffect(() => {
+    if (logoImageRef.current) {
       const loadImage = async () => {
         const logo = await window.electronAPI.loadImg("logo.png");
         logoImageRef.current.src = logo;
       };
       loadImage();
     }
-  }, [auth])
+  }, [auth]);
 
   const signoutAction = async () => {
     auth.handleLogout(localStorage.getItem("ID"));
@@ -45,13 +44,14 @@ export default function SideBar() {
 
   var menus: any = {
     qc: Translator.qc,
-    temperature: Translator.temperature
+    temperature: Translator.temperature,
   };
 
   if (!auth.user) return <Index />;
   else {
+    //ถ้าจอใหญ่
     if (isOpen || currentWidth >= 1536) {
-      if (logoImageRef.current){
+      if (logoImageRef.current) {
         const loadImage = async () => {
           const logo = await window.electronAPI.loadImg("logo.png");
           logoImageRef.current.src = logo;
@@ -61,7 +61,7 @@ export default function SideBar() {
       return (
         <>
           <div
-            className="sticky top-0 z-50 h-screen bg-white absolute 2xl:static 2xl:flex 2xl:flex-col border-r-black border-r-2 2xl:w-[350px] z-10"
+            className="sticky top-0 z-50 w-screen h-screen bg-white absolute 2xl:static 2xl:flex 2xl:flex-col border-r-black border-r-2 2xl:w-[350px] z-10"
             ref={menuRef}
           >
             <div className="flex flex-col w-full h-full">
@@ -78,12 +78,15 @@ export default function SideBar() {
                   </button>
                 </div>
                 <div className="w-full h-1/3 flex">
-                  <h2 className="w-full h-full text-black text-lg xl:text-xl 2xl:text-2xl font-normal font-['Sarabun'] flex place-items-center justify-center text-nowrap text-ellipsis overflow-hidden" ref={nameRef}>
+                  <h2
+                    className="w-full h-full text-black text-lg xl:text-xl 2xl:text-2xl  flex place-items-center justify-center text-nowrap text-ellipsis overflow-hidden"
+                    ref={nameRef}
+                  >
                     ผู้ใช้: {auth.user.data?.name} {auth.user.data?.surname}
                   </h2>
                 </div>
               </div>
-              <div className="w-full h-[65px] text-black text-xl xl:text-2xl 2xl:text-3xl font-bold font-['Sarabun'] text-left flex place-items-center border-t-[2px] border-t-black">
+              <div className="w-full h-[65px] text-black text-xl xl:text-2xl 2xl:text-3xl font-bold  text-left flex place-items-center border-t-[2px] border-t-black">
                 <span className="ml-[20px]">รายการ</span>
               </div>
               <div className="w-full h-full overflow-y-auto">
@@ -93,7 +96,11 @@ export default function SideBar() {
                       <button
                         className="w-full"
                         key={menu}
-                        onClick={() => {setIsOpen(true);localStorage.setItem("currentUrl", menu);window.location.reload()}}
+                        onClick={() => {
+                          setIsOpen(true);
+                          localStorage.setItem("currentUrl", menu);
+                          window.location.reload();
+                        }}
                       >
                         <div className="w-full h-[50px] xl:h-[60px] 2xl:h-[70px] flex place-items-center bg-gray-200 hover:bg-gray-300">
                           <div className="ml-[20px] mr-[10px] w-[40px] h-[40px]">
@@ -102,7 +109,7 @@ export default function SideBar() {
                             </div>
                           </div>
                           <div className="w-full h-full">
-                            <h3 className="w-full h-full text-black text-lg xl:text-xl 2xl:text-2xl font-normal font-['Sarabun'] flex place-items-center justify-start pl-5">
+                            <h3 className="w-full h-full text-black text-lg xl:text-xl 2xl:text-2xl font-normal  flex place-items-center justify-start pl-5">
                               {menus[menu].name}
                             </h3>
                           </div>
@@ -114,7 +121,11 @@ export default function SideBar() {
                       <button
                         className="w-full"
                         key={menu}
-                        onClick={() => {setIsOpen(true);localStorage.setItem("currentUrl", menu);window.location.reload()}}
+                        onClick={() => {
+                          setIsOpen(true);
+                          localStorage.setItem("currentUrl", menu);
+                          window.location.reload();
+                        }}
                       >
                         <div className="w-full h-[50px] xl:h-[60px] 2xl:h-[70px] flex place-items-center hover:bg-gray-200">
                           <div className="ml-[20px] mr-[10px] w-[40px] h-[40px]">
@@ -123,7 +134,7 @@ export default function SideBar() {
                             </div>
                           </div>
                           <div className="w-full h-full">
-                            <h3 className="w-full h-full text-black text-lg xl:text-xl 2xl:text-2xl font-normal font-['Sarabun'] flex place-items-center justify-start pl-5">
+                            <h3 className="w-full h-full text-black text-lg xl:text-xl 2xl:text-2xl font-normal  flex place-items-center justify-start pl-5">
                               {menus[menu].name}
                             </h3>
                           </div>
@@ -167,7 +178,7 @@ export default function SideBar() {
         </>
       );
     } else {
-      if (logoImageRef.current){
+      if (logoImageRef.current) {
         const loadImage = async () => {
           const logo = await window.electronAPI.loadImg("logo.png");
           logoImageRef.current.src = logo;

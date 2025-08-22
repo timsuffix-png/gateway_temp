@@ -41,11 +41,11 @@ export default function SerialCommunicationPort() {
   return (
     <div className="text-start bg-white p-5 sm:p-10 2xl:p-20 border-black border-2 rounded-2xl flex flex-col">
       <label className="flex flex-col w-full">
-        <h1 className="text-lg lg:text-2xl text-black font-['Sarabun'] mb-2">
+        <h1 className="text-lg lg:text-2xl text-black  mb-2">
           พอร์ตในเครื่องทั้งหมด
         </h1>
         <div
-          className="h-[40px] md:h-[50px] bg-white rounded-md text-black text-lg lg:text-2xl px-3 font-normal font-['Sarabun']"
+          className="h-[40px] md:h-[50px] bg-white rounded-md text-black text-lg lg:text-2xl px-3 font-normal "
           style={{ width: currentWidth / 2 }}
         >
           <Select

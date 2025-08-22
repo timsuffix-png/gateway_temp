@@ -12,6 +12,7 @@ import SettingTest from "@/app/inspection/settingTest/page";
 import CreateSettingTest from "@/app/inspection/settingTest/create/page";
 import QcProject from "@/app/inspection/projectTest/page";
 import CreateQcproject from "@/app/inspection/projectTest/create/page";
+import QcDetail from "./inspection/detail";
 
 export default function Routing() {
   const auth = useAuth();
@@ -38,6 +39,8 @@ export default function Routing() {
     switch (currentUrl) {
       case "qc":
         return <Inspection />;
+      case "qc/detail":
+        return <QcDetail />;
 
       case "qc/projectTest/create":
         return <CreateQcproject />;

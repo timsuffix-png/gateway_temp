@@ -23,14 +23,14 @@ export default function SelectBar({ projects }: SelectBarProps) {
   return (
     <div className="flex flex-col 2x:flex-row">
       <ul
-        className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg font-['Sarabun']
+        className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg 
        md:flex-row md:gap-10 md:items-center "
       >
         <li
           className="flex flex-col justify-center items-center text-center whitespace-nowrap
         md:basis-40"
         >
-          <h4 className="flex-nowrap text-lg xl:text-xl font-normal font-['Sarabun']">
+          <h4 className="flex-nowrap text-lg xl:text-xl font-normal ">
             Temperature port
             <span className="text-red-600">&nbsp;*</span>
           </h4>

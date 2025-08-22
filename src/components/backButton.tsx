@@ -15,7 +15,7 @@ export default function BackButton({ text = "ย้อนกลับ", ...props
             fill="#001F3F"
           />
         </svg>
-        <div className="w-full h-full text-center text-[#001F3F] text-lg 2xl:text-xl font-bold font-['Sarabun'] place-content-center">
+        <div className="w-full h-full text-center text-[#001F3F] text-lg 2xl:text-xl font-bold  place-content-center">
           {text}
         </div>
       </div>

@@ -3,7 +3,7 @@
 import { Translator } from "./translator";
 
 export default function Breadcrumb() {
-  var currentUrl = localStorage.getItem("currentUrl").split("/");
+  var currentUrl = (localStorage.getItem("currentUrl") || "").split("/");
   var link = "/";
 
   return (
@@ -11,10 +11,10 @@ export default function Breadcrumb() {
       <div className="w-full h-full 2xl:flex place-items-center hidden">
         <div className="ml-10"></div>
         
-        <h3 className="ml-2 text-black text-xl 2xl:text-2xl font-normal font-['Sarabun']">
+        <h3 className="ml-2 text-black text-xl 2xl:text-2xl font-normal ">
           หน้าหลัก
         </h3>
-        <h3 className="ml-2 text-black text-2xl 2xl:text-3xl font-bold font-['Sarabun']">
+        <h3 className="ml-2 text-black text-2xl 2xl:text-3xl font-bold ">
           /
         </h3>
         {currentUrl.map((path) => {
@@ -23,7 +23,7 @@ export default function Breadcrumb() {
             if (path === currentUrl[currentUrl.length - 1]) {
               return (
                 <button key={path} onClick={() => link}>
-                  <h3 className="ml-2 text-black text-xl 2xl:text-2xl font-normal font-['Sarabun']">
+                  <h3 className="ml-2 text-black text-xl 2xl:text-2xl font-normal ">
                     {Translator[path].name}
                   </h3>
                 </button>
@@ -32,11 +32,11 @@ export default function Breadcrumb() {
               return (
                 <div key={path} className="flex">
                   <button onClick={() => link}>
-                    <h3 className="ml-2 text-black text-xl 2xl:text-2xl font-normal font-['Sarabun']">
+                    <h3 className="ml-2 text-black text-xl 2xl:text-2xl font-normal ">
                       {Translator[path].name}
                     </h3>
                   </button>
-                  <h3 className="ml-2 text-black text-2xl 2xl:text-3xl font-bold font-['Sarabun']">
+                  <h3 className="ml-2 text-black text-2xl 2xl:text-3xl font-bold ">
                     /
                   </h3>
                 </div>
