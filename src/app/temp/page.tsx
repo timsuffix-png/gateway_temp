@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SelectBar from "@/components/temperature/selectBar";
 import axios from "axios";
 import Footer from "@/components/footer";
@@ -24,6 +24,7 @@ const statusMap: Record<string, { css: string; stateName: string }> = {
 };
 
 export default function MainTempTest_page() {
+  const [a,seta] = useState("")
   // Selectbar
 
   const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า
@@ -122,10 +123,10 @@ export default function MainTempTest_page() {
     allPage: number;
   } | null>();
 
-  const qcMainsRef = React.useRef(qcMains);
-  const qcProjectRef = React.useRef(qcProject);
-  const serialNumberRef = React.useRef(serialNumber);
-  const statusRef = React.useRef(status);
+  const qcMainsRef = useRef(qcMains);
+  const qcProjectRef = useRef(qcProject);
+  const serialNumberRef =  useRef(serialNumber);
+  const statusRef =  useRef(status);
 
   useEffect(() => {
     qcProjectRef.current = qcProject;

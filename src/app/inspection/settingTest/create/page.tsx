@@ -98,31 +98,33 @@ export default function CreateSettingTest() {
   }, []);
 
   return (
-    <div>
+    <div className="flex">
       <Navbar />
-      <Breadcrumb />
+      <div className="w-full flex flex-col items-center border ">
+        <Breadcrumb />
 
-      <div className="w-full flex items-center px-20 py-5 ">
-        <div
-          tabIndex={0}
-          onClick={() => {
-            localStorage.setItem("currentUrl", "qc/settingTest");
-            window.location.reload();
-          }}
-          className="ml-5 sm:ml-20 cursor-pointer"
-        >
-          <BackButton />
-        </div>
+        <div>
+          <div
+            tabIndex={0}
+            onClick={() => {
+              localStorage.setItem("currentUrl", "qc/settingTest");
+              window.location.reload();
+            }}
+            className="flex ml-5 sm:ml-20 cursor-pointer"
+          >
+            <BackButton />
+          </div>
 
-        <p className="font-bold ml-15 text-xl 2xl:text-2xl">สร้างการทดสอบ</p>
-        <button
-          className="ml-auto px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F] 
+          <p className="font-bold ml-15 text-xl 2xl:text-2xl">สร้างการทดสอบ</p>
+          <button
+            className="ml-auto px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F] 
             xl:text-xl 
             2xl:text-2xl"
-          onClick={clickCreate}
-        >
-          สร้าง
-        </button>
+            onClick={clickCreate}
+          >
+            สร้าง
+          </button>
+        </div>
       </div>
 
       <div className="mx-10 px-10 py-10 flex flex-col gap-8 rounded-xl border-2">
