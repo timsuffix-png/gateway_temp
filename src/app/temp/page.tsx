@@ -24,7 +24,6 @@ const statusMap: Record<string, { css: string; stateName: string }> = {
 };
 
 export default function MainTempTest_page() {
-  const [a,setA] = useState("")
   // Selectbar
   const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า
   const [currentCOMPort, setCurrentCOMPort] = useState<number | null>();
