@@ -398,37 +398,34 @@ app.on("ready", () => {
         if (err) return reject(err);
       });
 
-      //ทุกครั้งที่ port.open จะ parser.on('data', ...) → ถ้าเปิด/ปิดหลายรอบ อาจซ้อนหลาย event
-      parser.removeAllListeners("data");
-
-      const dataArray = [];
+      // ทุกครั้งให้แน่ใจว่า parser ถูกสร้าง/มีอยู่ก่อนใช้งาน
+      if (!parser && port) {
+        parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
+      }
+      if (parser) {
+        parser.removeAllListeners("data");
+      }
 
       const onData = (data) => {
         console.log("Data from Arduino:", data.toString());
         data = data.trim();
-        dataArray.push(data);
         // ส่งข้อมูลไป renderer ทันทีทีละบรรทัด
         win.webContents.send("serial-data", data);
         // 👉 ฝั่ง renderer จะได้ทีละรอบ เรียลไทม์
 
         const index_data = data.split(",");
-        if (index_data.length >= 3) {
-          const state_data = index_data[8].trim();
-
-          //ถ้าstate ไม่เท่ากับ In process
+        // ตรวจความยาวก่อนเข้าถึง index 9 (state)
+        if (index_data.length > 9) {
+          const state_data = index_data[9].trim();
+          // ถ้า state ไม่เท่ากับ "on" ให้จบการรับข้อมูล
           if (state_data !== "on") {
-            console.log(
-              "Data array to be sent to serial-data-complete:",
-              dataArray
-            );
-            win.webContents.send("serial-data-complete", dataArray);
-            parser.removeListener("data", onData);
-            resolve(dataArray);
+            if (parser) parser.removeListener("data", onData);
+           
           }
         }
       };
 
-      parser.on("data", onData);
+      if (parser) parser.on("data", onData);
       // resolve("Open port in writeSerial func.");
     });
   });
@@ -452,20 +449,16 @@ app.on("ready", () => {
 });
 
 app.on("window-all-closed", () => {
-  if (port) {
-    if (port.isOpen) {
-      port.close((err) => {
-        if (err) {
-          console.error("Error closing serial port on app exit:", err.message);
-        } else {
-          console.log("Serial port closed on app exit.");
-        }
-        port = null; // << เพิ่มตรงนี้
-      });
-    } else {
-      console.log("Serial port was not open on app exit.");
-      port = null; // << เพิ่มตรงนี้
-    }
+  if (process.platform !== "darwin") {
+    app.quit();
   }
-  if (process.platform !== "darwin") app.quit();
+});
+
+
+app.on("activate", () => {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });

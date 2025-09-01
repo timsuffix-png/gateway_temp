@@ -24,16 +24,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.removeListener("serial-data", (_event, data) => callback(data));
   },
 
-  // เพิ่ม event สำหรับข้อมูลทั้งหมดตอนจบ
-  onSerialDataComplete: (callback: (dataArray: string[]) => void) =>
-    ipcRenderer.on("serial-data-complete", (_event, dataArray) =>
-      callback(dataArray)
-    ),
-  removeSerialDataCompleteListener: (callback: (dataArray: string[]) => void) =>
-    ipcRenderer.removeListener("serial-data-complete", (_event, dataArray) =>
-      callback(dataArray)
-    ),
-
   // ใช้บอกว่าพอตปิดเเล้ว Main → Renderer
   onSerialPortClosed: (callback: () => void) => {
     ipcRenderer.on("serial-port-closed", callback);

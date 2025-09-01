@@ -19,13 +19,13 @@ import { useAuth } from "@/lib/auth/authProvider";
 const statusMap: Record<string, { css: string; stateName: string }> = {
   stop: { css: "bg-red-600", stateName: "STOP" },
   on: { css: "bg-yellow-600", stateName: "IN PROCESS" },
-  pass: { css: "bg-green-600", stateName: "PASS" },
-  fail: { css: "bg-red-400", stateName: "FAIL" },
+  Passed: { css: "bg-green-600", stateName: "PASS" },
+  Failed: { css: "bg-red-400", stateName: "FAIL" },
 };
 
 export default function MainTempTest_page() {
   // Selectbar
-  const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า
+  const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า 99202505310001000901
   const [currentCOMPort, setCurrentCOMPort] = useState<number | null>();
   const [popup, setPopup] = useState(false);
   const openPopup = () => setPopup(true);
@@ -48,7 +48,6 @@ export default function MainTempTest_page() {
     stateName: "OFF",
   };
   const [reason, setReason] = useState("");
-  const [allResult, setAllResult] = useState<string[]>([]);
 
   const [sendData, setSendData] = useState<{
     state: string;
@@ -56,7 +55,7 @@ export default function MainTempTest_page() {
     currentLim: number;
     timeLim: number;
   }>({
-    state: "stop",
+    state: "on",
     tempLim: 60.0,
     currentLim: 6.0,
     timeLim: 10,
@@ -123,37 +122,8 @@ export default function MainTempTest_page() {
 
   const qcMainsRef = useRef(qcMains);
   const qcProjectRef = useRef(qcProject);
-  const serialNumberRef =  useRef(serialNumber);
-  const statusRef =  useRef(status);
-
-  useEffect(() => {
-    qcProjectRef.current = qcProject;
-  }, [qcProject]);
-  useEffect(() => {
-    serialNumberRef.current = serialNumber;
-  }, [serialNumber]);
-  useEffect(() => {
-    statusRef.current = status;
-  }, [status]);
-    useEffect(() => {
-    qcMainsRef.current = qcMains;
-  }, [qcMains]);
-
-  //ฟังก์ชันเปิดพอต
-  const serialPort = async () => {
-    try {
-      const port = await window.electronAPI.getPort();
-      await window.electronAPI.openPort(port);
-      const data = await window.electronAPI.writeData({
-        port,
-        command: sendData,
-      });
-      console.log("State command : " + JSON.stringify(sendData));
-      console.log("Data  : " + data);
-    } catch (error) {
-      console.log("Error in serialPort: " + error);
-    }
-  };
+  const serialNumberRef = useRef(serialNumber);
+  const statusRef = useRef(status);
 
   //ฟังชั่นรับserial Data
   const handleSerialData = (data: string) => {
@@ -173,21 +143,16 @@ export default function MainTempTest_page() {
       setTemp3(parseFloat(parts[2]));
       setTime(parseInt(parts[3]));
       setCurrent(parseFloat(parts[4]));
-      setStatus(parts[8].trim());
-      setReason(parts[9].trim());
+      setStatus(parts[9].trim());
+      setReason(parts[10].trim());
 
-      if (parts[8].trim() === "fail" || parts[8].trim() === "pass") {
-        console.log("qcProject before recordData:", qcProjectRef.current);
-        console.log("serialNumber before recordData:", serialNumberRef.current);
-
+      if (
+        parts[9].trim() === "Passed" ||
+        (parts[9].trim() === "Failed" && parts[10] !== "Please check iron.")
+      ) {
         recordData(parts);
       }
     }
-  };
-
-  const handleSerialDataComplete = (dataArray: string[]) => {
-    console.log("Data received in handleSerialDataComplete:", dataArray);
-    setAllResult(dataArray);
   };
 
   //ฟังก์ชันปิดพอต
@@ -195,34 +160,6 @@ export default function MainTempTest_page() {
     console.log("Serial port ถูกปิดแล้ว"); // แจ้งสถานะ port ถูกปิด
     // TODO: อัพเดต UI แจ้งเตือนผู้ใช้ว่า port ปิดแล้ว เช่น ปิดปุ่ม หรือแสดงข้อความ
   };
-
-  useEffect(() => {
-    // ส่ง callback เดิมเข้าไปทั้งตอน on และตอน remove)
-    const serialDataListener = handleSerialData;
-    const serialPortClosedListener = handlePortClosed;
-    const serialDataCompleteListener = handleSerialDataComplete;
-
-    window.electronAPI.onSerialData(serialDataListener); // เมื่อมีข้อมูล Serial Data เข้ามา ให้เรียกใช้ฟังก์ชัน handleSerialData
-    window.electronAPI.onSerialPortClosed(serialPortClosedListener); // เมื่อพอร์ตถูกปิด ให้เรียกใช้ฟังก์ชัน handlePortClosed
-    window.electronAPI.onSerialDataComplete(serialDataCompleteListener); // เมื่อข้อมูล Serial Data ถูกส่งมาครบถ้วน ให้เรียกใช้ฟังก์ชัน handleSerialDataComplete
-
-    // ล้าง listener เมื่อ component ถูก unmount
-    return () => {
-      window.electronAPI.removeSerialDataListener(serialDataListener);
-      window.electronAPI.removeSerialPortClosedListener(
-        serialPortClosedListener
-      );
-      window.electronAPI.removeSerialDataCompleteListener(
-        serialDataCompleteListener
-      );
-    };
-  }, []);
-
-  useEffect(() => {
-    if (sendData.state !== "on" && sendData.state !== "stop") return;
-
-    serialPort();
-  }, [sendData.state]);
 
   //fetch API
   const fetchQcProjectList = async () => {
@@ -254,15 +191,6 @@ export default function MainTempTest_page() {
       (data: any) =>
         data.qcMain?.qcType?.ID === "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600"
     );
-
-    // console.log("format_script" + JSON.stringify(format_script));
-
-    // console.log(
-    //   "temp : " + format_script?.qcMain?.qcScript?.script?.TemperatureMax
-    // );
-    // console.log(
-    //   "current : " + format_script?.qcMain?.qcScript?.script?.CurrentMax
-    // );
     console.log("time : " + format_script?.qcMain?.qcScript?.script?.Time);
     setSendData((prev) => ({
       ...prev,
@@ -273,21 +201,20 @@ export default function MainTempTest_page() {
   };
 
   const clickTest = async () => {
-    const port = await window.electronAPI.getPort();
+    if (!currentCOMPort) {
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: "กรุณาเลือกพอร์ตให้ถูกต้อง",
+      });
+      return;
+    }
+
     if (!qcProject) {
       Swal.fire({
         icon: "error",
         title: "เกิดข้อผิดพลาด",
         text: "กรุณาเลือกโปรเจ็คการทดสอบ",
-      });
-      return;
-    }
-
-    if (!port) {
-      Swal.fire({
-        icon: "error",
-        title: "เกิดข้อผิดพลาด",
-        text: "กรุณาเลือกพอร์ตให้ถูกต้อง",
       });
       return;
     }
@@ -301,10 +228,27 @@ export default function MainTempTest_page() {
       return;
     }
 
-    setSendData((prev) => ({
-      ...prev,
-      state: "on",
-    }));
+    try {
+      await window.electronAPI.openPort(String(currentCOMPort));
+      const data = await window.electronAPI.writeData({
+        port : currentCOMPort,
+        command: { ...sendData, state: "on" },
+      });
+      console.log(
+        "State command : " + JSON.stringify({ ...sendData, state: "on" })
+      );
+      console.log("Data  : " + data);
+    } catch (error) {
+      const errStr = String(error ?? "").trim(); // รับรองเป็น string
+      if (currentCOMPort !== null && errStr.includes("Access denied")) {
+        Swal.fire({
+          icon: "warning",
+          title: "เกิดข้อผิดพลาด",
+          text: `พอร์ต ${currentCOMPort} กำลังเชื่อมต่อกับที่อื่น`,
+        });
+      }
+      return;
+    }
   };
 
   const recordData = async (lastResult: string[]) => {
@@ -317,10 +261,6 @@ export default function MainTempTest_page() {
     // let splitResultArray = splitData[splitData.length - 1]; // ผลลัพธ์: [" 8.4S", " 249", " 500.000000","Passed",""Cus termostate is cut in time.]
 
     try {
-      // console.log("qcProjectID: ", qcProject);
-      // console.log("serialNumber: ", serialNumber);
-      console.log("Testby : ", auth.user.data.ID);
-
       const record = await window.electronAPI.fetchAPI({
         method: "POST",
         URL: "qc/record",
@@ -330,26 +270,14 @@ export default function MainTempTest_page() {
           testBy: auth.user.data.ID,
         },
       });
-
-      console.log("Record response:", record);
-
-      console.log("Record created with ID:", record.data[0].ID);
-      console.log("qcMains:", qcMainsRef.current);
-      console.log(
-        "qcMains?.data[0]?.qcMain?.ID:",
-        qcMainsRef.current?.data[0]?.qcMain?.ID
-      );
-      console.log("Result:", statusRef.current + "ed");
-      console.log("Detail lastResult:", lastResult);
-
       const res = await window.electronAPI.fetchAPI({
         method: "POST",
         URL: "qc/status",
         body: {
           qcRecordID: record.data[0].ID,
           qcMainID: qcMainsRef.current?.data[0]?.qcMain?.ID,
-          result: statusRef.current + "ed",
-          status: statusRef.current + "ed",
+          result: statusRef.current,
+          status: statusRef.current,
           detail: lastResult.join(",").trim(),
         },
       });
@@ -365,6 +293,36 @@ export default function MainTempTest_page() {
   };
 
   useEffect(() => {
+    qcProjectRef.current = qcProject;
+  }, [qcProject]);
+  useEffect(() => {
+    serialNumberRef.current = serialNumber;
+  }, [serialNumber]);
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
+  useEffect(() => {
+    qcMainsRef.current = qcMains;
+  }, [qcMains]);
+
+  useEffect(() => {
+    // ส่ง callback เดิมเข้าไปทั้งตอน on และตอน remove)
+    const serialDataListener = handleSerialData;
+    const serialPortClosedListener = handlePortClosed;
+
+    window.electronAPI.onSerialData(serialDataListener); // เมื่อมีข้อมูล Serial Data เข้ามา ให้เรียกใช้ฟังก์ชัน handleSerialData
+    window.electronAPI.onSerialPortClosed(serialPortClosedListener); // เมื่อพอร์ตถูกปิด ให้เรียกใช้ฟังก์ชัน handlePortClosed
+
+    // ล้าง listener เมื่อ component ถูก unmount หรือเมื่อdependencyเปลี่ยน
+    return () => {
+      window.electronAPI.removeSerialDataListener(serialDataListener);
+      window.electronAPI.removeSerialPortClosedListener(
+        serialPortClosedListener
+      );
+    };
+  }, []);
+
+  useEffect(() => {
     refreshData();
   }, []);
 
@@ -372,6 +330,8 @@ export default function MainTempTest_page() {
     if (!qcProject) return;
     fetchScript(qcProject);
   }, [qcProject]);
+
+
 
   return (
     <div className="flex">
@@ -463,12 +423,12 @@ export default function MainTempTest_page() {
         {/* ----------- Body -------------*/}
         <div
           className="flex mx-[20%] flex-col justify-between gap-10 
-      lg:gap-10 lg:mx-[10%]"
+      lg:gap-10 lg:mx-[10%] lg:my-2"
         >
           {/* charTemp */}
           <div
-            className="flex flex-col py-6 gap-10 w-full items-center justify-between rounded-[10%] bg-gray-100
-         lg:flex-row lg:rounded-full lg:px-[5%] lg:py-10 "
+            className="flex flex-col py-6 gap-5 w-full items-center justify-between rounded-[10%] bg-gray-100
+            lg:flex-row lg:rounded-full lg:px-[5%] lg:py-[4%] "
           >
             <div
               className="flex flex-row items-center gap-4 text-center
@@ -549,7 +509,6 @@ export default function MainTempTest_page() {
               <button
                 id="test"
                 className="w-40 h-15  rounded-lg bg-[#001F3F] hover:cursor-pointer text-xl text-white font-semibold
-
           md:w-45 md:h-20"
                 onClick={clickTest}
               >
@@ -558,12 +517,11 @@ export default function MainTempTest_page() {
               <button
                 className="w-40 h-15  rounded-lg bg-red-600 hover:cursor-pointer text-xl text-white font-semibold
           md:w-45 md:h-20"
-                onClick={() => {
-                  setSendData((prev) => ({
-                    ...prev,
-                    state: "stop",
-                  }));
-                  return;
+                onClick={async () => {
+                  await window.electronAPI.writeData({
+                   port : currentCOMPort,
+                    command: { ...sendData, state: "stop" },
+                  });
                 }}
               >
                 หยุด
