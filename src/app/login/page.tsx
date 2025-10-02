@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
+import Footer from "@/components/footer";
+import SubmitButton from "@/components/submitButton";
 import { useAuth } from "@/lib/auth/authProvider";
-import Popup from "@/components/popup";
-import ButtonBlue from "@/components/buttonBlue";
+import Index from "@/components";
 import APISetting from "@/components/temperature/apiSetting";
-import Index from "@/components/index";
+import Popup from "@/components/popup";
 
 export default function Login() {
   const [username, setusername] = useState("");
@@ -63,7 +64,7 @@ export default function Login() {
 
   if (!auth.user?.data)
     return (
-      <div className="w-screen  flex bg-white">
+      <div className="h-screen flex bg-white">
         <div className="w-full lg:w-8/12 h-full flex flex-col">
           <div className="w-full h-[20%] flex place-items-center place-content-center sm:place-content-start sm:pl-20">
             <img
@@ -76,19 +77,19 @@ export default function Login() {
           </div>
           <div className="w-full h-[80%] flex flex-col place-items-center">
             <div className="w-full sm:w-3/4 2xl:w-1/2 h-auto flex flex-col place-items-center bg-white rounded-[15px] border-2 border-black pt-10">
-              <h1 className="text-black text-[23px] lg:text-[27px] xl:text-[32px] font-extrabold  ">
+              <h1 className="text-black text-[23px] lg:text-[27px] xl:text-[32px] font-extrabold font-['Sarabun']">
                 ยินดีต้อนรับสู่โปรแกรมทดสอบ
               </h1>
-              <h2 className="text-black text-base lg:text-lg xl:text-2xl font-bold  mt-10">
+              <h2 className="text-black text-base lg:text-lg xl:text-2xl font-bold font-['Sarabun'] mt-10">
                 ลงชื่อเข้าใช้บัญชีผู้ทดสอบของคุณ
               </h2>
               <div className="w-full flex flex-col place-items-center mt-14">
                 <label className="w-3/4">
-                  <h3 className="text-black text-base lg:text-lg xl:text-xl font-normal ">
+                  <h3 className="text-black text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
                     ชื่อผู้ใช้งาน
                   </h3>
                   <input
-                    className="w-full h-[40px] md:h-[50px] bg-white rounded-md border border-black text-black text-base lg:text-lg xl:text-2xl px-3 font-normal "
+                    className="w-full h-[40px] md:h-[50px] bg-white rounded-md border border-black text-black text-base lg:text-lg xl:text-2xl px-3 font-normal font-['Sarabun']"
                     type="text"
                     placeholder="ชื่อผู้ใช้งาน"
                     onChange={(e) => setusername(e.target.value)}
@@ -96,11 +97,11 @@ export default function Login() {
                   />
                 </label>
                 <label className="w-3/4 mt-5">
-                  <h3 className="text-black text-base lg:text-lg xl:text-xl font-normal ">
+                  <h3 className="text-black text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
                     รหัสผ่าน
                   </h3>
                   <input
-                    className="w-full h-[40px] md:h-[50px] bg-white rounded-md border border-black text-black text-base lg:text-lg xl:text-2xl px-3 font-normal "
+                    className="w-full h-[40px] md:h-[50px] bg-white rounded-md border border-black text-black text-base lg:text-lg xl:text-2xl px-3 font-normal font-['Sarabun']"
                     type="password"
                     placeholder="รหัสผ่าน"
                     onChange={(e) => setPassword(e.target.value)}
@@ -110,23 +111,26 @@ export default function Login() {
               </div>
               <div className="w-full flex place-content-center">
                 <div className="w-3/4">
-                  <h5 className="text-zinc-500 text-[10px] md:text-xs font-normal  leading-snug mt-1">
+                  <h5 className="text-zinc-500 text-[10px] md:text-xs font-normal font-['Sarabun'] leading-snug mt-1">
                     ลืมรหัสผ่าน?
                   </h5>
                 </div>
               </div>
               <div className="w-full flex place-content-center">
                 <div className="w-3/4 flex place-content-end mt-5">
-                  <ButtonBlue name="เข้าสู่ระบบ" onClick={fetchData} />
+                  <SubmitButton text="เข้าสู่ระบบ" onClick={fetchData} />
                 </div>
               </div>
               <div className="w-full">
                 <button className="mt-10 ml-5 mb-3" onClick={openPopup}>
-                  <h5 className="text-neutral-500 text-[10px] md:text-xs font-normal  leading-snug">
+                  <h5 className="text-neutral-500 text-[10px] md:text-xs font-normal font-['Sarabun'] leading-snug">
                     เปลี่ยนเส้นทางบันทึกข้อมูล?
                   </h5>
                 </button>
               </div>
+            </div>
+            <div className="h-full flex place-items-end place-content-center w-full">
+              <Footer />
             </div>
           </div>
         </div>
