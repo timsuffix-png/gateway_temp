@@ -1,6 +1,8 @@
+"use client";
 import Link from "next/link";
 import ButtonBlue from "@/components/buttonBlue";
-import Navbar from "@/components/navbar";
+import SideBar from "@/components/sidebar";
+
 import Footer from "@/components/footer";
 import Breadcrumb from "@/components/breadcrumb";
 import { useEffect, useState } from "react";
@@ -8,7 +10,7 @@ import { useAuth } from "@/lib/auth/authProvider";
 import { Translator } from "@/components/translator";
 import Pagination from "@/components/pagination";
 
-export default function Inspection_page() {
+export default function Inspection() {
   const auth = useAuth();
   const [like, setLike] = useState("");
   const [passPercent, setPassPercent] = useState(0);
@@ -32,6 +34,13 @@ export default function Inspection_page() {
         };
         qcProject: {
           projectName: string;
+          qcItemProject:[ {
+            qcMain: {
+              qcType: {
+                name: string;
+              };
+            };
+          }];
         };
         testBy: {
           name: string;
@@ -39,7 +48,7 @@ export default function Inspection_page() {
         };
         statusOverView: string;
         createdAt: string;
-      }
+      },
     ];
     allPage: number;
   } | null>();
@@ -70,7 +79,7 @@ export default function Inspection_page() {
   const fetchQcRecordList = async () => {
     const data = await window.electronAPI.fetchAPI({
       method: "GET",
-      URL: `qc/record/serial?limit=50&page=${page}&like=${like}`,
+      URL: `qc/record/serial/type?limit=50&page=${page}&like=${like}`,
     });
     if (!data) {
       throw new Error("Failed to fetch data");
@@ -113,9 +122,8 @@ export default function Inspection_page() {
   return (
     <>
       <div className="flex w-screen h-screen">
-        <div>
-          <Navbar />
-        </div>
+        <SideBar />
+
         <div className="flex flex-col w-full h-full">
           <Breadcrumb />
           <div className="flex flex-col bg-white w-full h-full overflow-y-auto whitespace-nowrap place-items-center pt-10">
@@ -127,7 +135,7 @@ export default function Inspection_page() {
                 <div
                   tabIndex={0}
                   onClick={() => {
-                    localStorage.setItem("currentUrl", "qc/settingTest");
+                    localStorage.setItem("currentUrl", "qc/testSetting");
                     window.location.reload();
                   }}
                   className="ml-10 sm:mr-3"
@@ -202,6 +210,9 @@ export default function Inspection_page() {
                           รหัสสินค้า
                         </div>
                         <div className="w-2/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                          ประเภท
+                        </div>
+                        <div className="w-2/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
                           โปรเจ็คการทดสอบ
                         </div>
                         <div className="hidden lg:block w-2/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
@@ -235,6 +246,14 @@ export default function Inspection_page() {
                               <h5 className="xl:ml-1 text-ellipsis overflow-hidden">
                                 {data.construct.ID}
                               </h5>
+                            </div>
+                            <div className="w-2/12 text-center text-base lg:text-lg  flex place-content-center place-items-center">
+                              <div className="text-ellipsis overflow-hidden">
+                                {
+                                  data.qcProject.qcItemProject[0].qcMain.qcType
+                                    .name
+                                }
+                              </div>
                             </div>
                             <div className="w-2/12 text-center text-base lg:text-lg  flex place-content-center place-items-center">
                               <div className="text-ellipsis overflow-hidden">

@@ -4,10 +4,12 @@ import React from "react";
 import BackButton from "@/components/backButton";
 import Link from "next/link";
 import Swal from "sweetalert2";
-import Navbar from "@/components/navbar";
-import Breadcrumb from "@/components/breadcrumb";
+import SideBar from "@/components/sidebar";
 
-export default function CreateSettingTest() {
+import Breadcrumb from "@/components/breadcrumb";
+import Footer from "@/components/footer";
+
+export default function CreateTestSetting() {
   const [name, setName] = useState("");
   const [detail, setDetail] = useState("");
   const [qcType, setQcType] = useState({ name: "", value: "" });
@@ -18,14 +20,15 @@ export default function CreateSettingTest() {
       {
         ID: string;
         name: string;
-      }
+      },
     ];
     allPage: number;
   } | null>();
   const [qcScript, setQcScript] = useState({
     TemperatureMax: 0,
     CurrentMax: 0,
-    Time: 0,
+    StartMoment: 0,
+    EndMoment: 0,
   });
 
   async function clickCreate() {
@@ -99,15 +102,14 @@ export default function CreateSettingTest() {
 
   return (
     <div className="flex">
-      <Navbar />
-      <div className="w-full flex flex-col items-center border ">
+      <SideBar />
+      <div className="w-full h-full flex flex-col">
         <Breadcrumb />
-
-        <div>
+        <div className="w-full flex items-center px-20 py-5 ">
           <div
             tabIndex={0}
             onClick={() => {
-              localStorage.setItem("currentUrl", "qc/settingTest");
+              localStorage.setItem("currentUrl", "qc/testSetting");
               window.location.reload();
             }}
             className="flex ml-5 sm:ml-20 cursor-pointer"
@@ -125,122 +127,129 @@ export default function CreateSettingTest() {
             สร้าง
           </button>
         </div>
-      </div>
 
-      <div className="mx-10 px-10 py-10 flex flex-col gap-8 rounded-xl border-2">
-        {/* เลือกประเภทการทดสอบ*/}
-        <div>
-          <div className="flex">
-            <p className="lg:text-lg xl:text-xl">ประเภทการทดสอบ</p>
-            <span className="text-red-600">&nbsp;*</span>
-          </div>
+        <div className="mx-10 px-10 py-10 flex flex-col gap-8 rounded-xl border-2">
+          {/* เลือกประเภทการทดสอบ*/}
+          <div>
+            <div className="flex">
+              <p className="lg:text-lg xl:text-xl">ประเภทการทดสอบ</p>
+              <span className="text-red-600">&nbsp;*</span>
+            </div>
 
-          <div className="flex gap-10 items-center">
-            {qcType ? (
-              <select
-                defaultValue={"none"}
-                onChange={(e) => {
-                  setQcType({
-                    value: e.target.value,
-                    name: e.target.options[e.target.selectedIndex].text,
-                  });
-                }}
-                className="w-[80%] px-8 h-10 text-lg border rounded-sm"
-              >
-                <option value="" disabled hidden>
-                  {" "}
-                  เลือกประเภทการทดสอบ
-                </option>
-                {qcTypeList?.data?.map((data) => {
-                  return (
-                    <option
-                      key={data.ID}
-                      value={data.ID}
-                      data-something={data.name}
-                    >
-                      {data.name}
-                    </option>
-                  );
-                })}
-              </select>
-            ) : (
-              <select className="w-[80%] px-8 h-10 text-lg border rounded-sm">
-                <option value="" disabled hidden>
-                  {" "}
-                  No options
-                </option>
-              </select>
-            )}
+            <div className="flex gap-10 items-center">
+              {qcType ? (
+                <select
+                  defaultValue={"none"}
+                  onChange={(e) => {
+                    setQcType({
+                      value: e.target.value,
+                      name: e.target.options[e.target.selectedIndex].text,
+                    });
+                  }}
+                  className="w-[80%] px-8 h-10 text-lg border rounded-sm"
+                >
+                  <option value="" disabled hidden>
+                    {" "}
+                    เลือกประเภทการทดสอบ
+                  </option>
+                  {qcTypeList?.data?.map((data) => {
+                    return (
+                      <option
+                        key={data.ID}
+                        value={data.ID}
+                        data-something={data.name}
+                      >
+                        {data.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              ) : (
+                <select className="w-[80%] px-8 h-10 text-lg border rounded-sm">
+                  <option value="" disabled hidden>
+                    {" "}
+                    No options
+                  </option>
+                </select>
+              )}
 
-            <button
-              className="w-[20%] p-2 rounded-xl bg-gray-200
+              <button
+               onClick={() => {
+              localStorage.setItem("currentUrl", "qc/testSetting/create/qcType");
+              window.location.reload();
+            }}
+                className="w-[20%] p-2 rounded-xl bg-gray-200
             xl:px-2 xl:py-4 xl:text-lg 
             hover:cursor-pointer hover:bg-gray-300"
-            >
-              จัดการประเภทการทดสอบ
-            </button>
+              >
+                จัดการประเภทการทดสอบ
+              </button>
+            </div>
           </div>
+
+          {/* ชื่อการทดสอบ */}
+          <div>
+            <div className="flex">
+              <p className="lg:text-lg xl:text-xl">ชื่อการทดสอบ</p>
+              <span className="text-red-600">&nbsp;*</span>
+            </div>
+
+            <div className="flex gap-10 items-center">
+              <input
+                placeholder="ชื่อการทดสอบ"
+                className="w-full px-8 h-10 text-lg border rounded-sm"
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* รายละเอียดการทดสอบ */}
+          <div>
+            {" "}
+            <div className="flex">
+              <p className="lg:text-lg xl:text-xl">รายละเอียด</p>
+              <span className="text-red-600">&nbsp;*</span>
+            </div>
+            <div className="flex gap-10 items-center">
+              <input
+                className="w-full px-8 h-10 text-lg border rounded-sm"
+                onChange={(e) => setDetail(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {qcType.name === "temperature" && (
+            <div className="grid grid-cols-2 rounded-xl border">
+              {Object.keys(qcScript).map((key, index) => (
+                <div key={index}>
+                  <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
+                    <h4 className="text-base lg:text-lg xl:text-xl">
+                      {key}
+                      <span className="text-red-600">&nbsp;*</span>
+                    </h4>
+                    <input
+                      className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base lg:text-lg xl:text-2xl rounded-md"
+                      type="number"
+                      maxLength={50}
+                      placeholder="PowerLowLimit"
+                      value={qcScript[key as keyof typeof qcScript]}
+                      onChange={(e) =>
+                        setQcScript({
+                          ...qcScript,
+                          [key]: Number(e.target.value),
+                        })
+                      }
+                      required
+                    />
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-
-        {/* ชื่อการทดสอบ */}
-        <div>
-          <div className="flex">
-            <p className="lg:text-lg xl:text-xl">ชื่อการทดสอบ</p>
-            <span className="text-red-600">&nbsp;*</span>
-          </div>
-
-          <div className="flex gap-10 items-center">
-            <input
-              placeholder="ชื่อการทดสอบ"
-              className="w-full px-8 h-10 text-lg border rounded-sm"
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
+        <div className="flex flex-col-reverse place-content-center">
+          <Footer />
         </div>
-
-        {/* รายละเอียดการทดสอบ */}
-        <div>
-          {" "}
-          <div className="flex">
-            <p className="lg:text-lg xl:text-xl">รายละเอียด</p>
-            <span className="text-red-600">&nbsp;*</span>
-          </div>
-          <div className="flex gap-10 items-center">
-            <input
-              className="w-full px-8 h-10 text-lg border rounded-sm"
-              onChange={(e) => setDetail(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {qcType.name === "temperature" && (
-          <div className="grid grid-cols-2 rounded-xl border">
-            {Object.keys(qcScript).map((key, index) => (
-              <div key={index}>
-                <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
-                  <h4 className="text-base lg:text-lg xl:text-xl">
-                    {key}
-                    <span className="text-red-600">&nbsp;*</span>
-                  </h4>
-                  <input
-                    className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base lg:text-lg xl:text-2xl rounded-md"
-                    type="number"
-                    maxLength={50}
-                    placeholder="PowerLowLimit"
-                    value={qcScript[key as keyof typeof qcScript]}
-                    onChange={(e) =>
-                      setQcScript({
-                        ...qcScript,
-                        [key]: Number(e.target.value),
-                      })
-                    }
-                    required
-                  />
-                </label>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

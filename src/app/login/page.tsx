@@ -63,7 +63,7 @@ export default function Login() {
 
   if (!auth.user?.data)
     return (
-      <div className="w-screen h-screen flex bg-white">
+      <div className="w-screen  flex bg-white">
         <div className="w-full lg:w-8/12 h-full flex flex-col">
           <div className="w-full h-[20%] flex place-items-center place-content-center sm:place-content-start sm:pl-20">
             <img
@@ -76,7 +76,7 @@ export default function Login() {
           </div>
           <div className="w-full h-[80%] flex flex-col place-items-center">
             <div className="w-full sm:w-3/4 2xl:w-1/2 h-auto flex flex-col place-items-center bg-white rounded-[15px] border-2 border-black pt-10">
-              <h1 className="text-black text-[23px] lg:text-[27px] xl:text-[32px] font-extrabold ">
+              <h1 className="text-black text-[23px] lg:text-[27px] xl:text-[32px] font-extrabold  ">
                 ยินดีต้อนรับสู่โปรแกรมทดสอบ
               </h1>
               <h2 className="text-black text-base lg:text-lg xl:text-2xl font-bold  mt-10">

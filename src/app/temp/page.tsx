@@ -12,7 +12,8 @@ import Swal from "sweetalert2";
 import { resolve } from "path";
 import Select from "react-select";
 import ChartTemp from "@/components/temperature/chartTemp";
-import Navbar from "@/components/navbar";
+import SideBar from "@/components/sidebar";
+
 import Breadcrumb from "@/components/breadcrumb";
 import { useAuth } from "@/lib/auth/authProvider";
 
@@ -23,9 +24,9 @@ const statusMap: Record<string, { css: string; stateName: string }> = {
   Failed: { css: "bg-red-400", stateName: "FAIL" },
 };
 
-export default function MainTempTest_page() {
+export default function MainTempTest() {
   // Selectbar
-  const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า 99202505310001000901
+  const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า 99202509250014055801
   const [currentCOMPort, setCurrentCOMPort] = useState<number | null>();
   const [popup, setPopup] = useState(false);
   const openPopup = () => setPopup(true);
@@ -40,6 +41,9 @@ export default function MainTempTest_page() {
   const [temp1, setTemp1] = useState<number | 0>(0);
   const [temp2, setTemp2] = useState<number | 0>(0);
   const [temp3, setTemp3] = useState<number | 0>(0);
+  const [ambient1, setAmbient1] = useState<number | 0>(0);
+  const [ambient2, setAmbient2] = useState<number | 0>(0);
+  const [ambient3, setAmbient3] = useState<number | 0>(0);
   const [current, setCurrent] = useState<number | null>(null);
   const [time, setTime] = useState<number | null>(null);
   const [status, setStatus] = useState<string>(""); //สถานะการทดสอบ
@@ -47,18 +51,20 @@ export default function MainTempTest_page() {
     css: "bg-gray-400",
     stateName: "OFF",
   };
-  const [reason, setReason] = useState("");
+  const [detail, setDetail] = useState("");
 
   const [sendData, setSendData] = useState<{
     state: string;
     tempLim: number;
     currentLim: number;
-    timeLim: number;
+    startMoment: number;
+    endMoment: number;
   }>({
     state: "on",
-    tempLim: 60.0,
-    currentLim: 6.0,
-    timeLim: 10,
+    tempLim: 0.0,
+    currentLim: 0.0,
+    startMoment: 0.0,
+    endMoment: 0.0,
   });
   //รายละเอียดqcที่จะทดสอบ
   const [qcMains, setQcMains] = useState<{
@@ -94,7 +100,7 @@ export default function MainTempTest_page() {
           projectName: string;
           detail: string;
         };
-      }
+      },
     ];
   } | null>();
   const [qcProjectList, setQcProjectList] = useState<{
@@ -113,13 +119,14 @@ export default function MainTempTest_page() {
               testName: string;
               detail: string;
             };
-          }
+          },
         ];
-      }
+      },
     ];
     allPage: number;
   } | null>();
 
+  const recordedRef = useRef(false);
   const qcMainsRef = useRef(qcMains);
   const qcProjectRef = useRef(qcProject);
   const serialNumberRef = useRef(serialNumber);
@@ -128,7 +135,7 @@ export default function MainTempTest_page() {
   //ฟังชั่นรับserial Data
   const handleSerialData = (data: string) => {
     const parts = data.split(",");
-    if (parts.length > 8) {
+    if (parts.length > 10) {
       // const [t1, t2, t3, curr, tm, sendData] = parts;
 
       // setTemp1(parseFloat(parts[0]));
@@ -141,16 +148,22 @@ export default function MainTempTest_page() {
       setTemp1(parseFloat(parts[0]));
       setTemp2(parseFloat(parts[1]));
       setTemp3(parseFloat(parts[2]));
-      setTime(parseInt(parts[3]));
-      setCurrent(parseFloat(parts[4]));
+      setAmbient1(parseFloat(parts[3]));
+      setAmbient2(parseFloat(parts[4]));
+      setAmbient3(parseFloat(parts[5]));
+      setTime(parseInt(parts[7]));
+      setCurrent(parseFloat(parts[8]));
       setStatus(parts[9].trim());
-      setReason(parts[10].trim());
+      setDetail(parts[10].trim());
 
       if (
         parts[9].trim() === "Passed" ||
         (parts[9].trim() === "Failed" && parts[10] !== "Please check iron.")
       ) {
-        recordData(parts);
+        if (!recordedRef.current) {
+          recordedRef.current = true;
+          recordData(parts);
+        }
       }
     }
   };
@@ -174,7 +187,6 @@ export default function MainTempTest_page() {
   };
 
   const fetchScript = async (idProject: string) => {
-    console.log("ID Project: " + idProject);
     const rawData = await window.electronAPI.fetchAPI({
       method: "GET",
       URL: `qc/itemProject/${idProject}`,
@@ -189,18 +201,29 @@ export default function MainTempTest_page() {
       //     "name": "temperature"
       //   },
       (data: any) =>
-        data.qcMain?.qcType?.ID === "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600"
+        //api kla
+        data.qcMain?.qcType?.ID === "96accb41-4eae-43af-853b-bedcae094c10"
+      //api  P' Bright
+      // data.qcMain?.qcType?.ID === "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600"
     );
-    console.log("time : " + format_script?.qcMain?.qcScript?.script?.Time);
+    console.log(
+      "StartMoment : " + format_script?.qcMain?.qcScript?.script?.StartMoment
+    );
+    console.log(
+      "EndMoment : " + format_script?.qcMain?.qcScript?.script?.EndMoment
+    );
+
     setSendData((prev) => ({
       ...prev,
       tempLim: format_script?.qcMain?.qcScript?.script?.TemperatureMax,
       currentLim: format_script?.qcMain?.qcScript?.script?.CurrentMax,
-      timeLim: format_script?.qcMain?.qcScript?.script?.Time,
+      startMoment: format_script?.qcMain?.qcScript?.script?.StartMoment,
+      endMoment: format_script?.qcMain?.qcScript?.script?.EndMoment,
     }));
   };
 
   const clickTest = async () => {
+    recordedRef.current = false;
     if (!currentCOMPort) {
       Swal.fire({
         icon: "error",
@@ -229,9 +252,25 @@ export default function MainTempTest_page() {
     }
 
     try {
+      const checkSerialNumber = async () => {
+        const response = await window.electronAPI.fetchAPI({
+          method: "GET",
+          URL: `construct/${serialNumber}`,
+        });
+        if (!response) {
+          Swal.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: "รหัสสินค้าไม่ถูกต้อง",
+          });
+          return;
+        }
+      };
+      checkSerialNumber()
+
       await window.electronAPI.openPort(String(currentCOMPort));
       const data = await window.electronAPI.writeData({
-        port : currentCOMPort,
+        port: currentCOMPort,
         command: { ...sendData, state: "on" },
       });
       console.log(
@@ -266,10 +305,19 @@ export default function MainTempTest_page() {
         URL: "qc/record",
         body: {
           qcProjectID: qcProjectRef.current,
+          //99202509160012055701
           serialNumber: serialNumberRef.current,
           testBy: auth.user.data.ID,
         },
       });
+      if (!record) {
+        Swal.fire({
+          icon: "error",
+          title: "เกิดข้อผิดพลาดทางซอฟเเวร์",
+          text: "ไม่สามารถบันทึกค่าได้",
+        });
+        return;
+      }
       const res = await window.electronAPI.fetchAPI({
         method: "POST",
         URL: "qc/status",
@@ -331,202 +379,243 @@ export default function MainTempTest_page() {
     fetchScript(qcProject);
   }, [qcProject]);
 
-
-
   return (
-    <div className="flex">
-      <Navbar />
-      <div className="w-full h-full flex flex-col justify-between">
+    <div className="flex h-screen">
+      <SideBar />
+      <div className="flex flex-col w-full h-full overflow-y-auto">
         <Breadcrumb />
-        {/* Select Bar */}
-        <div className="flex flex-col 2x:flex-row">
-          <ul
-            className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg 
-       md:flex-row md:gap-10 md:items-center "
-          >
-            <li
-              className="flex flex-col justify-center items-center text-center whitespace-nowrap
-        md:basis-40"
+        <div className="flex flex-col bg-white w-full h-full overflow-y-auto whitespace-nowrap place-items-center">
+          {/* Select Bar */}
+          <div className="w-full flex flex-col 2x:flex-row">
+            <ul
+              className=" flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg 
+            md:flex-row md:gap-10 md:items-center"
             >
-              <h4 className="flex-nowrap text-lg xl:text-xl font-normal ">
-                Temperature port
-                <span className="text-red-600">&nbsp;*</span>
-              </h4>
-              <div className="text-black text-lg xl:text-xl flex place-content-start w-full lg:mt-3">
-                {currentCOMPort ? <h1>{"COM" + currentCOMPort}</h1> : null}
-                <button className="ml-5" onClick={openPopup}>
-                  {currentCOMPort ? "เปลี่ยน" : "เลือก"}
-                </button>
-              </div>
-              {popup && (
-                <Popup onClose={closePopup}>
-                  <SerialCommunicationPort />
-                </Popup>
-              )}
-            </li>
-            <li className="w-full md:basis-60">
-              <div className="flex">
-                <p className="">โปรเจคการทดสอบ</p>
-                <span className="text-red-600">&nbsp;*</span>
-              </div>
+              <li
+                className="flex flex-col justify-center items-center text-center whitespace-nowrap
+             md:basis-40"
+              >
+                <h4 className="flex-nowrap text-lg xl:text-xl font-normal ">
+                  Temperature port
+                  <span className="text-red-600">&nbsp;*</span>
+                </h4>
+                <div className="text-black text-lg xl:text-xl flex place-content-start w-full lg:mt-3">
+                  {currentCOMPort ? <h1>{"COM" + currentCOMPort}</h1> : null}
+                  <button className="ml-5" onClick={openPopup}>
+                    {currentCOMPort ? "เปลี่ยน" : "เลือก"}
+                  </button>
+                </div>
+                {popup && (
+                  <Popup onClose={closePopup}>
+                    <SerialCommunicationPort />
+                  </Popup>
+                )}
+              </li>
+              <li className="w-full md:basis-60">
+                <div className="flex">
+                  <p className="">โปรเจคการทดสอบ</p>
+                  <span className="text-red-600">&nbsp;*</span>
+                </div>
 
-              <Select
-                className="rounded-sm border"
-                options={
-                  qcProjectList?.data
-                    ? qcProjectList.data
-                        //1) filter
-                        .filter((project) =>
-                          project.qcItemProject?.some(
-                            (item) =>
-                              item.qcMain?.ID ===
-                              "daf844d8-2e39-4f05-8d45-4102b4baf7f4"
-                          )
-                        )
-                        //2) map
-                        .map((project) => ({
-                          value: project.ID,
-                          label: project.projectName,
-                        }))
-                    : []
-                }
-                onChange={(e) => {
-                  console.log("Selected project:", e?.value);
-                  setQcProject(e ? e.value : "");
-                }}
-              />
-            </li>
-            <li className="w-full md:flex-grow md:w-auto">
-              <div className="flex">
-                <p>รหัสสินค้า</p>
-                <span className="text-red-600">&nbsp;*</span>
-              </div>
-              <input
-                required
-                className="w-full px-2 py-1 rounded-sm border"
-                placeholder="รหัสสินค้า"
-                onClick={(e: any) => {
-                  e.target.value = "";
-                  setSerialNumber("");
-                }}
-                onChange={(e) => {
-                  console.log("Serial number input:", e.target.value);
-                  setSerialNumber(e.target.value);
-                  return;
-                }}
-              />
-            </li>
-          </ul>
-        </div>
-        <div className="w-full h-10 my-4"> </div>
-
-        {/* ----------- Body -------------*/}
-        <div
-          className="flex mx-[20%] flex-col justify-between gap-10 
-      lg:gap-10 lg:mx-[10%] lg:my-2"
-        >
-          {/* charTemp */}
-          <div
-            className="flex flex-col py-6 gap-5 w-full items-center justify-between rounded-[10%] bg-gray-100
-            lg:flex-row lg:rounded-full lg:px-[5%] lg:py-[4%] "
-          >
-            <div
-              className="flex flex-row items-center gap-4 text-center
-          lg:flex-col"
-            >
-              <ChartTemp maxTemp={sendData.tempLim} values={temp1} />
-              <label className="text-3xl">{temp1} °C</label>
-              <label>ตัวที่ 1</label>
-            </div>
-            <div
-              className="flex flex-row items-center gap-4 text-center
-          lg:flex-col"
-            >
-              <ChartTemp maxTemp={sendData.tempLim} values={temp2} />
-              <label className="text-3xl ">{temp2} °C </label>
-              <label>ตัวที่ 2</label>
-            </div>
-            <div
-              className="flex flex-row items-center gap-4 text-center
-          lg:flex-col"
-            >
-              <ChartTemp maxTemp={sendData.tempLim} values={temp3} />
-              <label className="text-3xl ">{temp3} °C</label>
-              <label>ตัวที่ 3</label>
-            </div>
+                <Select
+                  className="rounded-sm border"
+                  // options={
+                  //   qcProjectList?.data
+                  //     ? qcProjectList.data
+                  //         //1) filter
+                  //         .filter((project) =>
+                  //           project.qcItemProject?.some(
+                  //             (item) =>
+                  //               item.qcMain?.ID ===
+                  //               //api kla
+                  //               "497da269-cdd3-419c-8f7d-f14a8a07e1f0"
+                  //               //api P' Bright
+                  //               // "23c853da-0d4d-4605-b242-0c13731dfb29"
+                  //           )
+                  //         )
+                  //         //2) map
+                  //         .map((project) => ({
+                  //           value: project.ID,
+                  //           label: project.projectName,
+                  //         }))
+                  //     : []
+                  // }
+                  options={qcProjectList?.data?.map((data) => ({
+                    value: data.ID,
+                    label: data.projectName,
+                  }))}
+                  onChange={(e) => {
+                    console.log("Selected project:", e?.value);
+                    setQcProject(e ? e.value : "");
+                  }}
+                />
+              </li>
+              <li className="w-full md:flex-grow md:w-auto">
+                <div className="flex">
+                  <p>รหัสสินค้า</p>
+                  <span className="text-red-600">&nbsp;*</span>
+                </div>
+                <input
+                  required
+                  className="w-full px-2 py-1 rounded-sm border"
+                  placeholder="รหัสสินค้า"
+                  onClick={(e: any) => {
+                    e.target.value = "";
+                    setSerialNumber("");
+                  }}
+                  onChange={(e) => {
+                    console.log("Serial number input:", e.target.value);
+                    setSerialNumber(e.target.value);
+                    return;
+                  }}
+                />
+              </li>
+            </ul>
           </div>
+          <div className="w-full h-10 my-4"> </div>
 
+          {/* ----------- Body -------------*/}
           <div
-            className="flex flex-col justify-between gap-10
-        lg:flex-row lg:gap-0"
+            className="w-full flex px-[20%] flex-col justify-between gap-10 
+          lg:gap-10 lg:px-[10%] lg:my-2"
           >
-            {/* กระแส อุณหภูมิ */}
+            {/* charTemp */}
             <div
-              className="flex flex-col w-full justify-between text-lg 
-          lg:items-start lg:pl-10 "
+              className="w-full flex flex-col py-6 gap-5 w-full items-center justify-between rounded-[10%] bg-gray-100
+            lg:flex-row lg:rounded-full lg:px-[5%] lg:py-[4%] "
             >
-              <div className="flex gap-10">
-                <div className="flex items-center gap-4">
-                  <p>กระแสไฟฟ้า :</p>
-                  <input
-                    className="w-25 h-10 text-center border rounded-sm "
-                    type="text"
-                    value={current ? current : 0}
-                    readOnly
-                  ></input>
-                </div>
-                <div className="flex items-center gap-4">
-                  <p>เวลา :</p>
-                  <input
-                    className="w-25 h-10 text-center border rounded-sm "
-                    type="text"
-                    value={time ? time : 0}
-                    readOnly
-                  ></input>
-                </div>
+              <div
+                className="flex flex-row items-center gap-4 text-center
+          lg:flex-col"
+              >
+                <ChartTemp maxTemp={sendData.tempLim} values={temp1} />
+                <label className="text-3xl">{temp1} °C</label>
+                <label>ตัวที่ 1</label>
               </div>
-              <div className="flex flex-col gap-3">
-                <div className="flex h-auto w-auto items-center justify-center gap-4 ">
-                  <p>ผลลัพธ์ : </p>
-                  <div
-                    className={`w-24 flex py-2 justify-center items-center whitespace-nowrap rounded-lg text-white ${css}`}
-                  >
-                    {stateName}
+              <div
+                className="flex flex-row items-center gap-4 text-center
+          lg:flex-col"
+              >
+                <ChartTemp maxTemp={sendData.tempLim} values={temp2} />
+                <label className="text-3xl ">{temp2} °C </label>
+                <label>ตัวที่ 2</label>
+              </div>
+              <div
+                className="flex flex-row items-center gap-4 text-center
+          lg:flex-col"
+              >
+                <ChartTemp maxTemp={sendData.tempLim} values={temp3} />
+                <label className="text-3xl ">{temp3} °C</label>
+                <label>ตัวที่ 3</label>
+              </div>
+            </div>
+
+            {/* df */}
+            <div
+              className="flex flex-col py-6 gap-5 w-full items-center justify-between rounded-[10%] bg-gray-100
+            lg:flex-row lg:rounded-full lg:px-[5%] lg:py-[4%] "
+            >
+              <div
+                className="flex flex-row items-center gap-4 text-center
+          lg:flex-col"
+              >
+                <ChartTemp maxTemp={sendData.tempLim} values={temp1} />
+                <label className="text-3xl">{temp1} °C</label>
+                <label>ตัวที่ 1</label>
+              </div>
+              <div
+                className="flex flex-row items-center gap-4 text-center
+          lg:flex-col"
+              >
+                <ChartTemp maxTemp={sendData.tempLim} values={temp2} />
+                <label className="text-3xl ">{temp2} °C </label>
+                <label>ตัวที่ 2</label>
+              </div>
+              <div
+                className="flex flex-row items-center gap-4 text-center
+          lg:flex-col"
+              >
+                <ChartTemp maxTemp={sendData.tempLim} values={temp3} />
+                <label className="text-3xl ">{temp3} °C</label>
+                <label>ตัวที่ 3</label>
+              </div>
+            </div>
+
+            <div
+              className="flex flex-col justify-between gap-10
+         lg:flex-row lg:gap-0"
+            >
+              {/* กระแส อุณหภูมิ */}
+              <div
+                className="flex flex-col w-full justify-between text-lg 
+          lg:items-start lg:pl-10 "
+              >
+                <div className="flex gap-10">
+                  <div className="flex items-center gap-4">
+                    <p>กระแสไฟฟ้า :</p>
+                    <input
+                      className="w-25 h-10 text-center border rounded-sm "
+                      type="text"
+                      value={current ? current : 0}
+                      readOnly
+                    ></input>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <p>เวลา :</p>
+                    <input
+                      className="w-25 h-10 text-center border rounded-sm "
+                      type="text"
+                      value={time ? time : 0}
+                      readOnly
+                    ></input>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <p>หมายเหตุ :</p>
-                  <p>{reason}</p>
+                <div className="flex flex-col gap-3">
+                  <div className="flex h-auto w-auto items-center justify-center gap-4 ">
+                    <p>ผลลัพธ์ : </p>
+                    <div
+                      className={`w-24 flex py-2 justify-center items-center whitespace-nowrap rounded-lg text-white ${css}`}
+                    >
+                      {stateName}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <p>หมายเหตุ :</p>
+                    <p>{detail}</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* ปุ่มกดทดสอบ หยุด */}
-            <div
-              className="flex flex-col h-full items-center gap-10
+              {/* ปุ่มกดทดสอบ หยุด */}
+              <div
+                className="flex flex-col h-full items-center gap-10
           lg:items-end"
-            >
-              <button
-                id="test"
-                className="w-40 h-15  rounded-lg bg-[#001F3F] hover:cursor-pointer text-xl text-white font-semibold
-          md:w-45 md:h-20"
-                onClick={clickTest}
               >
-                ทดสอบ
-              </button>
-              <button
-                className="w-40 h-15  rounded-lg bg-red-600 hover:cursor-pointer text-xl text-white font-semibold
+                <button
+                  id="test"
+                  className="w-40 h-15  rounded-lg bg-[#001F3F] hover:cursor-pointer text-xl text-white font-semibold
           md:w-45 md:h-20"
-                onClick={async () => {
-                  await window.electronAPI.writeData({
-                   port : currentCOMPort,
-                    command: { ...sendData, state: "stop" },
-                  });
-                }}
-              >
-                หยุด
-              </button>
+                  onClick={clickTest}
+                >
+                  ทดสอบ
+                </button>
+                <button
+                  className="w-40 h-15  rounded-lg bg-red-600 hover:cursor-pointer text-xl text-white font-semibold
+          md:w-45 md:h-20"
+                  onClick={async () => {
+                    await window.electronAPI.writeData({
+                      port: currentCOMPort,
+                      command: { ...sendData, state: "stop" },
+                    });
+                  }}
+                >
+                  หยุด
+                </button>
+              </div>
             </div>
+          </div>
+          <div className="flex flex-col-reverse place-content-center">
+            <Footer />
           </div>
         </div>
       </div>

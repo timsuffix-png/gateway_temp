@@ -1,45 +1,41 @@
-import { readFileSync, writeFileSync } from "fs";
-import { app, BrowserWindow, ipcMain } from "electron";
-import { SerialPort, ReadlineParser } from "serialport";
+import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import * as child_process from "child_process";
+import { promisify } from "util";
 import { error } from "console";
+import { SerialPort } from "serialport";
+import { ReadlineParser } from "@serialport/parser-readline";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+if (require("electron-squirrel-startup")) {
+  app.quit();
+}
 
-const createWindow = () => {
-  // หน้าที่: เปิด BrowserWindow และโหลด preload.js
-  const mainWindow = new BrowserWindow({
+let mainWindow: BrowserWindow | null = null;
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "../../electron/dist/electron/preload.js"),
-      nodeIntegration: false,
-      contextIsolation: true,
+      preload: path.join(__dirname, "preload.js"),
     },
   });
 
   mainWindow.loadURL("http://localhost:3000");
-  mainWindow.webContents.openDevTools();
 
   mainWindow.webContents.session.on(
     "select-serial-port",
     (event, portList, webContents, callback) => {
-      const newPortList = [];
-      for (let port of portList) {
-        if (port.portName.includes("COM")) {
-          newPortList.push(port);
-        }
-      }
-      mainWindow.webContents.send("portlist", newPortList);
+      const newPortList = portList.filter((p) => p.portName?.includes("COM"));
+      mainWindow?.webContents.send("portlist", newPortList);
     }
   );
-};
+}
 
 app.on("ready", () => {
   createWindow();
-
   //-----------------------------------------------------------Image----------------------------------------------------------
   ipcMain.handle("loadImg", (event, args) => {
     const ext = path.extname(args);
@@ -302,8 +298,8 @@ app.on("ready", () => {
     }
   });
 
-  let port; //ใช้เช็กว่า พอร์ตเปิดอยู่มั้ย
-  let parser = null; //ฟังรอข้อมูลเข้ามา มีข้อมูลเมื่อไหร่ จะยิง 'data' event
+  let port: SerialPort | null; //ใช้เช็กว่า พอร์ตเปิดอยู่มั้ย
+  let parser: ReadlineParser | null = null; //ฟังรอข้อมูลเข้ามา มีข้อมูลเมื่อไหร่ จะยิง 'data' event
 
   ipcMain.handle("openPort", async (event, portName) => {
     return new Promise((resolve, reject) => {
@@ -336,7 +332,7 @@ app.on("ready", () => {
     });
   });
 
-  async function openPortIfNeeded(portName) {
+  async function openPortIfNeeded(portName: string) {
     return new Promise((resolve, reject) => {
       if (port && port.isOpen) {
         return resolve("Port already opened");
@@ -349,8 +345,8 @@ app.on("ready", () => {
       });
       parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
 
-      port.on("error", (err) => {
-        reject("Serial port error:", err);
+      port.on("error", (err: Error) => {
+        reject("Serial port error:" + err.message);
       });
       port.open((err) => {
         if (err) {
@@ -371,8 +367,7 @@ app.on("ready", () => {
       const win = BrowserWindow.getAllWindows()[0];
       const state_command = args.command.state.trim();
       const cleanCmd = `${args.command.state.trim()},${args.command.tempLim},${
-        args.command.currentLim
-      },${args.command.timeLim}`;
+        args.command.currentLim},${args.command.startMoment},${args.command.endMoment}`;
 
       if (state_command === "stop") {
         if (port && port.isOpen) {
@@ -385,11 +380,7 @@ app.on("ready", () => {
         return;
       }
       if (!port || !port.isOpen) {
-        try {
-          await openPortIfNeeded(args.port);
-        } catch (err) {
-          return reject(err); // ต้อง reject ถ้าเปิดพอร์ตไม่สำเร็จ
-        }
+        return reject("Port not available after openPortIfNeeded");
       }
 
       console.log("State on : " + cleanCmd);
@@ -406,21 +397,20 @@ app.on("ready", () => {
         parser.removeAllListeners("data");
       }
 
-      const onData = (data) => {
-        console.log("Data from Arduino:", data.toString());
-        data = data.trim();
+      const onData = (data: Buffer | string): void => {
+        const str = data.toString().trim();
+        console.log("Data from Arduino:", str);
         // ส่งข้อมูลไป renderer ทันทีทีละบรรทัด
-        win.webContents.send("serial-data", data);
+        win.webContents.send("serial-data", str);
         // 👉 ฝั่ง renderer จะได้ทีละรอบ เรียลไทม์
 
-        const index_data = data.split(",");
+        const index_data = str.split(",");
         // ตรวจความยาวก่อนเข้าถึง index 9 (state)
-        if (index_data.length > 9) {
+        if (index_data.length > 10) {
           const state_data = index_data[9].trim();
           // ถ้า state ไม่เท่ากับ "on" ให้จบการรับข้อมูล
           if (state_data !== "on") {
             if (parser) parser.removeListener("data", onData);
-           
           }
         }
       };
@@ -451,14 +441,5 @@ app.on("ready", () => {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
-  }
-});
-
-
-app.on("activate", () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
   }
 });

@@ -41,7 +41,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
       state: string;
       tempLim: number;
       currentLim: number;
-      timeLim: number;
+      startMoment: number;
+      endMoment: number;
+
     };
   }) => ipcRenderer.invoke("writeData", args),
 });

@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "lib": ["es2021", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "allowJs": false,
+    "rootDir": "src/electron",
+    "outDir": "electron/dist",
+    "noEmit": false,
+    "noEmitOnError": false,
+    "incremental": true,
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@electron/*": ["src/electron/*"]
+    }
+  },
+  "include": ["src/electron/**/*"],
+  "exclude": ["node_modules", ".next", "src/app", "src/pages", "src/components"]
+}

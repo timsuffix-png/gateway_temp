@@ -1,45 +1,27 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "ES2021",
+    "lib": ["dom", "dom.iterable", "es2021"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-     "outDir": "electron/dist/electron",
-     "rootDir": ".",  // ถ้าไฟล์ ts อยู่ใน src ปรับให้ตรงกับโครงสร้าง
-    "noEmit": false,
+    "noEmit": true,                 
     "esModuleInterop": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] }     
   },
   "include": [
     "next-env.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/electron/**/*.ts",
-    "src/electron/**/*.tsx",
-    "src/electron/main.js",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts"
-, "src/app/pages/index.js"  ],
-  "exclude": [
-    "node_modules"
-  ]
+  ],
+  "exclude": ["node_modules", "electron/dist", "src/electron"] 
 }
