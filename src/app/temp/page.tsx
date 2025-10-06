@@ -16,6 +16,7 @@ import SideBar from "@/components/sidebar";
 
 import Breadcrumb from "@/components/breadcrumb";
 import { useAuth } from "@/lib/auth/authProvider";
+import { abort } from "process";
 
 const statusMap: Record<string, { css: string; stateName: string }> = {
   stop: { css: "bg-red-600", stateName: "STOP" },
@@ -38,9 +39,9 @@ export default function MainTempTest() {
   const auth = useAuth();
 
   const [qcProject, setQcProject] = useState(""); //qcProject ID
-  const [temp1, setTemp1] = useState<number | 0>(0);
-  const [temp2, setTemp2] = useState<number | 0>(0);
-  const [temp3, setTemp3] = useState<number | 0>(0);
+  const [temp1, setTemp1] = useState<number | 0>(0); //หันหน้าเข้าแผ่นเตารีด ขวา
+  const [temp2, setTemp2] = useState<number | 0>(0); //หันหน้าเข้าแผ่นเตารีด ซ้าย
+  const [temp3, setTemp3] = useState<number | 0>(0); //บนหน้าเตารีด
   const [ambient1, setAmbient1] = useState<number | 0>(0);
   const [ambient2, setAmbient2] = useState<number | 0>(0);
   const [ambient3, setAmbient3] = useState<number | 0>(0);
@@ -52,7 +53,7 @@ export default function MainTempTest() {
     stateName: "OFF",
   };
   const [detail, setDetail] = useState("");
-
+  const ironImageRef = useRef<any | null>(null);
   const [sendData, setSendData] = useState<{
     state: string;
     tempLim: number;
@@ -131,6 +132,19 @@ export default function MainTempTest() {
   const qcProjectRef = useRef(qcProject);
   const serialNumberRef = useRef(serialNumber);
   const statusRef = useRef(status);
+
+  useEffect(() => {
+    if (ironImageRef.current) {
+      const loadImage = async () => {
+        const logo = await window.electronAPI.loadImg("iron-plate.png");
+       
+
+        ironImageRef.current.src = logo;
+       
+      };
+      loadImage();
+    }
+  }, [auth]);
 
   //ฟังชั่นรับserial Data
   const handleSerialData = (data: string) => {
@@ -266,7 +280,7 @@ export default function MainTempTest() {
           return;
         }
       };
-      checkSerialNumber()
+      checkSerialNumber();
 
       await window.electronAPI.openPort(String(currentCOMPort));
       const data = await window.electronAPI.writeData({
@@ -445,7 +459,6 @@ export default function MainTempTest() {
                     label: data.projectName,
                   }))}
                   onChange={(e) => {
-                    console.log("Selected project:", e?.value);
                     setQcProject(e ? e.value : "");
                   }}
                 />
@@ -480,10 +493,50 @@ export default function MainTempTest() {
           lg:gap-10 lg:px-[10%] lg:my-2"
           >
             {/* charTemp */}
-            <div
-              className="w-full flex flex-col py-6 gap-5 w-full items-center justify-between rounded-[10%] bg-gray-100
-            lg:flex-row lg:rounded-full lg:px-[5%] lg:py-[4%] "
-            >
+            <div className="relative self-center pt-10">
+              <img
+                className="w-[240px] h-[370px]"
+                ref={ironImageRef}
+                alt="logo"
+              />
+
+              <div>
+                <div>
+                  {/* บน */}
+                  <div className="absolute left-27 -top-7 text-[#C7AD00] text-lg xl:text-xl 2xl:text-2xl font-bold">
+                    บน  {temp3} °C
+                  </div>
+                  <div className="absolute left-10 top-3 text-gray-900 text-sm xl:text-lg 2xl:text-xl font-semibold">
+                    อุณหภูมิรอบข้าง : {ambient3} °C
+                  </div>
+                  <svg className="absolute left-26 top-20 h-6 w-6"
+                  fill="#fbff00ff" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path></g></svg>
+                </div>
+                {/* ซ้าย */}
+
+                <div className="absolute -left-27 top-50 text-[#00A385] text-lg xl:text-xl 2xl:text-2xl font-bold">
+                  ซ้าย {temp2} °C
+                </div>
+                <div className="absolute -left-45 top-58 text-gray-900 text-sm xl:text-lg 2xl:text-xl  font-semibold">
+                  อุณหภูมิรอบข้าง : {ambient1} °C
+                </div>
+                 <svg className="absolute left-6 top-55 h-6 w-6"
+                  fill="#00ffd0ff" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path></g></svg>
+              </div>
+
+              <div>
+                <div className="absolute -right-27 top-50 text-[#FF5CB6] text-lg xl:text-xl 2xl:text-2xl font-bold">
+                  ขวา {temp1} °C
+                </div>
+                <div className="absolute  -right-45 top-58 text-gray-900 text-sm xl:text-lg 2xl:text-xl font-semibold">
+                  อุณหภูมิรอบข้าง : {ambient1} °C
+                </div>
+                 <svg className="absolute right-5 top-55 h-6 w-6"
+                  fill="#FFB8DF" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path></g></svg>
+              </div>
+            </div>
+
+            {/* 
               <div
                 className="flex flex-row items-center gap-4 text-center
           lg:flex-col"
@@ -508,39 +561,7 @@ export default function MainTempTest() {
                 <label className="text-3xl ">{temp3} °C</label>
                 <label>ตัวที่ 3</label>
               </div>
-            </div>
-
-            {/* df */}
-            <div
-              className="flex flex-col py-6 gap-5 w-full items-center justify-between rounded-[10%] bg-gray-100
-            lg:flex-row lg:rounded-full lg:px-[5%] lg:py-[4%] "
-            >
-              <div
-                className="flex flex-row items-center gap-4 text-center
-          lg:flex-col"
-              >
-                <ChartTemp maxTemp={sendData.tempLim} values={temp1} />
-                <label className="text-3xl">{temp1} °C</label>
-                <label>ตัวที่ 1</label>
-              </div>
-              <div
-                className="flex flex-row items-center gap-4 text-center
-          lg:flex-col"
-              >
-                <ChartTemp maxTemp={sendData.tempLim} values={temp2} />
-                <label className="text-3xl ">{temp2} °C </label>
-                <label>ตัวที่ 2</label>
-              </div>
-              <div
-                className="flex flex-row items-center gap-4 text-center
-          lg:flex-col"
-              >
-                <ChartTemp maxTemp={sendData.tempLim} values={temp3} />
-                <label className="text-3xl ">{temp3} °C</label>
-                <label>ตัวที่ 3</label>
-              </div>
-            </div>
-
+            </div> */}
             <div
               className="flex flex-col justify-between gap-10
          lg:flex-row lg:gap-0"
