@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { localStorageWeb } from "@/utils/localstorage";
 import SideBar from "@/components/sidebar";
 import Breadcrumb from "@/components/breadcrumb";
 import Footer from "@/components/footer";
@@ -108,28 +109,28 @@ export default function QcType() {
               <div
                 tabIndex={0}
                 onClick={() => {
-                  localStorage.setItem("currentUrl", "qc/testSetting/create");
+                  localStorageWeb.setItem("currentUrl", "qc/testSetting/create");
                   window.location.reload();
                 }}
                 className="ml-5 sm:ml-20 cursor-pointer"
               >
                 <BackButton text="ย้อนกลับ" />
               </div>
-              <h2 className="ml-5 sm:ml-20 text-black text-lg xl:text-xl 2xl:text-2xl font-bold ">
+              <h2 className="ml-5 sm:ml-20 text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold ">
                 ประเภทการทดสอบ
               </h2>
             </div>
             <div className="flex flex-col w-full mt-10">
               <div className="flex flex-row w-full place-items-center">
-                <h2 className="ml-16 lg:ml-40 text-black text-lg xl:text-xl font-normal ">
+                <h2 className="ml-16 lg:ml-40 text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                   เพิ่มรายการประเภทการทดสอบ
                 </h2>
               </div>
               <div className="flex flex-col sm:flex-row place-items-center place-content-center mt-10">
                 <label className="mx-20 w-3/4 sm:w-1/2 flex flex-col">
-                  <h4 className="text-lg xl:text-xl text-black font-normal ">
+                  <h4 className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-black font-normal ">
                     ชื่อประเภทการทดสอบ
-                    <span className="text-red-600">&nbsp;*</span>
+                    <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
                   </h4>
                   <input
                     type="text"
@@ -144,7 +145,7 @@ export default function QcType() {
                 </div>
               </div>
               <div className="flex flex-row w-full place-items-center mt-10">
-                <h2 className="ml-16 lg:ml-40 text-black text-lg xl:text-xl font-normal ">
+                <h2 className="ml-16 lg:ml-40 text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                   รายการประเภทการทดสอบ
                 </h2>
               </div>
@@ -153,13 +154,13 @@ export default function QcType() {
                   <div className="w-[95%] my-[20px]">
                     <div className="text-black font-bold">
                       <div className="bg-[#6494d3] rounded-t-3xl flex flex-row h-10 place-items-center">
-                        <div className="w-6/12 text-center text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-6/12 text-center text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-bold  text-ellipsis overflow-hidden">
                           ชื่อประเภทการทดสอบ
                         </div>
-                        <div className="w-3/12 text-center text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-3/12 text-center text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-bold  text-ellipsis overflow-hidden">
                           แก้ไข
                         </div>
-                        <div className="w-3/12 text-center text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-3/12 text-center text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-bold  text-ellipsis overflow-hidden">
                           ลบ
                         </div>
                       </div>
@@ -175,14 +176,14 @@ export default function QcType() {
                               <div className="hidden sm:block">
                                 {Translator.type.icon}
                               </div>
-                              <h5 className="sm:ml-5 text-ellipsis overflow-hidden">{data.name}</h5>
+                              <h5 className="sm:ml-5 text-ellipsis text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl overflow-hidden">{data.name}</h5>
                             </div>
                             <div className="w-3/12 text-center text-lg  flex place-content-center place-items-center">
                               <button
                                 onClick={
                                   () => {
-                                    localStorage.setItem("currentUrl", "qc/testSetting/create/qcType/edit");
-                                    localStorage.setItem("param", data.ID)
+                                    localStorageWeb.setItem("currentUrl", "qc/testSetting/create/qcType/edit");
+                                    localStorageWeb.setItem("param", data.ID)
                                     window.location.reload();
                                   }
                                 }
@@ -239,7 +240,7 @@ export default function QcType() {
                 />
               </div>
             </div>
-            <div className="flex flex-col-reverse place-content-center">
+            <div className="flex flex-col-reverse place-content-center mt-auto">
               <Footer />
             </div>
           </div>

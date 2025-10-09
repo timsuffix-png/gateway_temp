@@ -254,7 +254,7 @@ export const Translator: any = {
     ),
   },
   testSetting: { name: "ตั้งค่าการทดสอบ" },
-  project: { name: "โปรเจ็ค" },
+  project: { name: "โปรเจกต์" },
   approve: { name: "อนุมัติ" },
   qcType: { name: "ประเภทการทดสอบ" },
   repair: { name: "ซ่อมแซม" },

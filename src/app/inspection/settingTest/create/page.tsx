@@ -1,8 +1,8 @@
 "use client";
 import { use, useEffect, useState } from "react";
 import React from "react";
+import { localStorageWeb } from "@/utils/localstorage";
 import BackButton from "@/components/backButton";
-import Link from "next/link";
 import Swal from "sweetalert2";
 import SideBar from "@/components/sidebar";
 
@@ -101,15 +101,15 @@ export default function CreateTestSetting() {
   }, []);
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <SideBar />
-      <div className="w-full h-full flex flex-col">
+      <div className="w-full h-full flex flex-col border-4">
         <Breadcrumb />
         <div className="w-full flex items-center px-20 py-5 ">
           <div
             tabIndex={0}
             onClick={() => {
-              localStorage.setItem("currentUrl", "qc/testSetting");
+              localStorageWeb.setItem("currentUrl", "qc/testSetting");
               window.location.reload();
             }}
             className="flex ml-5 sm:ml-20 cursor-pointer"
@@ -117,11 +117,12 @@ export default function CreateTestSetting() {
             <BackButton />
           </div>
 
-          <p className="font-bold ml-15 text-xl 2xl:text-2xl">สร้างการทดสอบ</p>
+          <p className="font-bold ml-15 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+            สร้างการทดสอบ
+          </p>
           <button
-            className="ml-auto px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F] 
-            xl:text-xl 
-            2xl:text-2xl"
+            className="ml-auto px-10 py-3 text-white text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-xl bg-[#001F3F] hover:cursor-pointer
+           "
             onClick={clickCreate}
           >
             สร้าง
@@ -132,8 +133,12 @@ export default function CreateTestSetting() {
           {/* เลือกประเภทการทดสอบ*/}
           <div>
             <div className="flex">
-              <p className="lg:text-lg xl:text-xl">ประเภทการทดสอบ</p>
-              <span className="text-red-600">&nbsp;*</span>
+              <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                ประเภทการทดสอบ
+              </p>
+              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                &nbsp;*
+              </span>
             </div>
 
             <div className="flex gap-10 items-center">
@@ -146,7 +151,7 @@ export default function CreateTestSetting() {
                       name: e.target.options[e.target.selectedIndex].text,
                     });
                   }}
-                  className="w-[80%] px-8 h-10 text-lg border rounded-sm"
+                  className="w-[80%] px-8 h-10 text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  border rounded-sm"
                 >
                   <option value="" disabled hidden>
                     {" "}
@@ -174,12 +179,15 @@ export default function CreateTestSetting() {
               )}
 
               <button
-               onClick={() => {
-              localStorage.setItem("currentUrl", "qc/testSetting/create/qcType");
-              window.location.reload();
-            }}
-                className="w-[20%] p-2 rounded-xl bg-gray-200
-            xl:px-2 xl:py-4 xl:text-lg 
+                onClick={() => {
+                  localStorageWeb.setItem(
+                    "currentUrl",
+                    "qc/testSetting/create/qcType"
+                  );
+                  window.location.reload();
+                }}
+                className="w-[20%] p-2 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-xl bg-gray-200
+            xl:px-2 xl:py-4 
             hover:cursor-pointer hover:bg-gray-300"
               >
                 จัดการประเภทการทดสอบ
@@ -190,14 +198,18 @@ export default function CreateTestSetting() {
           {/* ชื่อการทดสอบ */}
           <div>
             <div className="flex">
-              <p className="lg:text-lg xl:text-xl">ชื่อการทดสอบ</p>
-              <span className="text-red-600">&nbsp;*</span>
+              <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                ชื่อการทดสอบ
+              </p>
+              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                &nbsp;*
+              </span>
             </div>
 
             <div className="flex gap-10 items-center">
               <input
                 placeholder="ชื่อการทดสอบ"
-                className="w-full px-8 h-10 text-lg border rounded-sm"
+                className="w-full px-8 h-10 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl border rounded-sm"
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
@@ -207,12 +219,16 @@ export default function CreateTestSetting() {
           <div>
             {" "}
             <div className="flex">
-              <p className="lg:text-lg xl:text-xl">รายละเอียด</p>
-              <span className="text-red-600">&nbsp;*</span>
+              <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                รายละเอียด
+              </p>
+              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                &nbsp;*
+              </span>
             </div>
             <div className="flex gap-10 items-center">
               <input
-                className="w-full px-8 h-10 text-lg border rounded-sm"
+                className="w-full px-8 h-10 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl border rounded-sm"
                 onChange={(e) => setDetail(e.target.value)}
               />
             </div>
@@ -223,12 +239,14 @@ export default function CreateTestSetting() {
               {Object.keys(qcScript).map((key, index) => (
                 <div key={index}>
                   <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
-                    <h4 className="text-base lg:text-lg xl:text-xl">
+                    <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
                       {key}
-                      <span className="text-red-600">&nbsp;*</span>
+                      <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                        &nbsp;*
+                      </span>
                     </h4>
                     <input
-                      className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base lg:text-lg xl:text-2xl rounded-md"
+                      className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
                       type="number"
                       maxLength={50}
                       placeholder="PowerLowLimit"
@@ -247,7 +265,7 @@ export default function CreateTestSetting() {
             </div>
           )}
         </div>
-        <div className="flex flex-col-reverse place-content-center">
+        <div className="flex flex-col-reverse place-content-center mt-auto">
           <Footer />
         </div>
       </div>

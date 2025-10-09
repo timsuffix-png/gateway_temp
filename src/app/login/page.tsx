@@ -75,21 +75,21 @@ export default function Login() {
               alt="logo"
             />
           </div>
-          <div className="w-full h-[80%] flex flex-col place-items-center">
+          <div className=" w-full h-[80%] flex flex-col place-items-center">
             <div className="w-full sm:w-3/4 2xl:w-1/2 h-auto flex flex-col place-items-center bg-white rounded-[15px] border-2 border-black pt-10">
-              <h1 className="text-black text-[23px] lg:text-[27px] xl:text-[32px] font-extrabold font-['Sarabun']">
+              <h1 className="text-black text-[23px] lg:text-[27px] xl:text-[32px] font-extrabold ">
                 ยินดีต้อนรับสู่โปรแกรมทดสอบ
               </h1>
-              <h2 className="text-black text-base lg:text-lg xl:text-2xl font-bold font-['Sarabun'] mt-10">
+              <h2 className="text-black text-base lg:text-lg xl:text-2xl font-bold  mt-10">
                 ลงชื่อเข้าใช้บัญชีผู้ทดสอบของคุณ
               </h2>
               <div className="w-full flex flex-col place-items-center mt-14">
                 <label className="w-3/4">
-                  <h3 className="text-black text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
+                  <h3 className="text-black text-base lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                     ชื่อผู้ใช้งาน
                   </h3>
                   <input
-                    className="w-full h-[40px] md:h-[50px] bg-white rounded-md border border-black text-black text-base lg:text-lg xl:text-2xl px-3 font-normal font-['Sarabun']"
+                    className="w-full h-[40px] md:h-[50px] bg-white rounded-md border border-black text-black text-base lg:text-lg xl:text-2xl px-3 font-normal "
                     type="text"
                     placeholder="ชื่อผู้ใช้งาน"
                     onChange={(e) => setusername(e.target.value)}
@@ -97,11 +97,11 @@ export default function Login() {
                   />
                 </label>
                 <label className="w-3/4 mt-5">
-                  <h3 className="text-black text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
+                  <h3 className="text-black text-base lg:text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                     รหัสผ่าน
                   </h3>
                   <input
-                    className="w-full h-[40px] md:h-[50px] bg-white rounded-md border border-black text-black text-base lg:text-lg xl:text-2xl px-3 font-normal font-['Sarabun']"
+                    className="w-full h-[40px] md:h-[50px] bg-white rounded-md border border-black text-black text-base lg:text-lg xl:text-2xl px-3 font-normal "
                     type="password"
                     placeholder="รหัสผ่าน"
                     onChange={(e) => setPassword(e.target.value)}
@@ -111,7 +111,7 @@ export default function Login() {
               </div>
               <div className="w-full flex place-content-center">
                 <div className="w-3/4">
-                  <h5 className="text-zinc-500 text-[10px] md:text-xs font-normal font-['Sarabun'] leading-snug mt-1">
+                  <h5 className="text-zinc-500 text-[10px] md:text-xs font-normal  leading-snug mt-1">
                     ลืมรหัสผ่าน?
                   </h5>
                 </div>
@@ -123,13 +123,13 @@ export default function Login() {
               </div>
               <div className="w-full">
                 <button className="mt-10 ml-5 mb-3" onClick={openPopup}>
-                  <h5 className="text-neutral-500 text-[10px] md:text-xs font-normal font-['Sarabun'] leading-snug">
-                    เปลี่ยนเส้นทางบันทึกข้อมูล?
+                  <h5 className="text-neutral-500 text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-normal  leading-snug hover:cursor-pointer">
+                    เปลี่ยนเส้นทางบันทึกข้อมูล
                   </h5>
                 </button>
               </div>
             </div>
-            <div className="h-full flex place-items-end place-content-center w-full">
+            <div className="flex place-items-end place-content-center ">
               <Footer />
             </div>
           </div>

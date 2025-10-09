@@ -1,5 +1,5 @@
 "use client";
-
+import { localStorageWeb } from "@/utils/localstorage";
 import SideBar from "@/components/sidebar";
 import Breadcrumb from "@/components/breadcrumb";
 import Footer from "@/components/footer";
@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth/authProvider";
 
 export default function QcDetail() {
   const auth = useAuth();
-  const param = localStorage.getItem("param");
+  const param = localStorageWeb.getItem("param");
   const [record, setRecord] = useState([]);
 
   useEffect(() => {
@@ -48,14 +48,16 @@ export default function QcDetail() {
                 <div
                   tabIndex={0}
                   onClick={() => {
-                    localStorage.setItem("currentUrl", "qc");
+                   
+                    localStorageWeb.setItem("currentUrl", "qc");
                     window.location.reload();
+                    
                   }}
                   className="ml-5 sm:ml-20 cursor-pointer"
                 >
                   <BackButton text="ย้อนกลับ" />
                 </div>
-                <h2 className="ml-5 sm:ml-20 text-black text-lg xl:text-xl 2xl:text-2xl font-bold  text-wrap sm:text-nowrap">
+                <h2 className="ml-5 sm:ml-20 text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold  text-wrap sm:text-nowrap">
                   รายละเอียดการทดสอบ
                 </h2>
               </div>
@@ -71,37 +73,37 @@ export default function QcDetail() {
                       >
                         <div className="w-full flex px-5 pt-3 pb-2 place-content-between place-items-center bg-[#76a0d6] rounded-t-2xl">
                           <div className="flex w-1/2">
-                            <h1 className="text-black  text-lg lg:text-xl font-normal">
+                            <h1 className="text-black  text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal">
                               ทดสอบ
                             </h1>
                             <div className="ml-2 overflow-hidden text-ellipsis">
                               {data.statusOverView === "Passed" ? (
-                                <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-base lg:text-lg rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
+                                <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
                                   ผ่าน
                                 </h3>
                               ) : data.statusOverView === "Failed" ? (
-                                <h3 className="text-[#ff0000] bg-[#ffa6a6] px-2 text-base lg:text-lg rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
+                                <h3 className="text-[#ff0000] bg-[#ffa6a6] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
                                   ไม่ผ่าน
                                 </h3>
                               ) : data.statusOverView === "In progress" ? (
-                                <h3 className="text-[#ff6600] bg-[#ffea8f] px-2 text-base lg:text-lg rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
+                                <h3 className="text-[#ff6600] bg-[#ffea8f] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
                                   รอการตรวจสอบ
                                 </h3>
                               ) : null}
                             </div>
                           </div>
                           <div className="flex place-content-end w-1/2">
-                            <h1 className="text-black text-base lg:text-lg font-normal  overflow-hidden text-ellipsis">
+                            <h1 className="text-black text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  overflow-hidden text-ellipsis">
                               {data.updatedAt.split("T")[0] +
                                 " " +
                                 data.updatedAt.split("T")[1]}
                             </h1>
                           </div>
                         </div>
-                        <h1 className="text-black font-normal  text-base lg:text-lg w-full text-center mt-5">
+                        <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
                           ทดสอบโดย
                         </h1>
-                        <h1 className="text-black font-normal  text-base lg:text-lg w-full text-center mt-5">
+                        <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
                           ผู้ใช้: {data.testBy.name + " " + data.testBy.surname}
                         </h1>
                       </div>
@@ -113,21 +115,21 @@ export default function QcDetail() {
                         className="text-black w-full border border-black mt-5 rounded-2xl pb-5"
                       >
                         <div className="w-full flex px-5 pt-3 pb-2 place-content-between place-items-center bg-[#f3856a] rounded-t-2xl">
-                          <h1 className="text-black  text-lg lg:text-xl font-normal">
+                          <h1 className="text-black  text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal">
                             ซ่อมแซม
                           </h1>
                           <div className="flex overflow-hidden text-ellipsis">
-                            <h1 className="text-black text-base lg:text-lg font-normal  overflow-hidden text-ellipsis">
+                            <h1 className="text-black text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  overflow-hidden text-ellipsis">
                               {data.createdAt.split("T")[0] +
                                 " " +
                                 data.createdAt.split("T")[1]}
                             </h1>
                           </div>
                         </div>
-                        <h1 className="text-black font-normal  text-base lg:text-lg w-full text-center mt-5">
+                        <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
                           ซ่อมแซมโดย
                         </h1>
-                        <h1 className="text-black font-normal  text-base lg:text-lg w-full text-center mt-5">
+                        <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
                           ผู้ใช้:{" "}
                           {data.repairBy.name + " " + data.repairBy.surname}
                         </h1>
@@ -138,12 +140,12 @@ export default function QcDetail() {
                   }
                 })
               ) : (
-                <h1 className="text-black w-full text-base lg:text-lg font-normal  text-center">
+                <h1 className="text-black w-full text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  text-center">
                   ไม่มีข้อมูล
                 </h1>
               )}
             </div>
-            <div className="flex flex-col-reverse place-content-center">
+            <div className="flex flex-col-reverse place-content-center mt-auto">
               <Footer />
             </div>
           </div>

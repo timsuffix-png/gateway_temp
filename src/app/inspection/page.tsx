@@ -1,5 +1,6 @@
 "use client";
-import Link from "next/link";
+
+import { localStorageWeb } from "@/utils/localstorage";
 import ButtonBlue from "@/components/buttonBlue";
 import SideBar from "@/components/sidebar";
 
@@ -34,13 +35,15 @@ export default function Inspection() {
         };
         qcProject: {
           projectName: string;
-          qcItemProject:[ {
-            qcMain: {
-              qcType: {
-                name: string;
+          qcItemProject: [
+            {
+              qcMain: {
+                qcType: {
+                  name: string;
+                };
               };
-            };
-          }];
+            },
+          ];
         };
         testBy: {
           name: string;
@@ -121,22 +124,23 @@ export default function Inspection() {
 
   return (
     <>
-      <div className="flex w-screen h-screen">
+      <div className="flex h-screen">
         <SideBar />
-
-        <div className="flex flex-col w-full h-full">
+        <div className="flex flex-col w-full h-full overflow-y-auto">
           <Breadcrumb />
           <div className="flex flex-col bg-white w-full h-full overflow-y-auto whitespace-nowrap place-items-center pt-10">
             <div className="flex flex-col sm:flex-row w-full sm:place-content-between sm:place-items-center">
-              <h2 className="ml-14 2xl:ml-20 text-black text-lg xl:text-xl 2xl:text-2xl font-bold ">
+              <h2 className="ml-14 2xl:ml-20 text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold ">
                 การตรวจสอบคุณภาพสินค้า
               </h2>
               <div className="mt-5 flex place-content-between sm:mt-0 sm:place-content-start">
                 <div
                   tabIndex={0}
                   onClick={() => {
-                    localStorage.setItem("currentUrl", "qc/testSetting");
+                   
+                    localStorageWeb.setItem("currentUrl", "qc/testSetting");
                     window.location.reload();
+                    
                   }}
                   className="ml-10 sm:mr-3"
                 >
@@ -145,22 +149,22 @@ export default function Inspection() {
                 <div
                   tabIndex={0}
                   onClick={() => {
-                    localStorage.setItem("currentUrl", "qc/projectTest");
+                    localStorageWeb.setItem("currentUrl", "qc/projectTest");
                     window.location.reload();
                   }}
                   className="mr-10 sm:mr-20"
                 >
-                  <ButtonBlue name="โปรเจ็คการทดสอบ" />
+                  <ButtonBlue name="โปรเจกต์การทดสอบ" />
                 </div>
               </div>
             </div>
             <div className="w-full flex flex-col mt-10 px-1 sm:pl-10 sm:pr-20">
               <div className="flex place-items-center place-content-between">
-                <h3 className="text-black font-normal  ml-5">
+                <p className="text-black text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-normal  ml-5">
                   ผลการตรวจสอบโดยรวม
-                </h3>
+                </p>
               </div>
-              <div className="w-full flex border border-black rounded-full bg-gray-200">
+              <div className="w-full flex text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl border border-black rounded-full bg-gray-200">
                 <div
                   className="h-7 sm:h-10 bg-[#13A452] rounded-l-full flex place-items-center place-content-center group"
                   style={{ width: `${passPercent}%` }}
@@ -188,7 +192,7 @@ export default function Inspection() {
               </div>
             </div>
             <div className="flex flex-col lg:flex-row w-full lg:place-items-center mt-10">
-              <h2 className="ml-16 lg:ml-40 text-black text-lg xl:text-xl font-normal ">
+              <h2 className="ml-16 lg:ml-40 text-black text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-normal ">
                 ตารางผลการทดสอบ
               </h2>
               <div className="w-full flex place-items-center place-content-center lg:place-content-start">
@@ -201,33 +205,33 @@ export default function Inspection() {
               </div>
             </div>
             <div className="flex flex-col w-full">
-              <div className="sm:ml-10 sm:mr-20 mt-10 flex flex-col place-content-center border border-[#cecece] rounded-xl">
+              <div className="sm:ml-10 sm:mr-10 mt-10 flex flex-col place-content-center border border-[#cecece] rounded-xl">
                 <div className="flex place-content-center">
-                  <div className="w-[95%] my-[20px]">
+                  <div className="w-[98%] my-[20px]">
                     <div className="text-black font-bold">
                       <div className="bg-[#6494d3] rounded-t-3xl flex flex-row h-10 place-items-center">
-                        <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-center text-xl 3xl:text-2xl  4xl:text-3xl font-bold  text-ellipsis overflow-hidden">
                           รหัสสินค้า
                         </div>
-                        <div className="w-2/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-2/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
                           ประเภท
                         </div>
-                        <div className="w-2/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
-                          โปรเจ็คการทดสอบ
+                        <div className="w-2/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
+                          โปรเจกต์การทดสอบ
                         </div>
-                        <div className="hidden lg:block w-2/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="hidden lg:block w-2/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
                           ชื่อล็อตการผลิต
                         </div>
-                        <div className="hidden sm:block w-2/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="hidden sm:block w-2/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
                           ชื่อผู้ทดสอบ
                         </div>
-                        <div className="w-1/12 sm:w-2/12 lg:w-1/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-1/12 sm:w-2/12 lg:w-1/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
                           สถานะ
                         </div>
-                        <div className="hidden md:block w-2/12 lg:w-1/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="hidden md:block w-2/12 lg:w-1/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
                           เวลา
                         </div>
-                        <div className="w-1/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-1/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
                           ข้อมูล
                         </div>
                       </div>
@@ -237,9 +241,9 @@ export default function Inspection() {
                         return (
                           <div
                             key={data.ID}
-                            className="flex flex-row w-full h-12 hover:bg-gray-200"
+                            className="flex flex-row w-full h-12  hover:bg-gray-200 "
                           >
-                            <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-start text-base lg:text-lg  flex place-items-center">
+                            <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-items-center">
                               <div className="hidden xl:block">
                                 {Translator.item.icon}
                               </div>
@@ -247,7 +251,7 @@ export default function Inspection() {
                                 {data.construct.ID}
                               </h5>
                             </div>
-                            <div className="w-2/12 text-center text-base lg:text-lg  flex place-content-center place-items-center">
+                            <div className="w-2/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-content-center place-items-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {
                                   data.qcProject.qcItemProject[0].qcMain.qcType
@@ -255,12 +259,12 @@ export default function Inspection() {
                                 }
                               </div>
                             </div>
-                            <div className="w-2/12 text-center text-base lg:text-lg  flex place-content-center place-items-center">
+                            <div className="w-2/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-content-center place-items-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {data.qcProject.projectName}
                               </div>
                             </div>
-                            <div className="hidden lg:flex w-2/12 text-center text-base lg:text-lg  place-content-start place-items-center">
+                            <div className="hidden lg:flex w-2/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   place-content-start place-items-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {
                                   data.construct.productionSub.productionLot
@@ -268,7 +272,7 @@ export default function Inspection() {
                                 }
                               </div>
                             </div>
-                            <div className="hidden sm:flex w-2/12 text-start text-base lg:text-lg  place-items-center">
+                            <div className="hidden sm:flex w-2/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   place-items-center">
                               <div className="hidden xl:block">
                                 {Translator.user.icon}
                               </div>
@@ -276,7 +280,7 @@ export default function Inspection() {
                                 {data.testBy.name + " " + data.testBy.surname}
                               </h5>
                             </div>
-                            <div className="w-1/12 sm:w-2/12 lg:w-1/12 text-center text-base lg:text-lg  flex place-content-center place-items-center">
+                            <div className="w-1/12 sm:w-2/12 lg:w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-content-center place-items-center">
                               {data.statusOverView === "Passed" ? (
                                 <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
                                   ผ่าน
@@ -291,19 +295,19 @@ export default function Inspection() {
                                 </h3>
                               ) : null}
                             </div>
-                            <div className="hidden md:block w-2/12 lg:w-1/12 text-center text-base lg:text-lg  place-content-center place-items-center">
+                            <div className="hidden md:block w-2/12 lg:w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   place-content-center place-items-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {data.createdAt.split("T")[0]}
                               </div>
                             </div>
-                            <div className="w-1/12 text-center text-base lg:text-lg  flex place-content-center place-items-center">
+                            <div className="w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-content-center place-items-center">
                               <button
                                 onClick={() => {
-                                  localStorage.setItem(
+                                  localStorageWeb.setItem(
                                     "currentUrl",
                                     "qc/detail"
                                   );
-                                  localStorage.setItem(
+                                  localStorageWeb.setItem(
                                     "param",
                                     data.construct.ID
                                   );
@@ -342,7 +346,7 @@ export default function Inspection() {
                 />
               </div>
             </div>
-            <div className="flex flex-col-reverse place-content-center">
+            <div className="flex flex-col-reverse place-content-center mt-auto">
               <Footer />
             </div>
           </div>

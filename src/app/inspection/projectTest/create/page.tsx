@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import BackButton from "@/components/backButton";
-import Link from "next/link";
+import { localStorageWeb } from "@/utils/localstorage";
 import { useState, useEffect } from "react";
 import Select, { MultiValue } from "react-select";
 import Swal from "sweetalert2";
@@ -104,20 +104,18 @@ export default function CreateQcproject() {
           <div
             tabIndex={0}
             onClick={() => {
-              localStorage.setItem("currentUrl", "qc/projectTest");
+              localStorageWeb.setItem("currentUrl", "qc/projectTest");
               window.location.reload();
             }}
             className="ml-5 sm:ml-20 cursor-pointer"
           >
             <BackButton />
           </div>
-          <p className="font-bold ml-15 text-xl 2xl:text-2xl">
-            สร้างโปรเจ็คการทดสอบ
+          <p className="font-bold ml-15 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+            สร้างโปรเจกต์การทดสอบ
           </p>
           <button
-            className="ml-auto px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F] 
-            xl:text-xl 
-            2xl:text-2xl"
+            className="ml-auto px-10 py-3 text-white text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-xl bg-[#001F3F] hover:cursor-pointer"
             onClick={createQcProject}
           >
             สร้าง
@@ -128,14 +126,14 @@ export default function CreateQcproject() {
           {/* ชื่อการทดสอบ */}
           <div>
             <div className="flex">
-              <p>ชื่อโปรเจ็คการทดสอบ</p>
-              <span className="text-red-600">&nbsp;*</span>
+              <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">ชื่อโปรเจกต์การทดสอบ</p>
+              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
             </div>
 
             <div className="flex gap-10 items-center">
               <input
-                placeholder="ชื่อโปรเจ็คการทดสอบ"
-                className="w-full px-8 h-10 text-lg border rounded-sm"
+                placeholder="ชื่อโปรเจกต์การทดสอบ"
+                className="w-full px-8 h-10 text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl border rounded-sm"
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
@@ -144,14 +142,14 @@ export default function CreateQcproject() {
           {/* เลือกประเภทการทดสอบ*/}
           <div>
             <div className="flex">
-              <p>การทดสอบ </p>
-              <span className="text-red-600">&nbsp;*</span>
+              <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">การทดสอบ </p>
+              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
             </div>
 
             <div className="flex gap-10 items-center">
               <Select
                 isMulti
-                className="w-full rounded-sm border-gray-300"
+                className="w-full text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-sm border-gray-300"
                 options={qcMainList?.data?.map((data: any) => ({
                   value: data.ID,
                   label: data.testName,
@@ -165,12 +163,12 @@ export default function CreateQcproject() {
           <div>
             {" "}
             <div className="flex">
-              <p>รายละเอียด</p>
-              <span className="text-red-600">&nbsp;*</span>
+              <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">รายละเอียด</p>
+              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
             </div>
             <div className="flex gap-10 items-center">
               <textarea
-                className="bg-white border border-black w-full h-[150px] min-h-[50px] max-h-[150px] rounded-lg text-base lg:text-lg xl:text-2xl font-normal  px-2 py-2"
+                className="bg-white border border-black w-full h-[150px] min-h-[50px] max-h-[150px] rounded-lg text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-normal  px-2 py-2"
                 maxLength={200}
                 onChange={(e) => setDetail(e.target.value)}
               ></textarea>

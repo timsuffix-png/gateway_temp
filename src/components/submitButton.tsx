@@ -11,7 +11,7 @@ export default function SubmitButton({ ...props }) {
             "w-full h-full bg-[#001F3F] rounded-[10px] " + props.className
           }
         >
-          <div className="w-full h-full text-center text-white text-base lg:text-lg xl:text-xl 2xl:text-2xl font-bold  place-content-center">
+          <div className="w-full h-full text-center text-white text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-bold  place-content-center hover:cursor-pointer">
             {props.text}
           </div>
         </div>

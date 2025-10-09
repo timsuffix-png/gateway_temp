@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { localStorageWeb } from "@/utils/localstorage";
 import SideBar from "@/components/sidebar";
 import Breadcrumb from "@/components/breadcrumb";
 import Footer from "@/components/footer";
@@ -11,7 +12,7 @@ import { useAuth } from "@/lib/auth/authProvider";
 
 export default function EditQcType() {
   const auth = useAuth()
-  const param = localStorage.getItem("param")
+  const param = localStorageWeb.getItem("param")
   const [name, setName] = useState("");
 
   useEffect(() => {
@@ -81,30 +82,30 @@ export default function EditQcType() {
           <div className="flex flex-col bg-white w-full h-full overflow-y-auto whitespace-nowrap place-qcs-center pt-[60px]">
             <div className="flex flex-row w-full place-qcs-center">
               <div tabIndex={0} onClick={() => {
-                  localStorage.setItem("currentUrl", "qc/testSetting/create/qcType");
+                  localStorageWeb.setItem("currentUrl", "qc/testSetting/create/qcType");
                   window.location.reload();
                 }} className="ml-5 sm:ml-20 cursor-pointer">
                 <BackButton text="ย้อนกลับ" />
               </div>
-              <h2 className="ml-5 sm:ml-20 text-black text-lg xl:text-xl 2xl:text-2xl font-bold  text-wrap">
+              <h2 className="ml-5 sm:ml-20 text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold  text-wrap">
                 แก้ไขประเภทการทดสอบ
               </h2>
             </div>
             <div className="flex flex-col w-full mt-10">
               <div className="flex flex-row w-full place-qcs-center">
-                <h2 className="ml-16 lg:ml-40 text-black text-lg xl:text-xl font-normal ">
+                <h2 className="ml-16 lg:ml-40 text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                   แก้ไขชื่อประเภทการทดสอบ
                 </h2>
               </div>
               <div className="flex place-qcs-center place-content-center mt-10">
                 <label className="mx-20 w-3/4 sm:w-1/2 flex flex-col">
-                  <h4 className="text-lg xl:text-xl text-black font-normal ">
+                  <h4 className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-black font-normal ">
                     ชื่อประเภทการทดสอบ
-                    <span className="text-red-600">&nbsp;*</span>
+                    <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
                   </h4>
                   <input
                     type="text"
-                    className="h-[40px] md:h-[50px] w-[90%] xl:w-[600px] border border-black mt-1 lg:ml-10 px-3 text-black text-xl xl:text-2xl font-normal  rounded-md"
+                    className="h-[40px] md:h-[50px] w-[90%] xl:w-[600px] border border-black mt-1 lg:ml-10 px-3 text-black text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-normal  rounded-md"
                     defaultValue={name}
                     placeholder="ชื่อประเภทการทดสอบ"
                     onChange={(e) => setName(e.target.value)}
@@ -113,7 +114,7 @@ export default function EditQcType() {
                 <SubmitButton text="บันทึก" onClick={editQcType} />
               </div>
             </div>
-            <div className="flex flex-col-reverse place-content-center">
+            <div className="flex flex-col-reverse place-content-center mt-auto">
               <Footer />
             </div>
           </div>

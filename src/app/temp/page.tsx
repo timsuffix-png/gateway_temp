@@ -61,7 +61,7 @@ export default function MainTempTest() {
     startMoment: number;
     endMoment: number;
   }>({
-    state: "on",
+    state: "on", //on,100,10,10,60
     tempLim: 0.0,
     currentLim: 0.0,
     startMoment: 0.0,
@@ -137,10 +137,8 @@ export default function MainTempTest() {
     if (ironImageRef.current) {
       const loadImage = async () => {
         const logo = await window.electronAPI.loadImg("iron-plate.png");
-       
 
         ironImageRef.current.src = logo;
-       
       };
       loadImage();
     }
@@ -251,7 +249,7 @@ export default function MainTempTest() {
       Swal.fire({
         icon: "error",
         title: "เกิดข้อผิดพลาด",
-        text: "กรุณาเลือกโปรเจ็คการทดสอบ",
+        text: "กรุณาเลือกโปรเจกต์การทดสอบ",
       });
       return;
     }
@@ -409,11 +407,13 @@ export default function MainTempTest() {
                 className="flex flex-col justify-center items-center text-center whitespace-nowrap
              md:basis-40"
               >
-                <h4 className="flex-nowrap text-lg xl:text-xl font-normal ">
+                <h4 className="flex-nowrap pb-3 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                   Temperature port
-                  <span className="text-red-600">&nbsp;*</span>
+                  <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                    &nbsp;*
+                  </span>
                 </h4>
-                <div className="text-black text-lg xl:text-xl flex place-content-start w-full lg:mt-3">
+                <div className="text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl flex place-content-start w-full lg:mt-3">
                   {currentCOMPort ? <h1>{"COM" + currentCOMPort}</h1> : null}
                   <button className="ml-5" onClick={openPopup}>
                     {currentCOMPort ? "เปลี่ยน" : "เลือก"}
@@ -425,10 +425,12 @@ export default function MainTempTest() {
                   </Popup>
                 )}
               </li>
-              <li className="w-full md:basis-60">
-                <div className="flex">
-                  <p className="">โปรเจคการทดสอบ</p>
-                  <span className="text-red-600">&nbsp;*</span>
+              <li className="w-full text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:basis-60">
+                <div className="flex pb-3">
+                  <p className="">โปรเจกต์การทดสอบ</p>
+                  <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                    &nbsp;*
+                  </span>
                 </div>
 
                 <Select
@@ -463,10 +465,12 @@ export default function MainTempTest() {
                   }}
                 />
               </li>
-              <li className="w-full md:flex-grow md:w-auto">
-                <div className="flex">
+              <li className="w-full md:flex-grow md:w-auto text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                <div className="flex pb-3">
                   <p>รหัสสินค้า</p>
-                  <span className="text-red-600">&nbsp;*</span>
+                  <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                    &nbsp;*
+                  </span>
                 </div>
                 <input
                   required
@@ -503,36 +507,97 @@ export default function MainTempTest() {
               <div>
                 <div>
                   {/* บน */}
-                  <div className="absolute left-27 -top-7 text-[#C7AD00] text-lg xl:text-xl 2xl:text-2xl font-bold">
-                    บน  {temp3} °C
+                  <div className="absolute left-27 -top-7 text-[#C7AD00] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                    {temp3} °C
                   </div>
-                  <div className="absolute left-10 top-3 text-gray-900 text-sm xl:text-lg 2xl:text-xl font-semibold">
+                  <div className="absolute left-10 top-3 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
                     อุณหภูมิรอบข้าง : {ambient3} °C
                   </div>
-                  <svg className="absolute left-26 top-20 h-6 w-6"
-                  fill="#fbff00ff" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path></g></svg>
-                </div>
-                {/* ซ้าย */}
+                  <div className="flex flex-col absolute left-25 top-20 items-center">
+                    <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#fbff00ff]">
+                      บน
+                    </label>
 
-                <div className="absolute -left-27 top-50 text-[#00A385] text-lg xl:text-xl 2xl:text-2xl font-bold">
-                  ซ้าย {temp2} °C
+                    <svg
+                      className="h-6 w-6"
+                      fill="#fbff00ff"
+                      viewBox="0 0 512 512"
+                      xmlns="http://www.w3.org/2000/svg"
+                      stroke="#ff0000"
+                    >
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                      <g
+                        id="SVGRepo_tracerCarrier"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></g>
+                      <g id="SVGRepo_iconCarrier">
+                        <path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path>
+                      </g>
+                    </svg>
+                  </div>
                 </div>
-                <div className="absolute -left-45 top-58 text-gray-900 text-sm xl:text-lg 2xl:text-xl  font-semibold">
+
+                <div className="absolute -left-27 top-50 text-[#00A385] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                  {temp2} °C
+                </div>
+                <div className="absolute -left-60 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
                   อุณหภูมิรอบข้าง : {ambient1} °C
                 </div>
-                 <svg className="absolute left-6 top-55 h-6 w-6"
-                  fill="#00ffd0ff" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path></g></svg>
+                <div className="flex flex-col absolute left-6 top-55 items-center">
+                  <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#00ffd0ff]">
+                    ซ้าย
+                  </label>
+                  <svg
+                    className="h-6 w-6"
+                    fill="#00ffd0ff"
+                    viewBox="0 0 512 512"
+                    xmlns="http://www.w3.org/2000/svg"
+                    stroke="#ff0000"
+                  >
+                    <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                    <g
+                      id="SVGRepo_tracerCarrier"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    ></g>
+                    <g id="SVGRepo_iconCarrier">
+                      <path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path>
+                    </g>
+                  </svg>
+                </div>
               </div>
 
               <div>
-                <div className="absolute -right-27 top-50 text-[#FF5CB6] text-lg xl:text-xl 2xl:text-2xl font-bold">
-                  ขวา {temp1} °C
+                <div className="absolute -right-27 top-50 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                  {temp1} °C
                 </div>
-                <div className="absolute  -right-45 top-58 text-gray-900 text-sm xl:text-lg 2xl:text-xl font-semibold">
+                <div className="absolute  -right-60 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
                   อุณหภูมิรอบข้าง : {ambient1} °C
                 </div>
-                 <svg className="absolute right-5 top-55 h-6 w-6"
-                  fill="#FFB8DF" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path></g></svg>
+                <div className="flex flex-col absolute right-5 top-55 items-center">
+                  <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#FFB8DF]">
+                    ขวา
+                  </label>
+
+                  <svg
+                    className="h-6 w-6"
+                    fill="#FFB8DF"
+                    viewBox="0 0 512 512"
+                    xmlns="http://www.w3.org/2000/svg"
+                    stroke="#ff0000"
+                  >
+                    <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                    <g
+                      id="SVGRepo_tracerCarrier"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    ></g>
+                    <g id="SVGRepo_iconCarrier">
+                      <path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path>
+                    </g>
+                  </svg>
+                </div>
               </div>
             </div>
 
@@ -564,13 +629,13 @@ export default function MainTempTest() {
             </div> */}
             <div
               className="flex flex-col justify-between gap-10
-         lg:flex-row lg:gap-0"
-            >
+              lg:flex-row lg:gap-0"
+              >
               {/* กระแส อุณหภูมิ */}
               <div
-                className="flex flex-col w-full justify-between text-lg 
-          lg:items-start lg:pl-10 "
-              >
+                className="flex flex-col w-full h-full gap-10 justify-between  text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl
+                lg:items-start lg:pl-10"
+                >
                 <div className="flex gap-10">
                   <div className="flex items-center gap-4">
                     <p>กระแสไฟฟ้า :</p>
@@ -591,7 +656,7 @@ export default function MainTempTest() {
                     ></input>
                   </div>
                 </div>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-10">
                   <div className="flex h-auto w-auto items-center justify-center gap-4 ">
                     <p>ผลลัพธ์ : </p>
                     <div
@@ -609,20 +674,18 @@ export default function MainTempTest() {
 
               {/* ปุ่มกดทดสอบ หยุด */}
               <div
-                className="flex flex-col h-full items-center gap-10
-          lg:items-end"
+                className="flex flex-col h-full w-full items-center gap-[9%]
+                lg:items-end"
               >
                 <button
                   id="test"
-                  className="w-40 h-15  rounded-lg bg-[#001F3F] hover:cursor-pointer text-xl text-white font-semibold
-          md:w-45 md:h-20"
+                  className="w-[50%] h-[80%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-lg bg-[#001F3F] hover:cursor-pointer text-xl text-white font-semibold"
                   onClick={clickTest}
                 >
                   ทดสอบ
                 </button>
                 <button
-                  className="w-40 h-15  rounded-lg bg-red-600 hover:cursor-pointer text-xl text-white font-semibold
-          md:w-45 md:h-20"
+                  className="w-[50%] h-[80%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-lg bg-red-600 hover:cursor-pointer text-xl text-white font-semibold"
                   onClick={async () => {
                     await window.electronAPI.writeData({
                       port: currentCOMPort,
@@ -635,7 +698,7 @@ export default function MainTempTest() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col-reverse place-content-center">
+          <div className="flex flex-col-reverse place-content-center mt-auto ">
             <Footer />
           </div>
         </div>

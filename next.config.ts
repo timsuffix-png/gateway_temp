@@ -1,7 +1,8 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export',
+  assetPrefix: './',      // ✅ ให้ไฟล์ _next ใช้ path relative
+  trailingSlash: true,    // ✅ ให้ทุกเพจเป็น index.html
 };
 
-export default nextConfig;
+module.exports = nextConfig;

@@ -1,4 +1,5 @@
 "use client";
+import { localStorageWeb } from "@/utils/localstorage";
 export const signIn = async (credentials: {
   username: string;
   password: string;
@@ -36,5 +37,4 @@ export const getProfile = async (ID: string) => {
   return data;
 };
 
-export const isAuthenticated =
-  typeof window !== "undefined" ? localStorage.getItem("ID") : null;
+export const isAuthenticated = localStorageWeb.getItem("ID");

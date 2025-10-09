@@ -1,5 +1,6 @@
 "use client"
 import * as React from "react";
+import { localStorageWeb } from "@/utils/localstorage";
 import { createContext, useContext, useState, useEffect } from "react";
 import { signIn, getProfile, isAuthenticated, signOut } from "./auth";
 
@@ -19,10 +20,10 @@ export default function AuthProvider({
 
   useEffect(() => {
     setStatus("loading");
-    //ถ้า isAuthenticated != null
+     if (typeof window === "undefined") return;
     if (isAuthenticated) {
       const fetchData = async () => {
-        const id = localStorage.getItem("ID"); 
+        const id = localStorageWeb.getItem("ID"); 
         //ถ้าไม่มีID
         if (!id) {
           setStatus("unauthenticated");
@@ -35,7 +36,7 @@ export default function AuthProvider({
         if (!data) {
           setStatus("unauthenticated");
           setUserData(null);
-          localStorage.removeItem("ID");
+          localStorageWeb.removeItem("ID");
           window.location.reload();
         } else {
           setStatus("authenticated");
@@ -60,12 +61,12 @@ export default function AuthProvider({
       });
       setStatus("authenticated");
       setUserData(user);
-      localStorage.setItem("ID", user.data.ID);
+      localStorageWeb.setItem("ID", user.data.ID);
       window.location.reload();
     } catch (err:any) {
       setStatus("unauthenticated");
       setUserData(null);
-      localStorage.removeItem("ID");
+      localStorageWeb.removeItem("ID");
       throw new Error(err);
     }
   };
@@ -74,7 +75,7 @@ export default function AuthProvider({
     await signOut(ID);
     setStatus("unauthenticated");
     setUserData(null);
-    localStorage.removeItem("ID");
+    localStorageWeb.removeItem("ID");
     window.location.reload();
   };
 

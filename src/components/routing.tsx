@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/lib/auth/authProvider";
 import { useEffect, useState } from "react";
+import { localStorageWeb } from "@/utils/localstorage";
 
 import LoadingPage from "./temperature/loading";
 import Login from "@/app/login/page";
@@ -25,11 +26,11 @@ export default function Routing() {
 
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem("currentUrl");
+      const stored = localStorageWeb.getItem("currentUrl");
       if (stored) {
         setCurrentUrl(stored);
       } else {
-        window.localStorage.setItem("currentUrl", "qc");
+        localStorageWeb.setItem("currentUrl", "qc");
         setCurrentUrl("qc");
       }
     } catch {

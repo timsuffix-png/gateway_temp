@@ -30,11 +30,11 @@ export default function SelectBar({ projects }: SelectBarProps) {
           className="flex flex-col justify-center items-center text-center whitespace-nowrap
         md:basis-40"
         >
-          <h4 className="flex-nowrap text-lg xl:text-xl font-normal ">
+          <h4 className="flex-nowrap text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
             Temperature port
-            <span className="text-red-600">&nbsp;*</span>
+            <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
           </h4>
-          <div className="text-black text-lg xl:text-xl flex place-content-start w-full lg:mt-3">
+          <div className="text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl flex place-content-start w-full lg:mt-3">
             {currentCOMPort ? <h1>{"COM" + currentCOMPort}</h1> : null}
             <button className="ml-5" onClick={openPopup}>
               {currentCOMPort ? "เปลี่ยน" : "เลือก"}
@@ -48,8 +48,8 @@ export default function SelectBar({ projects }: SelectBarProps) {
         </li>
         <li className="w-full md:basis-60">
           <div className="flex">
-            <p className="">โปรเจคการทดสอบ</p>
-            <span className="text-red-600">&nbsp;*</span>
+            <p className="">โปรเจกต์การทดสอบ</p>
+            <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
           </div>
 
           <Select
@@ -63,7 +63,7 @@ export default function SelectBar({ projects }: SelectBarProps) {
         <li className="w-full md:flex-grow md:w-auto">
           <div className="flex">
             <p>รหัสสินค้า</p>
-            <span className="text-red-600">&nbsp;*</span>
+            <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
           </div>
           <input
             required

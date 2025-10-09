@@ -8,10 +8,11 @@ import Select, { MultiValue } from "react-select";
 import SubmitButton from "@/components/submitButton";
 import Swal from "sweetalert2";
 import { useAuth } from "@/lib/auth/authProvider";
+import ButtonBlue from "@/components/buttonBlue";
 
 export default function Setting() {
   const auth = useAuth();
-  const role = auth.user.data.role;
+  const role = auth?.user?.data?.role;
   const imageRef = useRef<any | null>(null);
 
   const fileInputRef = useRef<any | null>(null);
@@ -56,7 +57,7 @@ export default function Setting() {
         const profile = await window.electronAPI.getImg({
           method: "GET",
           URL: `user/upload/profile/${
-            auth.user.data.ID
+            auth?.user?.data?.ID
           }?timestamp=${Date.now()}`,
         });
         try {
@@ -79,7 +80,7 @@ export default function Setting() {
   const fetchUserData = async () => {
     const data = await window.electronAPI.fetchAPI({
       method: "GET",
-      URL: `user/${auth.user.data.ID}`,
+      URL: `user/${auth?.user?.data?.ID}`,
     });
     if (!data) {
       Swal.fire({
@@ -111,7 +112,7 @@ export default function Setting() {
       }
       const data = await window.electronAPI.fetchAPI({
         method: "PATCH",
-        URL: `user/${auth.user.data.ID}`,
+        URL: `user/${auth?.user?.data?.ID}`,
         body:
           roleTemp === "----------"
             ? {
@@ -164,12 +165,12 @@ export default function Setting() {
           <div className="flex flex-col bg-white w-full h-full overflow-y-auto whitespace-nowrap place-items-center pt-[50px]">
             <div className="flex flex-row w-full place-items-center">
               <div className="flex place-items-center">
-                <h2 className="ml-5 sm:ml-20 text-black text-lg xl:text-xl 2xl:text-2xl font-bold ">
+                <h2 className="ml-5 sm:ml-20 text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold ">
                   แก้ไขข้อมูล
                 </h2>
               </div>
               <div className="hidden md:flex w-full place-content-end mr-20">
-                <SubmitButton text="บันทึกการแก้ไข" onClick={updateUser} />
+                <ButtonBlue name="บันทึกการแก้ไข" onClick={updateUser} />
               </div>
             </div>
             <div className="bg-white w-full flex flex-col place-items-center place-content-center">
@@ -182,7 +183,7 @@ export default function Setting() {
                       ref={fileInputRef}
                       onClick={async (e) => {
                         const result = await window.electronAPI.uploadImg({
-                          URL: `user/upload/profile/${auth.user.data.ID}`,
+                          URL: `user/upload/profile/${auth?.user?.data?.ID}`,
                           method: "PATCH",
                         });
                         while (!result) {}
@@ -221,11 +222,11 @@ export default function Setting() {
                   <div className="w-full flex md:mb-5 flex-col md:flex-row">
                     <div className="w-full h-full flex">
                       <label className="w-[100%]">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                           ชื่อผู้ใช้งาน
                         </h4>
                         <input
-                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal  rounded-md cursor-not-allowed"
+                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  rounded-md cursor-not-allowed"
                           type="text"
                           value={username}
                           disabled
@@ -236,11 +237,11 @@ export default function Setting() {
                   <div className="w-full flex md:mb-5 flex-col md:flex-row">
                     <div className="w-full md:w-1/2 h-full flex">
                       <label className="w-[100%]">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
-                          ชื่อจริง<span className="text-red-600">&nbsp;*</span>
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
+                          ชื่อจริง<span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
                         </h4>
                         <input
-                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal  rounded-md"
+                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  rounded-md"
                           type="text"
                           placeholder="ชื่อจริง"
                           value={name}
@@ -252,11 +253,11 @@ export default function Setting() {
                     <div className="hidden md:block w-[5%] h-full"></div>
                     <div className="w-full md:w-1/2 h-full flex">
                       <label className="w-[100%]">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
-                          นามสกุล<span className="text-red-600">&nbsp;*</span>
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
+                          นามสกุล<span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
                         </h4>
                         <input
-                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal  rounded-md"
+                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  rounded-md"
                           type="text"
                           placeholder="นามสกุล"
                           value={surname}
@@ -269,11 +270,11 @@ export default function Setting() {
                   <div className="w-full flex md:mb-5 flex-col md:flex-row">
                     <div className="w-full md:w-1/2 h-full flex">
                       <label className="w-[100%]">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
-                          อีเมล์<span className="text-red-600">&nbsp;*</span>
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
+                          อีเมล์<span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
                         </h4>
                         <input
-                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal  rounded-md"
+                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  rounded-md"
                           type="email"
                           placeholder="example@gmail.com"
                           value={email}
@@ -284,11 +285,11 @@ export default function Setting() {
                     <div className="hidden md:block w-[5%] h-full"></div>
                     <div className="w-full md:w-1/2 h-full flex">
                       <label className="w-[100%]">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                           เบอร์โทรศัพท์
                         </h4>
                         <input
-                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal  rounded-md cursor-not-allowed"
+                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  rounded-md cursor-not-allowed"
                           type="tel"
                           placeholder="084XXXXXXX"
                           value={tel}
@@ -301,10 +302,10 @@ export default function Setting() {
                   <div className="w-full flex md:mb-5 flex-col md:flex-row">
                     <div className="w-full md:w-1/2 h-full flex">
                       <label className="w-[100%]">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                           วันเกิด (MM/DD/YYYY)
                         </h4>
-                        <div className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal  rounded-md flex place-items-center overflow-hidden cursor-not-allowed">
+                        <div className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  rounded-md flex place-items-center overflow-hidden cursor-not-allowed">
                           <input
                             className="font-normal  w-full h-full cursor-not-allowed"
                             type="date"
@@ -320,10 +321,10 @@ export default function Setting() {
                     <div className="hidden md:block w-[5%] h-full"></div>
                     <div className="w-full md:w-1/2 h-full flex">
                       <label className="w-[100%]">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                           วันบรรจุเข้าทำงาน (MM/DD/YYYY)
                         </h4>
-                        <div className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal  rounded-md flex place-items-center overflow-hidden cursor-not-allowed">
+                        <div className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  rounded-md flex place-items-center overflow-hidden cursor-not-allowed">
                           <input
                             className="font-normal  w-full cursor-not-allowed"
                             type="date"
@@ -337,11 +338,11 @@ export default function Setting() {
                   <div className="w-full flex md:mb-5 flex-col md:flex-row">
                     <div className="w-full md:w-[20%] h-full">
                       <label>
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                           เพศ
                         </h4>
                         <select
-                          className="h-[40px] md:h-[50px] w-full pl-5 border border-black mt-1 text-base lg:text-lg xl:text-2xl font-normal  rounded-md cursor-not-allowed"
+                          className="h-[40px] md:h-[50px] w-full pl-5 border border-black mt-1 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  rounded-md cursor-not-allowed"
                           value={gender}
                           onChange={(e) => {
                             setGender(e.target.value);
@@ -364,13 +365,13 @@ export default function Setting() {
                     <div className="hidden md:block w-[5%] h-full"></div>
                     <div className="w-full md:w-[75%] h-full">
                       <label>
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                           ตำแหน่ง
                           {role && role[0] === "m" && (
-                            <span className="text-red-600">&nbsp;*</span>
+                            <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">&nbsp;*</span>
                           )}
                         </h4>
-                        <div className="w-full text-base lg:text-lg xl:text-2xl">
+                        <div className="w-full text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
                           {duty &&
                             (role[0] === "m" ? (
                               <Select
@@ -379,22 +380,22 @@ export default function Setting() {
                                 options={roles}
                                 onChange={(e) => setDuty(e)}
                                 defaultValue={[
-                                  auth.user.data.role[0] === "m"
+                                  auth?.user?.data?.role[0] === "m"
                                     ? roles[0]
                                     : null,
-                                  auth.user.data.role[1] === "s"
+                                  auth?.user?.data?.role[1] === "s"
                                     ? roles[1]
                                     : null,
-                                  auth.user.data.role[2] === "t"
+                                  auth?.user?.data?.role[2] === "t"
                                     ? roles[2]
                                     : null,
-                                  auth.user.data.role[3] === "w"
+                                  auth?.user?.data?.role[3] === "w"
                                     ? roles[3]
                                     : null,
-                                  auth.user.data.role[4] === "a"
+                                  auth?.user?.data?.role[4] === "a"
                                     ? roles[4]
                                     : null,
-                                  auth.user.data.role[5] === "f"
+                                  auth?.user?.data?.role[5] === "f"
                                     ? roles[5]
                                     : null,
                                 ]}
@@ -406,22 +407,22 @@ export default function Setting() {
                                 options={roles}
                                 onChange={(e) => setDuty(e)}
                                 defaultValue={[
-                                  auth.user.data.role[0] === "m"
+                                  auth?.user?.data?.role[0] === "m"
                                     ? roles[0]
                                     : null,
-                                  auth.user.data.role[1] === "s"
+                                  auth?.user?.data?.role[1] === "s"
                                     ? roles[1]
                                     : null,
-                                  auth.user.data.role[2] === "t"
+                                  auth?.user?.data?.role[2] === "t"
                                     ? roles[2]
                                     : null,
-                                  auth.user.data.role[3] === "w"
+                                  auth?.user?.data?.role[3] === "w"
                                     ? roles[3]
                                     : null,
-                                  auth.user.data.role[4] === "a"
+                                  auth?.user?.data?.role[4] === "a"
                                     ? roles[4]
                                     : null,
-                                  auth.user.data.role[5] === "f"
+                                  auth?.user?.data?.role[5] === "f"
                                     ? roles[5]
                                     : null,
                                 ]}
@@ -435,11 +436,11 @@ export default function Setting() {
                   <div className="w-full h-full flex">
                     <div className="w-full h-full">
                       <label className="w-auto h-auto">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal ">
+                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
                           ที่อยู่
                         </h4>
                         <textarea
-                          className="bg-white border border-black w-full h-[240px] min-h-[50px] max-h-[240px] rounded-lg text-base lg:text-lg xl:text-2xl font-normal  px-2 py-2 cursor-not-allowed"
+                          className="bg-white border border-black w-full h-[240px] min-h-[50px] max-h-[240px] rounded-lg text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal  px-2 py-2 cursor-not-allowed"
                           value={address}
                           onChange={(e) => setAddress(e.target.value)}
                           disabled
@@ -453,7 +454,7 @@ export default function Setting() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col-reverse place-content-center">
+            <div className="flex flex-col-reverse place-content-center mt-auto">
               <Footer />
             </div>
           </div>

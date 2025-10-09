@@ -3,6 +3,7 @@ import { useAuth } from "@/lib/auth/authProvider";
 import Index from ".";
 import { Translator } from "./translator";
 import { useState, useEffect, useRef } from "react";
+import { localStorageWeb } from "@/utils/localstorage";
 
 export default function SideBar() {
   const auth = useAuth();
@@ -14,11 +15,11 @@ export default function SideBar() {
 
   const currentUrl =
     typeof window !== "undefined"
-      ? localStorage.getItem("currentUrl")?.split("/") || []
+      ? localStorageWeb.getItem("currentUrl")?.split("/") || []
       : []; // ค่าเริ่มต้นเป็น array ว่าง
 
   useEffect(() => {
-    console.log("Temp : " + Translator.temperature)
+    console.log("Temp : " + Translator.temperature);
     const handleResize = () => {
       setCurrentWidth(window.innerWidth);
     };
@@ -40,7 +41,7 @@ export default function SideBar() {
   }, [auth]);
 
   const signoutAction = async () => {
-    auth.handleLogout(localStorage.getItem("ID"));
+    auth.handleLogout(localStorageWeb.getItem("ID"));
   };
 
   var menus: any = {
@@ -62,7 +63,12 @@ export default function SideBar() {
       return (
         <>
           <div
-            className="sticky top-0 z-50 w-screen h-screen bg-white absolute 2xl:static 2xl:flex 2xl:flex-col border-r-black border-r-2 2xl:w-[350px] z-10"
+            className="
+        fixed top-0 left-0 z-50
+        w-screen h-screen bg-white
+        2xl:static 2xl:flex 2xl:flex-col 2xl:w-[310px] 
+        border-r-2 border-black
+      "
             ref={menuRef}
           >
             <div className="flex flex-col w-full h-full">
@@ -80,14 +86,14 @@ export default function SideBar() {
                 </div>
                 <div className="w-full h-1/3 flex">
                   <h2
-                    className="w-full h-full text-black text-lg xl:text-xl 2xl:text-2xl  flex place-items-center justify-center text-nowrap text-ellipsis overflow-hidden"
+                    className="w-full h-full text-black text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl flex place-items-center justify-center text-nowrap text-ellipsis overflow-hidden"
                     ref={nameRef}
                   >
                     ผู้ใช้: {auth.user.data?.name} {auth.user.data?.surname}
                   </h2>
                 </div>
               </div>
-              <div className="w-full h-[65px] text-black text-xl xl:text-2xl 2xl:text-3xl font-bold  text-left flex place-items-center border-t-[2px] border-t-black">
+              <div className="w-full h-[65px] text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-bold  text-left flex place-items-center border-t-[2px] border-t-black">
                 <span className="ml-[20px]">รายการ</span>
               </div>
               <div className="w-full h-full overflow-y-auto">
@@ -99,7 +105,7 @@ export default function SideBar() {
                         key={menu}
                         onClick={() => {
                           setIsOpen(true);
-                          localStorage.setItem("currentUrl", menu);
+                          localStorageWeb.setItem("currentUrl", menu);
                           window.location.reload();
                         }}
                       >
@@ -110,7 +116,7 @@ export default function SideBar() {
                             </div>
                           </div>
                           <div className="w-full h-full">
-                            <h3 className="w-full h-full text-black text-lg xl:text-xl 2xl:text-2xl font-normal  flex place-items-center justify-start pl-5">
+                            <h3 className="w-full h-full text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-normal  flex place-items-center justify-start pl-5">
                               {menus[menu].name}
                             </h3>
                           </div>
@@ -124,7 +130,7 @@ export default function SideBar() {
                         key={menu}
                         onClick={() => {
                           setIsOpen(true);
-                          localStorage.setItem("currentUrl", menu);
+                          localStorageWeb.setItem("currentUrl", menu);
                           window.location.reload();
                         }}
                       >
@@ -135,7 +141,7 @@ export default function SideBar() {
                             </div>
                           </div>
                           <div className="w-full h-full">
-                            <h3 className="w-full h-full text-black text-lg xl:text-xl 2xl:text-2xl font-normal  flex place-items-center justify-start pl-5">
+                            <h3 className="w-full h-full text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-normal  flex place-items-center justify-start pl-5">
                               {menus[menu].name}
                             </h3>
                           </div>
@@ -160,7 +166,7 @@ export default function SideBar() {
                 </button>
                 <button
                   onClick={() => {
-                    localStorage.setItem("currentUrl", "setting");
+                    localStorageWeb.setItem("currentUrl", "setting");
                     window.location.reload();
                   }}
                   className="w-[67%] h-[50px] xl:h-[60px] 2xl:h-[70px] flex place-self-end"

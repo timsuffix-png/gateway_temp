@@ -1,4 +1,5 @@
 "use client";
+import { localStorageWeb } from "@/utils/localstorage";
 import React from "react";
 import BackButton from "@/components/backButton";
 import { useState, useEffect } from "react";
@@ -80,25 +81,26 @@ export default function QcProject() {
             <div
               tabIndex={0}
               onClick={() => {
-                localStorage.setItem("currentUrl", "qc");
-                window.location.reload();
+               
+                  localStorageWeb.setItem("currentUrl", "qc");
+                  window.location.reload();
+                
               }}
               className="ml-5 sm:ml-20 cursor-pointer"
             >
               <BackButton />
             </div>
 
-            <p className="self-center font-bold ml-15 text-xl 2xl:text-2xl">
-              โปรเจ็คการทดสอบ
+            <p className="self-center font-bold ml-15 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+              โปรเจกต์การทดสอบ
             </p>
             <button
               onClick={() => {
-                localStorage.setItem("currentUrl", "qc/projectTest/create");
+               
+                localStorageWeb.setItem("currentUrl", "qc/projectTest/create");
                 window.location.reload();
               }}
-              className="ml-auto mr-5 sm:mr-20 px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F]
-            xl:text-xl 
-            2xl:text-2xl"
+              className="ml-auto mr-5 sm:mr-20 px-10 py-3 text-white text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl   rounded-xl bg-[#001F3F] hover:cursor-pointer"
             >
               สร้าง
             </button>
@@ -114,7 +116,7 @@ export default function QcProject() {
                 >
                   <div className="w-full flex place-content-between px-5 mt-2">
                     <div className="flex place-items-end">
-                      <h3 className="text-black text-lg lg:text-xl font-bold ">
+                      <h3 className="text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-bold ">
                         {project.projectName}
                       </h3>
                     </div>
@@ -162,7 +164,7 @@ export default function QcProject() {
                       </svg>
                     </div>
                   </div>
-                  <h4 className="text-gray-500 w-full text-base font-normal  pl-16 mt-5">
+                  <h4 className="text-gray-500 w-full text-base font-normal text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl pl-16 mt-5">
                     รายละเอียด
                   </h4>
                   <div className="w-[92%] h-auto my-[20px] flex flex-col place-content-start">
@@ -173,10 +175,10 @@ export default function QcProject() {
                       <div className="mt-5">
                         <div className="text-black font-bold">
                           <div className="bg-[#6494d3] rounded-t-3xl flex flex-row h-10 place-items-center">
-                            <div className="w-4/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                            <div className="w-4/12 text-center text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-bold  text-ellipsis overflow-hidden">
                               ชื่อการทดสอบ
                             </div>
-                            <div className="w-8/12 text-center text-base lg:text-lg font-bold  text-ellipsis overflow-hidden">
+                            <div className="w-8/12 text-center text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-bold  text-ellipsis overflow-hidden">
                               รายละเอียด
                             </div>
                           </div>
@@ -185,7 +187,7 @@ export default function QcProject() {
                           return (
                             <div key={itemProject.ID} className="text-black">
                               <div className="flex flex-row w-full h-12 hover:bg-gray-200">
-                                <div className="w-4/12 text-start text-base lg:text-lg  flex place-items-center place-content-start">
+                                <div className="w-4/12 text-start text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  flex place-items-center place-content-start">
                                   <div className="hidden sm:block">
                                     {Translator.qc.icon}
                                   </div>
@@ -193,7 +195,7 @@ export default function QcProject() {
                                     {itemProject.qcMain.testName}
                                   </h5>
                                 </div>
-                                <div className="w-8/12 text-start text-base lg:text-lg  flex place-items-center place-content-start">
+                                <div className="w-8/12 text-start text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  flex place-items-center place-content-start">
                                   <div className="hidden sm:block">
                                     {Translator.detail.icon}
                                   </div>
@@ -221,7 +223,7 @@ export default function QcProject() {
                 last={lastPage}
               />
             </div>
-            <div className="flex flex-col-reverse place-content-center">
+            <div className="flex flex-col-reverse place-content-center mt-auto">
               <Footer />
             </div>
           </div>

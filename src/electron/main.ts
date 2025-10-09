@@ -1,9 +1,7 @@
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
-import * as child_process from "child_process";
-import { promisify } from "util";
-import { error } from "console";
+import { pathToFileURL } from "url";
 import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
 
@@ -16,31 +14,48 @@ let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
     height: 600,
+    width: 800,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
   });
 
-  mainWindow.loadURL("http://localhost:3000");
-
+  if (app.isPackaged) {
+    // โหลดไฟล์ index.html จาก out/
+    const indexPath = path.join(process.resourcesPath, "out", "index.html");
+    mainWindow.loadURL(pathToFileURL(indexPath).toString());
+  } else {
+    // ตอน dev
+    mainWindow.loadURL("http://localhost:3000");
+  }
   mainWindow.webContents.session.on(
     "select-serial-port",
     (event, portList, webContents, callback) => {
-      const newPortList = portList.filter((p) => p.portName?.includes("COM"));
+      const newPortList: Electron.SerialPort[] = [];
+      for (let port of portList) {
+        if (port.portName.includes("COM")) {
+          newPortList.push(port);
+        }
+      }
+
       mainWindow?.webContents.send("portlist", newPortList);
     }
   );
 }
+let port: SerialPort | null;
+let parser: ReadlineParser | null = null;
 
 app.on("ready", () => {
   createWindow();
+
   //-----------------------------------------------------------Image----------------------------------------------------------
   ipcMain.handle("loadImg", (event, args) => {
     const ext = path.extname(args);
     try {
-      const image = readFileSync(path.join(process.cwd(), "resources", args));
+      const image = readFileSync(
+      path.join(process.resourcesPath, "out", args)
+    );
       return `data:image/${ext};base64,${image.toString("base64")}`;
     } catch {
       const image = readFileSync(path.join(process.cwd(), "public", args));
@@ -144,7 +159,7 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://api.mephistopheles.live/api/v1/"
+        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
       );
       API = null;
     }
@@ -168,7 +183,7 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://api.mephistopheles.live/api/v1/"
+        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
       );
     }
   });
@@ -187,9 +202,9 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://api.mephistopheles.live/api/v1/"
+        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
       );
-      API = "API=https://api.mephistopheles.live/api/v1/";
+      API = "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/";
     }
     if (args.method === "POST") {
       try {
@@ -268,7 +283,7 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://api.mephistopheles.live/api/v1/"
+        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
       );
       COM = null;
     }
@@ -293,13 +308,10 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://api.mephistopheles.live/api/v1/"
+        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
       );
     }
   });
-
-  let port: SerialPort | null; //ใช้เช็กว่า พอร์ตเปิดอยู่มั้ย
-  let parser: ReadlineParser | null = null; //ฟังรอข้อมูลเข้ามา มีข้อมูลเมื่อไหร่ จะยิง 'data' event
 
   ipcMain.handle("openPort", async (event, portName) => {
     return new Promise((resolve, reject) => {
@@ -307,7 +319,7 @@ app.on("ready", () => {
         return resolve("Port already opened");
       }
 
-      const portPath = portName.startsWith("COM") ? portName : "COM" + portName;
+      const portPath = portName.startsWith("COM") ? portName : `COM${portName}`;
       port = new SerialPort({
         path: portPath,
         baudRate: 9600,
@@ -337,7 +349,7 @@ app.on("ready", () => {
       if (port && port.isOpen) {
         return resolve("Port already opened");
       }
-      const portPath = portName.startsWith("COM") ? portName : "COM" + portName;
+      const portPath = portName.startsWith("COM") ? portName : `COM${portName}`;
       port = new SerialPort({
         path: portPath,
         baudRate: 9600,
@@ -367,7 +379,8 @@ app.on("ready", () => {
       const win = BrowserWindow.getAllWindows()[0];
       const state_command = args.command.state.trim();
       const cleanCmd = `${args.command.state.trim()},${args.command.tempLim},${
-        args.command.currentLim},${args.command.startMoment},${args.command.endMoment}`;
+        args.command.currentLim
+      },${args.command.startMoment},${args.command.endMoment}`;
 
       if (state_command === "stop") {
         if (port && port.isOpen) {

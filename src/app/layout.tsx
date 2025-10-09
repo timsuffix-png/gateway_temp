@@ -1,10 +1,6 @@
 import "./globals.css";
 import AuthProvider from "@/lib/auth/authProvider";
 import { Sarabun } from "next/font/google";
-const sarabun = Sarabun({
-  subsets: ["thai"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
-});
 
 export default function RootLayout({
   children,
@@ -12,7 +8,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-     <html lang="en" className={sarabun.className}>
+     <html lang="en">
       <head>
         {/* ✅ ตรงนี้ใส่ link ฟอนต์ */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -28,12 +24,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen box-border">
         <AuthProvider>
-          {/* <header
-            className="sticky top-0 z-50 w-full bg-white 
-              2xl:fixed 2xl:top-0 2xl:left-0 2xl:h-screen 2xl:w-[20%] 2xl:border-r"
-          >
-            <SideBar />
-          </header> */}
+
           <main
             className="box-border h-auto min-h-screen overflow-y-auto "
           >
