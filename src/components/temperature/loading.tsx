@@ -1,26 +1,27 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../lib/auth/authProvider";
 
 export default function LoadingPage() {
   const auth = useAuth();
-  const imageRef = useRef<any | null>(null);
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    if (imageRef.current) {
-      const loadImage = async () => {
-        const loading = await window.electronAPI.loadImg("loading.gif");
-        try {
-          imageRef.current.src = loading;
-        } catch {}
-      };
-      loadImage();
-    }
+    const loadImage = async () => {
+      try {
+        const img = await window.electronAPI.loadImg("loading.gif");
+        if (img) setImgSrc(img);
+      } catch (err) {
+        console.error("Load image failed:", err);
+      }
+    };
+
+    loadImage();
   }, [auth]);
 
   return (
     <div className="flex min-h-screen justify-center items-center">
-      <img ref={imageRef} alt="my gif" height={100} width={100} />
-      <p>loading</p>
+      {imgSrc && <img src={imgSrc} alt="loading" width={100} height={100} />}
+      <p className="mt-3 text-gray-600">loading...</p>
     </div>
   );
 }

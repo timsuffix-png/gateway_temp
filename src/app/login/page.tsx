@@ -66,7 +66,7 @@ export default function Login() {
     return (
       <div className="h-screen flex bg-white">
         <div className="w-full lg:w-8/12 h-full flex flex-col">
-          <div className="w-full h-[20%] flex place-items-center place-content-center sm:place-content-start sm:pl-20">
+          <div className="w-full h-[15%] flex place-items-center place-content-center sm:place-content-start sm:pl-20">
             <img
               className="w-[254px] h-[60px]"
               ref={logoImageRef}
@@ -109,13 +109,13 @@ export default function Login() {
                   />
                 </label>
               </div>
-              <div className="w-full flex place-content-center">
+              {/* <div className="w-full flex place-content-center">
                 <div className="w-3/4">
                   <h5 className="text-zinc-500 text-[10px] md:text-xs font-normal  leading-snug mt-1">
                     ลืมรหัสผ่าน?
                   </h5>
                 </div>
-              </div>
+              </div> */}
               <div className="w-full flex place-content-center">
                 <div className="w-3/4 flex place-content-end mt-5">
                   <SubmitButton text="เข้าสู่ระบบ" onClick={fetchData} />
@@ -129,14 +129,15 @@ export default function Login() {
                 </button>
               </div>
             </div>
-            <div className="flex place-items-end place-content-center ">
+           
+          </div>
+           <div className="flex place-items-end place-content-center mt-auto">
               <Footer />
             </div>
-          </div>
         </div>
         <div className="w-4/12 h-full hidden lg:block">
           <img
-            className="w-full h-full"
+            className="w-full h-screen object-cover"
             ref={ironsImageRef}
             width={571}
             height={945}

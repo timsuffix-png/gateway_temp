@@ -21,6 +21,7 @@ function createWindow() {
     },
   });
 
+  mainWindow.webContents.session.clearCache();
   if (app.isPackaged) {
     // โหลดไฟล์ index.html จาก out/
     const indexPath = path.join(process.resourcesPath, "out", "index.html");
@@ -29,6 +30,7 @@ function createWindow() {
     // ตอน dev
     mainWindow.loadURL("http://localhost:3000");
   }
+
   mainWindow.webContents.session.on(
     "select-serial-port",
     (event, portList, webContents, callback) => {
@@ -53,13 +55,11 @@ app.on("ready", () => {
   ipcMain.handle("loadImg", (event, args) => {
     const ext = path.extname(args);
     try {
-      const image = readFileSync(
-      path.join(process.resourcesPath, "out", args)
-    );
-      return `data:image/${ext};base64,${image.toString("base64")}`;
+      const image = readFileSync(path.join(process.resourcesPath, "out", args));
+      return `data:image/${ext.replace(".", "")};base64,${image.toString("base64")}`;
     } catch {
       const image = readFileSync(path.join(process.cwd(), "public", args));
-      return `data:image/${ext};base64,${image.toString("base64")}`;
+      return `data:image/${ext.replace(".", "")};base64,${image.toString("base64")}`;
     }
   });
 

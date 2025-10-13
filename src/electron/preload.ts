@@ -24,14 +24,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.removeListener("serial-data", (_event, data) => callback(data));
   },
 
-  // ใช้บอกว่าพอตปิดเเล้ว Main → Renderer
-  onSerialPortClosed: (callback: () => void) => {
-    ipcRenderer.on("serial-port-closed", callback);
-  },
-  //ใช้ลบการฟังพอตปิด
-  removeSerialPortClosedListener: (callback: () => void) => {
-    ipcRenderer.removeListener("serial-port-closed", callback); //เวลาเรียกใช้พร้อมกับฟังชั่นฝั่งrederer
-  },
+  // // ใช้บอกว่าพอตปิดเเล้ว Main → Renderer
+  // onSerialPortClosed: (callback: () => void) => {
+  //   ipcRenderer.on("serial-port-closed", callback);
+  // },
+  // //ใช้ลบการฟังพอตปิด
+  // removeSerialPortClosedListener: (callback: () => void) => {
+  //   ipcRenderer.removeListener("serial-port-closed", callback); //เวลาเรียกใช้พร้อมกับฟังชั่นฝั่งrederer
+  // },
+  
   openPort: (portName: string) => ipcRenderer.invoke("openPort", portName),
   //ปิดพอต  	Renderer → Main
   closePort: () => ipcRenderer.invoke("closePort"),

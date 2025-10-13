@@ -145,7 +145,7 @@ export default function QcDetail() {
                 </h1>
               )}
             </div>
-            <div className="flex flex-col-reverse place-content-center mt-auto">
+            <div className="flex flex-col-reverse place-content-center mt-[50px]">
               <Footer />
             </div>
           </div>

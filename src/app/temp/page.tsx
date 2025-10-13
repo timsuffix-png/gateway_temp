@@ -61,13 +61,13 @@ export default function MainTempTest() {
     startMoment: number;
     endMoment: number;
   }>({
-    state: "on", //on,100,10,10,60
+    state: "on",
     tempLim: 0.0,
     currentLim: 0.0,
     startMoment: 0.0,
     endMoment: 0.0,
   });
-  //รายละเอียดqcที่จะทดสอบ
+
   const [qcMains, setQcMains] = useState<{
     error: boolean;
     message: string;
@@ -148,15 +148,6 @@ export default function MainTempTest() {
   const handleSerialData = (data: string) => {
     const parts = data.split(",");
     if (parts.length > 10) {
-      // const [t1, t2, t3, curr, tm, sendData] = parts;
-
-      // setTemp1(parseFloat(parts[0]));
-      // setTemp2(parseFloat(parts[1]));
-      // setTemp3(parseFloat(parts[2]));
-      // setCurrent(parseFloat(parts[3]));
-      // setTime(parseInt(parts[4]));
-      // setStatus(parseInt(parts[5]));
-
       setTemp1(parseFloat(parts[0]));
       setTemp2(parseFloat(parts[1]));
       setTemp3(parseFloat(parts[2]));
@@ -180,11 +171,6 @@ export default function MainTempTest() {
     }
   };
 
-  //ฟังก์ชันปิดพอต
-  const handlePortClosed = () => {
-    console.log("Serial port ถูกปิดแล้ว"); // แจ้งสถานะ port ถูกปิด
-    // TODO: อัพเดต UI แจ้งเตือนผู้ใช้ว่า port ปิดแล้ว เช่น ปิดปุ่ม หรือแสดงข้อความ
-  };
 
   //fetch API
   const fetchQcProjectList = async () => {
@@ -208,22 +194,13 @@ export default function MainTempTest() {
       throw new Error("Failed to fetch data");
     }
     const format_script = await rawData?.data?.find(
-      // หาที่ "qcType": {
-      //     "ID": "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600",
-      //     "name": "temperature"
-      //   },
       (data: any) =>
         //api kla
         data.qcMain?.qcType?.ID === "96accb41-4eae-43af-853b-bedcae094c10"
       //api  P' Bright
       // data.qcMain?.qcType?.ID === "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600"
     );
-    console.log(
-      "StartMoment : " + format_script?.qcMain?.qcScript?.script?.StartMoment
-    );
-    console.log(
-      "EndMoment : " + format_script?.qcMain?.qcScript?.script?.EndMoment
-    );
+
 
     setSendData((prev) => ({
       ...prev,
@@ -281,14 +258,11 @@ export default function MainTempTest() {
       checkSerialNumber();
 
       await window.electronAPI.openPort(String(currentCOMPort));
-      const data = await window.electronAPI.writeData({
+      await window.electronAPI.writeData({
         port: currentCOMPort,
         command: { ...sendData, state: "on" },
       });
-      console.log(
-        "State command : " + JSON.stringify({ ...sendData, state: "on" })
-      );
-      console.log("Data  : " + data);
+ 
     } catch (error) {
       const errStr = String(error ?? "").trim(); // รับรองเป็น string
       if (currentCOMPort !== null && errStr.includes("Access denied")) {
@@ -341,7 +315,6 @@ export default function MainTempTest() {
           detail: lastResult.join(",").trim(),
         },
       });
-      console.log("Record status response : ", res);
     } catch (error) {
       console.error("Error recording data:", error);
     }
@@ -368,18 +341,17 @@ export default function MainTempTest() {
   useEffect(() => {
     // ส่ง callback เดิมเข้าไปทั้งตอน on และตอน remove)
     const serialDataListener = handleSerialData;
-    const serialPortClosedListener = handlePortClosed;
 
     window.electronAPI.onSerialData(serialDataListener); // เมื่อมีข้อมูล Serial Data เข้ามา ให้เรียกใช้ฟังก์ชัน handleSerialData
-    window.electronAPI.onSerialPortClosed(serialPortClosedListener); // เมื่อพอร์ตถูกปิด ให้เรียกใช้ฟังก์ชัน handlePortClosed
+    // window.electronAPI.onSerialPortClosed(serialPortClosedListener); // เมื่อพอร์ตถูกปิด ให้เรียกใช้ฟังก์ชัน handlePortClosed
 
     // ล้าง listener เมื่อ component ถูก unmount หรือเมื่อdependencyเปลี่ยน
-    return () => {
-      window.electronAPI.removeSerialDataListener(serialDataListener);
-      window.electronAPI.removeSerialPortClosedListener(
-        serialPortClosedListener
-      );
-    };
+    // return () => {
+    //   window.electronAPI.removeSerialDataListener(serialDataListener);
+    //   window.electronAPI.removeSerialPortClosedListener(
+    //     serialPortClosedListener
+    //   );
+    // };
   }, []);
 
   useEffect(() => {
@@ -481,7 +453,6 @@ export default function MainTempTest() {
                     setSerialNumber("");
                   }}
                   onChange={(e) => {
-                    console.log("Serial number input:", e.target.value);
                     setSerialNumber(e.target.value);
                     return;
                   }}
@@ -507,10 +478,10 @@ export default function MainTempTest() {
               <div>
                 <div>
                   {/* บน */}
-                  <div className="absolute left-27 -top-7 text-[#C7AD00] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                  <div className="absolute absolute left-1/2 -translate-x-1/2 -top-7 text-[#C7AD00] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                     {temp3} °C
                   </div>
-                  <div className="absolute left-10 top-3 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
+                  <div className="absolute left-1/2 -translate-x-1/2 top-3 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
                     อุณหภูมิรอบข้าง : {ambient3} °C
                   </div>
                   <div className="flex flex-col absolute left-25 top-20 items-center">
@@ -538,10 +509,10 @@ export default function MainTempTest() {
                   </div>
                 </div>
 
-                <div className="absolute -left-27 top-50 text-[#00A385] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                <div className="absolute right-58 top-50 text-[#00A385] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                   {temp2} °C
                 </div>
-                <div className="absolute -left-60 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
+                <div className="absolute right-58 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
                   อุณหภูมิรอบข้าง : {ambient1} °C
                 </div>
                 <div className="flex flex-col absolute left-6 top-55 items-center">
@@ -569,10 +540,10 @@ export default function MainTempTest() {
               </div>
 
               <div>
-                <div className="absolute -right-27 top-50 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                <div className="absolute left-58 top-50 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                   {temp1} °C
                 </div>
-                <div className="absolute  -right-60 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
+                <div className="absolute  left-58 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
                   อุณหภูมิรอบข้าง : {ambient1} °C
                 </div>
                 <div className="flex flex-col absolute right-5 top-55 items-center">
@@ -656,11 +627,11 @@ export default function MainTempTest() {
                     ></input>
                   </div>
                 </div>
-                <div className="flex flex-col gap-10">
+                <div className="flex flex-col gap-10 items-start">
                   <div className="flex h-auto w-auto items-center justify-center gap-4 ">
                     <p>ผลลัพธ์ : </p>
                     <div
-                      className={`w-24 flex py-2 justify-center items-center whitespace-nowrap rounded-lg text-white ${css}`}
+                      className={`w-auto flex px-4 py-2 justify-center items-center whitespace-nowrap rounded-lg text-white ${css}`}
                     >
                       {stateName}
                     </div>

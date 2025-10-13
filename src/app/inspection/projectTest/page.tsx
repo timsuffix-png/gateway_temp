@@ -57,9 +57,7 @@ export default function QcProject() {
   };
 
   const increasePage = () => {
-    setPage(
-      qcProject && page >= qcProject.allPage ? qcProject.allPage : page + 1
-    );
+    setPage(qcProject && page >= qcProject.allPage ? qcProject.allPage : page + 1);
   };
   const decreasePage = () => {
     setPage(page <= 1 ? 1 : page - 1);
@@ -70,7 +68,6 @@ export default function QcProject() {
   const lastPage = () => {
     setPage(qcProject?.allPage || 1);
   };
-
   return (
     <div className="flex h-screen">
       <SideBar />
@@ -81,10 +78,8 @@ export default function QcProject() {
             <div
               tabIndex={0}
               onClick={() => {
-               
-                  localStorageWeb.setItem("currentUrl", "qc");
-                  window.location.reload();
-                
+                localStorageWeb.setItem("currentUrl", "qc");
+                window.location.reload();
               }}
               className="ml-5 sm:ml-20 cursor-pointer"
             >
@@ -96,7 +91,6 @@ export default function QcProject() {
             </p>
             <button
               onClick={() => {
-               
                 localStorageWeb.setItem("currentUrl", "qc/projectTest/create");
                 window.location.reload();
               }}
@@ -136,7 +130,7 @@ export default function QcProject() {
                             if (result.isConfirmed) {
                               await window.electronAPI.fetchAPI({
                                 method: "DELETE",
-                                URL: `qc/projectTest/${project.ID}`,
+                                URL: `qc/project/${project.ID}`,
                               });
                               await refreshData();
                               Swal.fire({

@@ -103,170 +103,175 @@ export default function CreateTestSetting() {
   return (
     <div className="flex h-screen">
       <SideBar />
-      <div className="w-full h-full flex flex-col border-4">
+      <div className="w-full h-full flex flex-col">
         <Breadcrumb />
-        <div className="w-full flex items-center px-20 py-5 ">
-          <div
-            tabIndex={0}
-            onClick={() => {
-              localStorageWeb.setItem("currentUrl", "qc/testSetting");
-              window.location.reload();
-            }}
-            className="flex ml-5 sm:ml-20 cursor-pointer"
-          >
-            <BackButton />
-          </div>
-
-          <p className="font-bold ml-15 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-            สร้างการทดสอบ
-          </p>
-          <button
-            className="ml-auto px-10 py-3 text-white text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-xl bg-[#001F3F] hover:cursor-pointer
-           "
-            onClick={clickCreate}
-          >
-            สร้าง
-          </button>
-        </div>
-
-        <div className="mx-10 px-10 py-10 flex flex-col gap-8 rounded-xl border-2">
-          {/* เลือกประเภทการทดสอบ*/}
-          <div>
-            <div className="flex">
-              <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-                ประเภทการทดสอบ
-              </p>
-              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                &nbsp;*
-              </span>
+        <div className=" flex flex-col bg-white w-full h-full overflow-y-auto whitespace-nowrap place-items-center pt-10">
+          <div className="flex flex-col sm:flex-row w-full sm:place-content-between sm:place-items-centers ">
+            <div
+              tabIndex={0}
+              onClick={() => {
+                localStorageWeb.setItem("currentUrl", "qc/testSetting");
+                window.location.reload();
+              }}
+              className="flex ml-5 sm:ml-20 cursor-pointer"
+            >
+              <BackButton />
             </div>
 
-            <div className="flex gap-10 items-center">
-              {qcType ? (
-                <select
-                  defaultValue={"none"}
-                  onChange={(e) => {
-                    setQcType({
-                      value: e.target.value,
-                      name: e.target.options[e.target.selectedIndex].text,
-                    });
-                  }}
-                  className="w-[80%] px-8 h-10 text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  border rounded-sm"
-                >
-                  <option value="" disabled hidden>
-                    {" "}
-                    เลือกประเภทการทดสอบ
-                  </option>
-                  {qcTypeList?.data?.map((data) => {
-                    return (
-                      <option
-                        key={data.ID}
-                        value={data.ID}
-                        data-something={data.name}
-                      >
-                        {data.name}
-                      </option>
-                    );
-                  })}
-                </select>
-              ) : (
-                <select className="w-[80%] px-8 h-10 text-lg border rounded-sm">
-                  <option value="" disabled hidden>
-                    {" "}
-                    No options
-                  </option>
-                </select>
-              )}
+            <p className="self-center font-bold ml-15 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+              สร้างการทดสอบ
+            </p>
+            <button
+              onClick={clickCreate}
+              className="ml-auto mr-5 sm:mr-20 px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F]
+                      xl:text-xl 
+                      2xl:text-2xl
+                      hover:cursor-pointer"
+            >
+              สร้าง
+            </button>
+          </div>
 
-              <button
-                onClick={() => {
-                  localStorageWeb.setItem(
-                    "currentUrl",
-                    "qc/testSetting/create/qcType"
-                  );
-                  window.location.reload();
-                }}
-                className="w-[20%] p-2 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-xl bg-gray-200
+          <div className="mx-10 px-10 py-10 w-[90%] flex flex-col gap-8 rounded-xl border-2  mt-[20px]">
+            {/* เลือกประเภทการทดสอบ*/}
+            <div>
+              <div className="flex">
+                <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                  ประเภทการทดสอบ
+                </p>
+                <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                  &nbsp;*
+                </span>
+              </div>
+
+              <div className="flex gap-10 items-center">
+                {qcType ? (
+                  <select
+                    defaultValue={"none"}
+                    onChange={(e) => {
+                      setQcType({
+                        value: e.target.value,
+                        name: e.target.options[e.target.selectedIndex].text,
+                      });
+                    }}
+                    className="w-[80%] px-8 h-10 text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  border rounded-sm"
+                  >
+                    <option value="" disabled hidden>
+                      {" "}
+                      เลือกประเภทการทดสอบ
+                    </option>
+                    {qcTypeList?.data?.map((data) => {
+                      return (
+                        <option
+                          key={data.ID}
+                          value={data.ID}
+                          data-something={data.name}
+                        >
+                          {data.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                ) : (
+                  <select className="w-[80%] px-8 h-10 text-lg border rounded-sm">
+                    <option value="" disabled hidden>
+                      {" "}
+                      No options
+                    </option>
+                  </select>
+                )}
+
+                <button
+                  onClick={() => {
+                    localStorageWeb.setItem(
+                      "currentUrl",
+                      "qc/testSetting/create/qcType"
+                    );
+                    window.location.reload();
+                  }}
+                  className="w-auto p-2 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-xl bg-gray-200
             xl:px-2 xl:py-4 
             hover:cursor-pointer hover:bg-gray-300"
-              >
-                จัดการประเภทการทดสอบ
-              </button>
+                >
+                  จัดการประเภทการทดสอบ
+                </button>
+              </div>
             </div>
+
+            {/* ชื่อการทดสอบ */}
+            <div>
+              <div className="flex">
+                <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                  ชื่อการทดสอบ
+                </p>
+                <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                  &nbsp;*
+                </span>
+              </div>
+
+              <div className="flex gap-10 items-center">
+                <input
+                  placeholder="ชื่อการทดสอบ"
+                  className="w-full px-8 h-10 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl border rounded-sm"
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* รายละเอียดการทดสอบ */}
+            <div>
+              {" "}
+              <div className="flex">
+                <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                  รายละเอียด
+                </p>
+                <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                  &nbsp;*
+                </span>
+              </div>
+              <div className="flex gap-10 items-center">
+                <input
+                  className="w-full px-8 h-10 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl border rounded-sm"
+                  onChange={(e) => setDetail(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {qcType.name === "temperature" && (
+              <div className="grid grid-cols-2 rounded-xl border">
+                {Object.keys(qcScript).map((key, index) => (
+                  <div key={index}>
+                    <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
+                      <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                        {key}
+                        <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                          &nbsp;*
+                        </span>
+                      </h4>
+                      <input
+                        className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
+                        type="number"
+                        maxLength={50}
+                        placeholder="PowerLowLimit"
+                        value={qcScript[key as keyof typeof qcScript]}
+                        onChange={(e) =>
+                          setQcScript({
+                            ...qcScript,
+                            [key]: Number(e.target.value),
+                          })
+                        }
+                        required
+                      />
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* ชื่อการทดสอบ */}
-          <div>
-            <div className="flex">
-              <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-                ชื่อการทดสอบ
-              </p>
-              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                &nbsp;*
-              </span>
-            </div>
-
-            <div className="flex gap-10 items-center">
-              <input
-                placeholder="ชื่อการทดสอบ"
-                className="w-full px-8 h-10 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl border rounded-sm"
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
+          <div className="flex flex-col-reverse place-content-center mt-auto">
+            <Footer />
           </div>
-
-          {/* รายละเอียดการทดสอบ */}
-          <div>
-            {" "}
-            <div className="flex">
-              <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-                รายละเอียด
-              </p>
-              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                &nbsp;*
-              </span>
-            </div>
-            <div className="flex gap-10 items-center">
-              <input
-                className="w-full px-8 h-10 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl border rounded-sm"
-                onChange={(e) => setDetail(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {qcType.name === "temperature" && (
-            <div className="grid grid-cols-2 rounded-xl border">
-              {Object.keys(qcScript).map((key, index) => (
-                <div key={index}>
-                  <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
-                    <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-                      {key}
-                      <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                        &nbsp;*
-                      </span>
-                    </h4>
-                    <input
-                      className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
-                      type="number"
-                      maxLength={50}
-                      placeholder="PowerLowLimit"
-                      value={qcScript[key as keyof typeof qcScript]}
-                      onChange={(e) =>
-                        setQcScript({
-                          ...qcScript,
-                          [key]: Number(e.target.value),
-                        })
-                      }
-                      required
-                    />
-                  </label>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col-reverse place-content-center mt-auto">
-          <Footer />
         </div>
       </div>
     </div>

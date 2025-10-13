@@ -1,6 +1,6 @@
 export default function BackButton({ text = "ย้อนกลับ", ...props }) {
   return (
-    <div className={"w-[125px] 2xl:w-[170px] h-10 2xl:h-14 " + props.className}>
+    <div className={" w-[140px] 2xl:w-[170px] h-10 2xl:h-14 " + props.className}>
       <div className="w-full h-full border-4 border-[#001F3F] rounded-[10px] flex flex-row place-items-center group">
         <svg
           className="group-hover:w-20 transition-all"
@@ -15,7 +15,7 @@ export default function BackButton({ text = "ย้อนกลับ", ...props
             fill="#001F3F"
           />
         </svg>
-        <div className="w-full h-full text-center text-[#001F3F] text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-bold  place-content-center">
+        <div className="w-full h-full text-center text-[#001F3F] text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl whitespace-nowrap  font-bold  place-content-center">
           {text}
         </div>
       </div>
