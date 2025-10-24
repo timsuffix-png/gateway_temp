@@ -470,8 +470,10 @@ export default function MainTempTest() {
             {/* charTemp */}
             <div className="relative self-center pt-10">
               <img
-                className="w-[240px] h-[370px]"
+                className="w-[240px] h-[400px]"
                 ref={ironImageRef}
+                // width={500}
+                // height={100}
                 alt="logo"
               />
 
