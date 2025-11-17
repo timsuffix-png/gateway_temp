@@ -211,7 +211,7 @@ export default function Setting() {
                           <div className="w-full h-full absolute invisible group-hover:visible rounded-full">
                             <div className="w-full h-full flex place-items-center place-content-center rounded-full">
                               <h1 className="text-white text-xl font-normal ">
-                                เปลี่ยนรูปภาพ
+                                อัปโหลดไฟล์
                               </h1>
                             </div>
                           </div>

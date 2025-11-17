@@ -6,6 +6,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("uploadImg", args),
   getImg: async (args: { method: string; URL: string }) =>
     ipcRenderer.invoke("getImg", args),
+
+  // อัปโหลดไฟล์คาลิเบรตด้วย Dialog (ไม่ต้องส่งพาธ)
+  uploadCalibrateFileDialog: async () => ipcRenderer.invoke("uploadCalibrateFileDialog"),
+  // อัปโหลดไฟล์คาลิเบรตจากไฟล์ที่ผู้ใช้เลือกในหน้า (bytes)
+  uploadCalibrateFile: async (payload: { name: string; bytes: ArrayBuffer | Uint8Array }) => ipcRenderer.invoke("uploadCalibrateFile", payload),
+  // อ่านไฟล์คาลิเบรตจากโฟลเดอร์ data (แยกจาก upload)
+  readCalibrateFile: async (name?: string) => ipcRenderer.invoke("readCalibrateFile", name),
   
   portlist: (callback: (portList: any) => void) =>
     ipcRenderer.on("portlist", (event, portList) => callback(portList)),
@@ -23,15 +30,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
   removeSerialDataListener: (callback: (data: string) => void) => {
     ipcRenderer.removeListener("serial-data", (_event, data) => callback(data));
   },
-
-  // // ใช้บอกว่าพอตปิดเเล้ว Main → Renderer
-  // onSerialPortClosed: (callback: () => void) => {
-  //   ipcRenderer.on("serial-port-closed", callback);
-  // },
-  // //ใช้ลบการฟังพอตปิด
-  // removeSerialPortClosedListener: (callback: () => void) => {
-  //   ipcRenderer.removeListener("serial-port-closed", callback); //เวลาเรียกใช้พร้อมกับฟังชั่นฝั่งrederer
-  // },
   
   openPort: (portName: string) => ipcRenderer.invoke("openPort", portName),
   //ปิดพอต  	Renderer → Main

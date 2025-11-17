@@ -1,22 +1,16 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import SelectBar from "@/components/temperature/selectBar";
-import axios from "axios";
 import Footer from "@/components/footer";
 import Popup from "@/components/popup";
 import SerialCommunicationPort from "@/components/temperature/serialCommunicationPort";
-import { error } from "console";
-import { useMemo } from "react";
-import { ipcRenderer } from "electron";
+import CalibrateFile from "@/components/temperature/carlibrateFile";
 import Swal from "sweetalert2";
-import { resolve } from "path";
 import Select from "react-select";
-import ChartTemp from "@/components/temperature/chartTemp";
 import SideBar from "@/components/sidebar";
 
 import Breadcrumb from "@/components/breadcrumb";
 import { useAuth } from "@/lib/auth/authProvider";
-import { abort } from "process";
+import { localStorageWeb } from "@/utils/localstorage";
 
 const statusMap: Record<string, { css: string; stateName: string }> = {
   stop: { css: "bg-red-600", stateName: "STOP" },
@@ -27,7 +21,7 @@ const statusMap: Record<string, { css: string; stateName: string }> = {
 
 export default function MainTempTest() {
   // Selectbar
-  const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า 99202509250014055801
+  const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า
   const [currentCOMPort, setCurrentCOMPort] = useState<number | null>();
   const [popup, setPopup] = useState(false);
   const openPopup = () => setPopup(true);
@@ -36,15 +30,28 @@ export default function MainTempTest() {
     setCurrentCOMPort(Number(await window.electronAPI.getPort()));
   };
 
+  const [calibratePopup, setCalibratePopup] = useState(false);
+  const openCalibratePopup = () => setCalibratePopup(true);
+  const closeCalibratePopup = async () => {
+    setCalibratePopup(false);
+  };
+
+  const [disAbleClick, setDisAbleClick] = useState<boolean>(false);
+
   const auth = useAuth();
 
   const [qcProject, setQcProject] = useState(""); //qcProject ID
   const [temp1, setTemp1] = useState<number | 0>(0); //หันหน้าเข้าแผ่นเตารีด ขวา
   const [temp2, setTemp2] = useState<number | 0>(0); //หันหน้าเข้าแผ่นเตารีด ซ้าย
   const [temp3, setTemp3] = useState<number | 0>(0); //บนหน้าเตารีด
+  const [temp4, setTemp4] = useState<number | 0>(0); //กลางหน้าเตารีด
+
+  const [equation, setEquation] = useState<Array<number>>([]);
   const [ambient1, setAmbient1] = useState<number | 0>(0);
   const [ambient2, setAmbient2] = useState<number | 0>(0);
   const [ambient3, setAmbient3] = useState<number | 0>(0);
+  const [ambient4, setAmbient4] = useState<number | 0>(0);
+
   const [current, setCurrent] = useState<number | null>(null);
   const [time, setTime] = useState<number | null>(null);
   const [status, setStatus] = useState<string>(""); //สถานะการทดสอบ
@@ -60,13 +67,39 @@ export default function MainTempTest() {
     currentLim: number;
     startMoment: number;
     endMoment: number;
+    emissivity: number;
+    m1: number;
+    c1: number;
+    m2: number;
+    c2: number;
+    m3: number;
+    c3: number;
+    m4: number;
+    c4: number;
   }>({
     state: "on",
     tempLim: 0.0,
     currentLim: 0.0,
     startMoment: 0.0,
     endMoment: 0.0,
+    emissivity: 0.0,
+    m1: 0.0,
+    c1: 0.0,
+    m2: 0.0,
+    c2: 0.0,
+    m3: 0.0,
+    c3: 0.0,
+    m4: 0.0,
+    c4: 0.0,
   });
+
+  const activeEmissivity = localStorageWeb.getItem("emissivity");
+  const activeFile = localStorageWeb.getItem("fileCalibrate");
+  const activeMode = activeEmissivity
+    ? "emissivity"
+    : activeFile
+      ? "file"
+      : "none";
 
   const [qcMains, setQcMains] = useState<{
     error: boolean;
@@ -144,6 +177,45 @@ export default function MainTempTest() {
     }
   }, [auth]);
 
+  const settingSensor = async () => {
+    if (activeEmissivity) {
+      return {
+        ...sendData,
+        emissivity: Number(activeEmissivity),
+        m1: 0.0,
+        c1: 0.0,
+        m2: 0.0,
+        c2: 0.0,
+        m3: 0.0,
+        c3: 0.0,
+        m4: 0.0,
+        c4: 0.0,
+      };
+    }
+
+    if (activeFile) {
+      const res = await window.electronAPI.readCalibrateFile(activeFile);
+      if (res?.status) {
+        const pairs: Array<{ x: number; y: number }> = Array.isArray(res.text)
+          ? res.text
+          : [];
+        return {
+          ...sendData,
+          emissivity: 0.0,
+          m1: pairs[0]?.x ?? 0.0,
+          c1: pairs[0]?.y ?? 0.0,
+          m2: pairs[1]?.x ?? 0.0,
+          c2: pairs[1]?.y ?? 0.0,
+          m3: pairs[2]?.x ?? 0.0,
+          c3: pairs[2]?.y ?? 0.0,
+          m4: pairs[3]?.x ?? 0.0,
+          c4: pairs[3]?.y ?? 0.0,
+        };
+      }
+    }
+    return null;
+  };
+
   //ฟังชั่นรับserial Data
   const handleSerialData = (data: string) => {
     const parts = data.split(",");
@@ -151,17 +223,22 @@ export default function MainTempTest() {
       setTemp1(parseFloat(parts[0]));
       setTemp2(parseFloat(parts[1]));
       setTemp3(parseFloat(parts[2]));
-      setAmbient1(parseFloat(parts[3]));
-      setAmbient2(parseFloat(parts[4]));
-      setAmbient3(parseFloat(parts[5]));
-      setTime(parseInt(parts[7]));
-      setCurrent(parseFloat(parts[8]));
-      setStatus(parts[9].trim());
-      setDetail(parts[10].trim());
+      setTemp4(parseFloat(parts[3]));
+
+      setAmbient1(parseFloat(parts[4]));
+      setAmbient2(parseFloat(parts[5]));
+      setAmbient3(parseFloat(parts[6]));
+      setAmbient4(parseFloat(parts[7]));
+
+      setTime(parseInt(parts[9]));
+      setCurrent(parseFloat(parts[10]));
+      setStatus(parts[11].trim());
+      setDetail(parts[12].trim());
 
       if (
-        parts[9].trim() === "Passed" ||
-        (parts[9].trim() === "Failed" && parts[10] !== "Please check iron.")
+        parts[11].trim() === "Passed" ||
+        (parts[11].trim() === "Failed" && parts[12] !== "Please check iron.") ||
+        (parts[11].trim() === "Failed" && parts[12].includes("broken"))
       ) {
         if (!recordedRef.current) {
           recordedRef.current = true;
@@ -170,7 +247,6 @@ export default function MainTempTest() {
       }
     }
   };
-
 
   //fetch API
   const fetchQcProjectList = async () => {
@@ -200,7 +276,6 @@ export default function MainTempTest() {
       //api  P' Bright
       // data.qcMain?.qcType?.ID === "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600"
     );
-
 
     setSendData((prev) => ({
       ...prev,
@@ -239,6 +314,24 @@ export default function MainTempTest() {
       });
       return;
     }
+    const commandData = await settingSensor();
+    if (!commandData) {
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: "กรุณาตั้งค่าSensor",
+      });
+      return;
+    }
+    setSendData(commandData);
+
+    if (disAbleClick) return;
+
+    setDisAbleClick(true); //กดไม่ได้
+
+    setTimeout(() => {
+      setDisAbleClick(false); //กดได้
+    }, 2000);
 
     try {
       const checkSerialNumber = async () => {
@@ -258,11 +351,11 @@ export default function MainTempTest() {
       checkSerialNumber();
 
       await window.electronAPI.openPort(String(currentCOMPort));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       await window.electronAPI.writeData({
         port: currentCOMPort,
-        command: { ...sendData, state: "on" },
+        command: { ...commandData, state: "on" },
       });
- 
     } catch (error) {
       const errStr = String(error ?? "").trim(); // รับรองเป็น string
       if (currentCOMPort !== null && errStr.includes("Access denied")) {
@@ -372,7 +465,7 @@ export default function MainTempTest() {
           {/* Select Bar */}
           <div className="w-full flex flex-col 2x:flex-row">
             <ul
-              className=" flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg 
+              className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg 
             md:flex-row md:gap-10 md:items-center"
             >
               <li
@@ -407,27 +500,6 @@ export default function MainTempTest() {
 
                 <Select
                   className="rounded-sm border"
-                  // options={
-                  //   qcProjectList?.data
-                  //     ? qcProjectList.data
-                  //         //1) filter
-                  //         .filter((project) =>
-                  //           project.qcItemProject?.some(
-                  //             (item) =>
-                  //               item.qcMain?.ID ===
-                  //               //api kla
-                  //               "497da269-cdd3-419c-8f7d-f14a8a07e1f0"
-                  //               //api P' Bright
-                  //               // "23c853da-0d4d-4605-b242-0c13731dfb29"
-                  //           )
-                  //         )
-                  //         //2) map
-                  //         .map((project) => ({
-                  //           value: project.ID,
-                  //           label: project.projectName,
-                  //         }))
-                  //     : []
-                  // }
                   options={qcProjectList?.data?.map((data) => ({
                     value: data.ID,
                     label: data.projectName,
@@ -458,17 +530,33 @@ export default function MainTempTest() {
                   }}
                 />
               </li>
+              <li className="flex flex-col gap-3 h-full items-center justify-center relative">
+                <div className="w-full h-full flex items-center justify-center">
+                  <button
+                    onClick={openCalibratePopup}
+                    className="px-4 h-full bg-gray-500 text-white text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-normal rounded-xl hover:bg-gray-700"
+                  >
+                    ตั้งค่าSensor
+                  </button>
+                </div>
+
+                {calibratePopup && (
+                  <Popup onClose={closeCalibratePopup}>
+                    <CalibrateFile />
+                  </Popup>
+                )}
+              </li>
             </ul>
           </div>
           <div className="w-full h-10 my-4"> </div>
 
           {/* ----------- Body -------------*/}
           <div
-            className="w-full flex px-[20%] flex-col justify-between gap-10 
-          lg:gap-10 lg:px-[10%] lg:my-2"
+            className="w-full h-full flex px-[20%] flex-col justify-between 
+          lg:gap-10 lg:px-[10%] lg:my-2 "
           >
-            {/* charTemp */}
-            <div className="relative self-center pt-10">
+            {/* ภาพเตารีด */}
+            <div className="relative self-center pt-10 pb-10">
               <img
                 className="w-[240px] h-[400px]"
                 ref={ironImageRef}
@@ -480,7 +568,7 @@ export default function MainTempTest() {
               <div>
                 <div>
                   {/* บน */}
-                  <div className="absolute absolute left-1/2 -translate-x-1/2 -top-7 text-[#C7AD00] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                  <div className="absolute left-1/2 -translate-x-1/2 -top-7 text-[#d6bb0fff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                     {temp3} °C
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 top-3 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
@@ -511,19 +599,53 @@ export default function MainTempTest() {
                   </div>
                 </div>
 
-                <div className="absolute right-58 top-50 text-[#00A385] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                <div>
+                  {/* กลาง */}
+                  <div className="absolute absolute left-1/2 -translate-x-1/2 bottom-1 text-[#1496ecff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                    {temp4} °C
+                  </div>
+                  <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
+                    อุณหภูมิรอบข้าง : {ambient4} °C
+                  </div>
+                  <div className="flex flex-col absolute left-23 top-40 items-center">
+                    <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#66f0ffff]">
+                      กลาง
+                    </label>
+
+                    <svg
+                      className="h-6 w-6"
+                      fill="#66f0ffff"
+                      viewBox="0 0 512 512"
+                      xmlns="http://www.w3.org/2000/svg"
+                      stroke="#ff0000"
+                    >
+                      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                      <g
+                        id="SVGRepo_tracerCarrier"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></g>
+                      <g id="SVGRepo_iconCarrier">
+                        <path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z"></path>
+                      </g>
+                    </svg>
+                  </div>
+                </div>
+
+                {/* ซ้าย */}
+                <div className="absolute right-58 top-50 text-[#0fb500ff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                   {temp2} °C
                 </div>
                 <div className="absolute right-58 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
-                  อุณหภูมิรอบข้าง : {ambient1} °C
+                  อุณหภูมิรอบข้าง : {ambient2} °C
                 </div>
                 <div className="flex flex-col absolute left-6 top-55 items-center">
-                  <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#00ffd0ff]">
+                  <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#61ff53ff]">
                     ซ้าย
                   </label>
                   <svg
                     className="h-6 w-6"
-                    fill="#00ffd0ff"
+                    fill="#61ff53ff"
                     viewBox="0 0 512 512"
                     xmlns="http://www.w3.org/2000/svg"
                     stroke="#ff0000"
@@ -541,6 +663,7 @@ export default function MainTempTest() {
                 </div>
               </div>
 
+              {/* ขวา */}
               <div>
                 <div className="absolute left-58 top-50 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                   {temp1} °C
@@ -574,41 +697,15 @@ export default function MainTempTest() {
               </div>
             </div>
 
-            {/* 
-              <div
-                className="flex flex-row items-center gap-4 text-center
-          lg:flex-col"
-              >
-                <ChartTemp maxTemp={sendData.tempLim} values={temp1} />
-                <label className="text-3xl">{temp1} °C</label>
-                <label>ตัวที่ 1</label>
-              </div>
-              <div
-                className="flex flex-row items-center gap-4 text-center
-          lg:flex-col"
-              >
-                <ChartTemp maxTemp={sendData.tempLim} values={temp2} />
-                <label className="text-3xl ">{temp2} °C </label>
-                <label>ตัวที่ 2</label>
-              </div>
-              <div
-                className="flex flex-row items-center gap-4 text-center
-          lg:flex-col"
-              >
-                <ChartTemp maxTemp={sendData.tempLim} values={temp3} />
-                <label className="text-3xl ">{temp3} °C</label>
-                <label>ตัวที่ 3</label>
-              </div>
-            </div> */}
             <div
-              className="flex flex-col justify-between gap-10
-              lg:flex-row lg:gap-0"
-              >
+              className="w-full h-full flex flex-col justify-between gap-10 pt-10 
+              lg:pt-0 lg:flex-row lg:gap-0"
+            >
               {/* กระแส อุณหภูมิ */}
               <div
                 className="flex flex-col w-full h-full gap-10 justify-between  text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl
                 lg:items-start lg:pl-10"
-                >
+              >
                 <div className="flex gap-10">
                   <div className="flex items-center gap-4">
                     <p>กระแสไฟฟ้า :</p>
@@ -647,18 +744,59 @@ export default function MainTempTest() {
 
               {/* ปุ่มกดทดสอบ หยุด */}
               <div
-                className="flex flex-col h-full w-full items-center gap-[9%]
+                className="flex flex-col h-[300px] min-h-full w-full items-center gap-2
                 lg:items-end"
               >
+                {activeMode && (
+                  <div className="flex justify-center items-center gap-2 px-3 py-2 text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl rounded-md bg-amber-50 text-amber-700">
+                    {activeMode === "emissivity" ? (
+                      <>
+                        <img
+                          src="/check.png"
+                          className="w-7 h-7"
+                        />
+                        <span>Emissivity : </span>
+                        <span className="font-semibold">
+                          {activeEmissivity}
+                        </span>
+                      </>
+                    ) : activeMode === "file" ? (
+                      <>
+                      <img
+                          src="/check.png"
+                          className="w-7 h-7"
+                        />
+                        <span>ไฟล์ : </span>
+                        <span className="font-semibold">{activeFile}</span>
+                      </>
+                    ) : (
+                      <>
+                      <img
+                          src="/warning.png"
+                          className="w-7 h-7"
+                        />
+                      <span>ยังไม่ได้ตั้งค่า sensor</span>
+                      </>
+                    )}
+                  </div>
+                )}
+
                 <button
                   id="test"
-                  className="w-[50%] h-[80%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-lg bg-[#001F3F] hover:cursor-pointer text-xl text-white font-semibold"
+                  className={`w-[50%] h-[90%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl 
+                  rounded-lg font-semibold text-white transition duration-200
+                  ${
+                    disAbleClick
+                      ? "bg-[#001F3F]/60 cursor-not-allowed"
+                      : "bg-[#003366] hover:bg-[#001F3F] hover:cursor-pointer"
+                  }`}
                   onClick={clickTest}
                 >
                   ทดสอบ
                 </button>
                 <button
-                  className="w-[50%] h-[80%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-lg bg-red-600 hover:cursor-pointer text-xl text-white font-semibold"
+                  className="w-[50%] h-[90%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-lg bg-red-500 hover:cursor-pointer text-xl text-white font-semibold 
+                  transition duration-300 hover:bg-red-600"
                   onClick={async () => {
                     await window.electronAPI.writeData({
                       port: currentCOMPort,

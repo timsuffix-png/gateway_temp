@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import path from "path";
+import { readFileSync, writeFileSync, existsSync, readdirSync } from "fs";
+import path, { resolve } from "path";
 import { pathToFileURL } from "url";
 import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
@@ -49,7 +49,82 @@ let port: SerialPort | null;
 let parser: ReadlineParser | null = null;
 
 app.on("ready", () => {
-  createWindow();
+  // //-----------------------------------------------------------File----------------------------------------------------------
+  ipcMain.handle("readCalibrateFile", async (event, name?: string) => {
+    const dataDir = path.join(process.cwd(), "data");
+    if (!existsSync(dataDir)) {
+      return { status: false, error: "File not found" };
+    }
+    //ถ้าไม่มีชื่อไฟล์ จะเลือกไฟล์แรกในโฟลเดอร์
+    let targetPath = name ? path.join(dataDir, name) : "";
+    if (!name || !existsSync(targetPath)) {
+      const names = readdirSync(dataDir);
+      if (!names.length) {
+        return { status: false, error: "File not found" };
+      }
+      targetPath = path.join(dataDir, names[0]);
+    }
+    try {
+      //อ่านไฟล์แบบ synchronous
+      const text = readFileSync(targetPath, "utf8");
+      const lines = text.trim().split("\n");
+      const calibrateValue: any = [];
+
+      lines.forEach((line, i) => {
+        const raw = line.split(",").map(Number);
+        const x = raw[1];
+        const y = raw[2];
+        calibrateValue[i] = { x, y };
+      });
+      return {
+        status: true,
+        path: targetPath,
+        name: path.basename(targetPath),
+        text: calibrateValue,
+      };
+    } catch {
+      return { status: false, error: "read failed" };
+    }
+  });
+
+  // อัปโหลดไฟล์คาลิเบรตจากไฟล์ที่เลือกใน Renderer (bytes)
+  ipcMain.handle("uploadCalibrateFile", async (event, arg: any) => {
+    const dataDir = path.join(process.cwd(), "data");
+    if (!existsSync(dataDir)) {
+      require("fs").mkdirSync(dataDir, { recursive: true });
+    }
+
+    try {
+      if (
+        !arg ||
+        typeof arg !== "object" ||
+        !("name" in arg) ||
+        !("bytes" in arg)
+      ) {
+        return { status: false, error: "invalid args" };
+      }
+      const name = String(arg.name);
+      const ext = path.extname(name).toLowerCase();
+      if (ext !== ".txt") {
+        return { status: false, error: "only .txt allowed" };
+      }
+      const bytes: any = (arg as any).bytes;
+      let buffer: Buffer;
+      if (bytes instanceof Uint8Array) {
+        buffer = Buffer.from(bytes);
+      } else if (bytes instanceof ArrayBuffer) {
+        buffer = Buffer.from(new Uint8Array(bytes));
+      } else {
+        return { status: false, error: "invalid bytes" };
+      }
+
+      const destPath = path.join(dataDir, path.basename(name));
+      writeFileSync(destPath, buffer);
+      return { status: true, path: destPath };
+    } catch (e: any) {
+      return { status: false, error: e?.message || "write failed" };
+    }
+  });
 
   //-----------------------------------------------------------Image----------------------------------------------------------
   ipcMain.handle("loadImg", (event, args) => {
@@ -316,6 +391,7 @@ app.on("ready", () => {
   ipcMain.handle("openPort", async (event, portName) => {
     return new Promise((resolve, reject) => {
       if (port && port.isOpen) {
+        console.log("Port already opened");
         return resolve("Port already opened");
       }
 
@@ -325,8 +401,6 @@ app.on("ready", () => {
         baudRate: 9600,
         autoOpen: false,
       });
-
-      parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
 
       port.on("error", (err) => {
         console.error("Serial port error:", err);
@@ -335,101 +409,98 @@ app.on("ready", () => {
       port.open((err) => {
         if (err) {
           port = null;
-          console.log("Failed to open port:", err.message);
           return reject(`Failed to open port: ${err.message}`);
         }
-        console.log("Port opened successfully");
-        resolve("Port opened");
+
+        console.log("Port opened successfully:", portPath);
+
+        parser = port!.pipe(new ReadlineParser({ delimiter: "\n" }));
+
+        const win = BrowserWindow.getAllWindows()[0];
+
+        const onData = (data: Buffer | string): void => {
+          const str = data.toString().trim();
+          console.log("Data from Arduino:", str);
+          // ส่งข้อมูลไป renderer ทันทีทีละบรรทัด
+          win.webContents.send("serial-data", str);
+          // ฝั่ง renderer จะได้ทีละรอบ เรียลไทม์
+        };
+
+        parser.removeAllListeners("data");
+        parser.on("data", onData);
+
+        resolve("Port opened and parser ready");
       });
     });
   });
 
-  async function openPortIfNeeded(portName: string) {
-    return new Promise((resolve, reject) => {
-      if (port && port.isOpen) {
-        return resolve("Port already opened");
-      }
-      const portPath = portName.startsWith("COM") ? portName : `COM${portName}`;
-      port = new SerialPort({
-        path: portPath,
-        baudRate: 9600,
-        autoOpen: false,
-      });
-      parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
-
-      port.on("error", (err: Error) => {
-        reject("Serial port error:" + err.message);
-      });
-      port.open((err) => {
-        if (err) {
-          port = null;
-          console.log("Failed to open port:", err.message);
-          return reject(`Failed to open port: ${err.message}`);
-        }
-        console.log("Port opened successfully");
-        resolve("Port opened");
-      });
-    });
-  }
-
   ipcMain.handle("writeData", async (event, args) => {
-    // console.log("writeData2 called with port:", args.port);
-    // // console.log("Port status in writeData2:", port, port?.isOpen);
-    return new Promise(async (resolve, reject) => {
-      const win = BrowserWindow.getAllWindows()[0];
-      const state_command = args.command.state.trim();
-      const cleanCmd = `${args.command.state.trim()},${args.command.tempLim},${
-        args.command.currentLim
-      },${args.command.startMoment},${args.command.endMoment}`;
+    // return new Promise(async (resolve, reject) => {
+    //   const win = BrowserWindow.getAllWindows()[0];
+    //   const state_command = args.command.state.trim();
+    //   const cleanCmd = `${args.command.state.trim()},${args.command.tempLim},${
+    //     args.command.currentLim
+    //   },${args.command.startMoment},${args.command.endMoment}`;
 
-      if (state_command === "stop") {
-        if (port && port.isOpen) {
-          port.write("stop" + "\n");
-          console.log("State stop : " + cleanCmd);
-        } else {
-          console.log("Stop received but port not open — skip write");
-        }
-        resolve("State is off stop sending datas.");
-        return;
-      }
-      if (!port || !port.isOpen) {
-        return reject("Port not available after openPortIfNeeded");
+    //   if (state_command === "stop") {
+    //     if (port && port.isOpen) {
+    //       port.write("stop" + "\n");
+    //       return resolve("Stopped");
+    //     }
+
+    //     console.log("State on : " + cleanCmd);
+    //     //เขียนคำสั่งไปarduino
+    //     port!.write(cleanCmd + "\n", (err) => {
+    //       if (err) return reject(err);
+    //     });
+
+    //     // ทุกครั้งให้แน่ใจว่า parser ถูกสร้าง/มีอยู่ก่อนใช้งาน
+    //     if (!parser && port) {
+    //       parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
+    //     }
+    //     if (parser) {
+    //       parser.removeAllListeners("data");
+    //     }
+
+    //     const onData = (data: Buffer | string): void => {
+    //       const str = data.toString().trim();
+    //       console.log("Data from Arduino:", str);
+    //       // ส่งข้อมูลไป renderer ทันทีทีละบรรทัด
+    //       win.webContents.send("serial-data", str);
+    //       // 👉 ฝั่ง renderer จะได้ทีละรอบ เรียลไทม์
+
+    //       const index_data = str.split(",");
+    //       // ตรวจความยาวก่อนเข้าถึง index 9 (state)
+    //       if (index_data.length == 12) {
+    //         const state_data = index_data[0].trim();
+    //         // ถ้า state ไม่เท่ากับ "on" ให้จบการรับข้อมูล
+    //         if (state_data !== "on") {
+    //           if (parser) parser.removeListener("data", onData);
+    //         }
+    //       }
+    //     };
+
+    //     if (parser) parser.on("data", onData);
+    //     // resolve("Open port in writeSerial func.");
+    //   }
+    // });
+    return new Promise((resolve, reject) => {
+      if (!port || !port.isOpen) return reject("Port not open");
+
+      const command = args.command;
+      const cleanCmd = `${command.state},${command.tempLim},${command.currentLim},${command.startMoment},${command.endMoment}`;
+
+      if (command.state === "stop") {
+        port.write("stop\n");
+        console.log("Sent stop command");
+        return resolve("Stopped");
       }
 
-      console.log("State on : " + cleanCmd);
-      //เขียนคำสั่งไปarduino
       port.write(cleanCmd + "\n", (err) => {
         if (err) return reject(err);
+        console.log("Sent command:", cleanCmd);
+        resolve("Command sent successfully");
       });
-
-      // ทุกครั้งให้แน่ใจว่า parser ถูกสร้าง/มีอยู่ก่อนใช้งาน
-      if (!parser && port) {
-        parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
-      }
-      if (parser) {
-        parser.removeAllListeners("data");
-      }
-
-      const onData = (data: Buffer | string): void => {
-        const str = data.toString().trim();
-        console.log("Data from Arduino:", str);
-        // ส่งข้อมูลไป renderer ทันทีทีละบรรทัด
-        win.webContents.send("serial-data", str);
-        // 👉 ฝั่ง renderer จะได้ทีละรอบ เรียลไทม์
-
-        const index_data = str.split(",");
-        // ตรวจความยาวก่อนเข้าถึง index 9 (state)
-        if (index_data.length > 10) {
-          const state_data = index_data[9].trim();
-          // ถ้า state ไม่เท่ากับ "on" ให้จบการรับข้อมูล
-          if (state_data !== "on") {
-            if (parser) parser.removeListener("data", onData);
-          }
-        }
-      };
-
-      if (parser) parser.on("data", onData);
-      // resolve("Open port in writeSerial func.");
     });
   });
 
@@ -449,6 +520,7 @@ app.on("ready", () => {
       });
     });
   });
+  createWindow();
 });
 
 app.on("window-all-closed", () => {
