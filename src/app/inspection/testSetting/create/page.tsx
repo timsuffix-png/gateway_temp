@@ -8,6 +8,9 @@ import SideBar from "@/components/sidebar";
 
 import Breadcrumb from "@/components/breadcrumb";
 import Footer from "@/components/footer";
+import Popup from "@/components/popup";
+import CalibrateFile from "@/components/temperature/carlibrateFile";
+
 type QcScriptSeaward = {
   script_1: string;
   script_2: number;
@@ -32,12 +35,22 @@ type QcScriptTemperature = {
   CurrentMax: number;
   StartMoment: number;
   EndMoment: number;
+  emissivity: number;
+  m1: number;
+  c1: number;
+  m2: number;
+  c2: number;
+  m3: number;
+  c3: number;
+  m4: number;
+  c4: number;
 };
 
 export default function CreateTestSetting() {
   const [name, setName] = useState("");
   const [detail, setDetail] = useState("");
   const [qcType, setQcType] = useState({ name: "", value: "" });
+  const [disAbleClick, setDisAbleClick] = useState(false);
   const [qcTypeList, setQcTypeList] = useState<{
     error: boolean;
     message: string;
@@ -50,7 +63,7 @@ export default function CreateTestSetting() {
     allPage: number;
   } | null>();
 
-  const defaultScripts:Record<string, any> = {
+  const defaultScripts: Record<string, any> = {
     seaward: {
       script_1: "",
       script_2: 0,
@@ -74,6 +87,15 @@ export default function CreateTestSetting() {
       CurrentMax: 0,
       StartMoment: 0,
       EndMoment: 0,
+      emissivity: 0,
+      m1: 0,
+      c1: 0,
+      m2: 0,
+      c2: 0,
+      m3: 0,
+      c3: 0,
+      m4: 0,
+      c4: 0,
     },
   };
 
@@ -81,18 +103,68 @@ export default function CreateTestSetting() {
     QcScriptSeaward | QcScriptTemperature | null
   >(null);
 
+  const [calibratePopup, setCalibratePopup] = useState(false);
+  const openCalibratePopup = () => setCalibratePopup(true);
+  const closeCalibratePopup = async () => {
+    setCalibratePopup(false);
+  };
+
+  const settingSensor = async () => {
+    const activeFile = localStorageWeb.getItem("fileCalibrate");
+    const emissivity = localStorageWeb.getItem("emissivity");
+    if (!activeFile || emissivity === null || emissivity === undefined) return null;
+    const res = await window.electronAPI.readCalibrateFile(activeFile);
+    if (!res?.status) {
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: res.text,
+      });
+      return null;
+    }
+    if (res?.status) {
+      const pairs: Array<{ x: number; y: number }> = Array.isArray(res.text)
+        ? res.text
+        : [];
+      return {
+        ...(qcScript as QcScriptTemperature),
+        emissivity: Number(emissivity),
+        m1: pairs[0]?.x ?? 0.0,
+        c1: pairs[0]?.y ?? 0.0,
+        m2: pairs[1]?.x ?? 0.0,
+        c2: pairs[1]?.y ?? 0.0,
+        m3: pairs[2]?.x ?? 0.0,
+        c3: pairs[2]?.y ?? 0.0,
+        m4: pairs[3]?.x ?? 0.0,
+        c4: pairs[3]?.y ?? 0.0,
+      };
+    }
+    return null;
+  };
+
   async function clickCreate() {
     try {
-      const temp = { ...qcScript };
+      if (disAbleClick) return;
+      setDisAbleClick(true);
+      setTimeout(() => {
+        setDisAbleClick(false);
+      }, 2000);
+      const checkSettingSensor = await settingSensor();
+
+      const script =
+        qcType.name === "temperature"
+          ?    {  ...(checkSettingSensor || {}) }
+          : (qcScript as QcScriptSeaward);
       if (!name || !qcType.value) {
         Swal.fire({
           icon: "error",
-          title: "กรอกข้อมูลไม่ครบ",
+          title: "เกิดข้อผิดพลาด",
           text: "กรุณากรอกข้อมูลให้ครบตามช่องที่มี * สีแดง",
         });
         return;
       }
 
+      // @ts-ignore
       const data = await window.electronAPI.fetchAPI({
         method: "POST",
         URL: "qc/main",
@@ -100,7 +172,7 @@ export default function CreateTestSetting() {
           qcType: qcType.value,
           testName: name,
           detail: detail,
-          script: temp,
+          script: script,
         },
       });
       if (!data) {
@@ -136,6 +208,7 @@ export default function CreateTestSetting() {
   };
 
   const fetchQcTypeList = async () => {
+    // @ts-ignore
     var data = await window.electronAPI.fetchAPI({
       method: "GET",
       URL: `qc/type?limit=9999999&page=1`,
@@ -165,7 +238,8 @@ export default function CreateTestSetting() {
       <div className="w-full h-full flex flex-col">
         <Breadcrumb />
         <div className=" flex flex-col bg-white w-full h-full overflow-y-auto whitespace-nowrap place-items-center pt-10">
-          <div className="flex flex-col sm:flex-row w-full sm:place-content-between sm:place-items-centers ">
+          {/* ส่วนหัว: ปุ่มย้อนกลับ, หัวข้อ, ปุ่มสร้าง */}
+          <div className="flex flex-col sm:flex-row w-full sm:place-content-between sm:place-items-center">
             <div
               tabIndex={0}
               onClick={() => {
@@ -176,22 +250,22 @@ export default function CreateTestSetting() {
             >
               <BackButton />
             </div>
-
             <p className="self-center font-bold ml-15 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
               สร้างการทดสอบ
             </p>
             <button
               onClick={clickCreate}
-              className="ml-auto mr-5 sm:mr-20 px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F]
-                      xl:text-xl 
-                      2xl:text-2xl
-                      hover:cursor-pointer"
+              className="ml-auto mr-5 sm:mr-20 px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F]
+                         xl:text-xl 
+                         2xl:text-2xl
+                         hover:cursor-pointer"
             >
               สร้าง
             </button>
           </div>
 
-          <div className="mx-10 px-10 py-10 w-[90%] flex flex-col gap-8 rounded-xl border-2  mt-[20px]">
+          {/* กล่องกรอกข้อมูลหลัก */}
+          <div className="mx-10 px-10 py-10 w-[90%] flex flex-col gap-8 rounded-xl border-2 mt-[20px]">
             {/* เลือกประเภทการทดสอบ*/}
             <div>
               <div className="flex">
@@ -206,15 +280,19 @@ export default function CreateTestSetting() {
               <div className="flex gap-10 items-center">
                 {qcType ? (
                   <select
-                    value={qcType?.value || ""} 
+                    value={qcType?.value || ""}
                     onChange={(e) => {
                       setQcType({
                         value: e.target.value,
                         name: e.target.options[e.target.selectedIndex].text,
                       });
-                        setQcScript(defaultScripts[ e.target.options[e.target.selectedIndex].text] || null);
+                      setQcScript(
+                        defaultScripts[
+                          e.target.options[e.target.selectedIndex].text
+                        ] || null
+                      );
                     }}
-                    className="w-[80%] px-8 h-10 text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  border rounded-sm"
+                    className="w-[80%] px-8 h-10 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl border rounded-sm"
                   >
                     <option value="" disabled hidden>
                       {" "}
@@ -250,8 +328,8 @@ export default function CreateTestSetting() {
                     window.location.reload();
                   }}
                   className="w-auto p-2 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-xl bg-gray-200
-            xl:px-2 xl:py-4 
-            hover:cursor-pointer hover:bg-gray-300"
+                           xl:px-2 xl:py-4 
+                           hover:cursor-pointer hover:bg-gray-300"
                 >
                   จัดการประเภทการทดสอบ
                 </button>
@@ -549,42 +627,60 @@ export default function CreateTestSetting() {
               </div>
             )}
             {TemperatureScript && (
-              <div className="grid grid-cols-2 rounded-xl border">
-                {Object.keys(qcScript as QcScriptTemperature).map(
-                  (key, index) => (
-                    <div key={index}>
-                      <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
-                        <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-                          {key}
-                          <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                            &nbsp;*
-                          </span>
-                        </h4>
-                        <input
-                          className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
-                          type="number"
-                          placeholder=""
-                          value={
-                            (qcScript as QcScriptTemperature)[
-                              key as keyof QcScriptTemperature
-                            ]
-                          }
-                          onChange={(e) =>
-                            setQcScript({
-                              ...(qcScript as QcScriptTemperature),
-                              [key]: Number(e.target.value),
-                            } as QcScriptTemperature)
-                          }
-                          required
-                        />
-                      </label>
+              <div className="py-4 grid grid-cols-2 rounded-xl border">
+                <div className="col-span-2 flex pl-4">
+                  <button
+                    onClick={openCalibratePopup}
+                    className="h-[40px] md:h-[50px] w-auto mt-1 px-3 text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md bg-gray-200 hover:bg-gray-300"
+                  >
+                    ตั้งค่าSensor
+                  </button>
+                  <span className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun'] text-red-600">
+                    &nbsp;*
+                  </span>
+
+                  {calibratePopup && (
+                    <Popup onClose={closeCalibratePopup}>
+                      <CalibrateFile />
+                    </Popup>
+                  )}
+                </div>
+                {[
+                  "TemperatureMax",
+                  "CurrentMax",
+                  "StartMoment",
+                  "EndMoment",
+                ].map((key, index) => (
+                  <div key={index}>
+                    <div className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
+                      <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                        {key}
+                        <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                          &nbsp;*
+                        </span>
+                      </h4>
+                      <input
+                        className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
+                        type="number"
+                        value={
+                          (qcScript as QcScriptTemperature)[
+                            key as keyof QcScriptTemperature
+                          ]
+                        }
+                        onChange={(e) =>
+                          setQcScript({
+                            ...(qcScript as QcScriptTemperature),
+                            [key]: Number(e.target.value),
+                          } as QcScriptTemperature)
+                        }
+                        required
+                      />
                     </div>
-                  )
-                )}
+                  </div>
+                ))}
               </div>
             )}
           </div>
-
           <div className="flex flex-col-reverse place-content-center mt-auto">
             <Footer />
           </div>

@@ -30,12 +30,6 @@ export default function MainTempTest() {
     setCurrentCOMPort(Number(await window.electronAPI.getPort()));
   };
 
-  const [calibratePopup, setCalibratePopup] = useState(false);
-  const openCalibratePopup = () => setCalibratePopup(true);
-  const closeCalibratePopup = async () => {
-    setCalibratePopup(false);
-  };
-
   const [disAbleClick, setDisAbleClick] = useState<boolean>(false);
 
   const auth = useAuth();
@@ -46,7 +40,6 @@ export default function MainTempTest() {
   const [temp3, setTemp3] = useState<number | 0>(0); //บนหน้าเตารีด
   const [temp4, setTemp4] = useState<number | 0>(0); //กลางหน้าเตารีด
 
-  const [equation, setEquation] = useState<Array<number>>([]);
   const [ambient1, setAmbient1] = useState<number | 0>(0);
   const [ambient2, setAmbient2] = useState<number | 0>(0);
   const [ambient3, setAmbient3] = useState<number | 0>(0);
@@ -92,14 +85,6 @@ export default function MainTempTest() {
     m4: 0.0,
     c4: 0.0,
   });
-
-  const activeEmissivity = localStorageWeb.getItem("emissivity");
-  const activeFile = localStorageWeb.getItem("fileCalibrate");
-  const activeMode = activeEmissivity
-    ? "emissivity"
-    : activeFile
-      ? "file"
-      : "none";
 
   const [qcMains, setQcMains] = useState<{
     error: boolean;
@@ -177,45 +162,6 @@ export default function MainTempTest() {
     }
   }, [auth]);
 
-  const settingSensor = async () => {
-    if (activeEmissivity) {
-      return {
-        ...sendData,
-        emissivity: Number(activeEmissivity),
-        m1: 0.0,
-        c1: 0.0,
-        m2: 0.0,
-        c2: 0.0,
-        m3: 0.0,
-        c3: 0.0,
-        m4: 0.0,
-        c4: 0.0,
-      };
-    }
-
-    if (activeFile) {
-      const res = await window.electronAPI.readCalibrateFile(activeFile);
-      if (res?.status) {
-        const pairs: Array<{ x: number; y: number }> = Array.isArray(res.text)
-          ? res.text
-          : [];
-        return {
-          ...sendData,
-          emissivity: 0.0,
-          m1: pairs[0]?.x ?? 0.0,
-          c1: pairs[0]?.y ?? 0.0,
-          m2: pairs[1]?.x ?? 0.0,
-          c2: pairs[1]?.y ?? 0.0,
-          m3: pairs[2]?.x ?? 0.0,
-          c3: pairs[2]?.y ?? 0.0,
-          m4: pairs[3]?.x ?? 0.0,
-          c4: pairs[3]?.y ?? 0.0,
-        };
-      }
-    }
-    return null;
-  };
-
   //ฟังชั่นรับserial Data
   const handleSerialData = (data: string) => {
     const parts = data.split(",");
@@ -283,10 +229,19 @@ export default function MainTempTest() {
       currentLim: format_script?.qcMain?.qcScript?.script?.CurrentMax,
       startMoment: format_script?.qcMain?.qcScript?.script?.StartMoment,
       endMoment: format_script?.qcMain?.qcScript?.script?.EndMoment,
+      emissivity: format_script?.qcMain?.qcScript?.script?.emissivity,
+      m1: format_script?.qcMain?.qcScript?.script?.m1,
+      c1: format_script?.qcMain?.qcScript?.script?.c1,
+      m2: format_script?.qcMain?.qcScript?.script?.m2,
+      c2: format_script?.qcMain?.qcScript?.script?.c2,
+      m3: format_script?.qcMain?.qcScript?.script?.m3,
+      c3: format_script?.qcMain?.qcScript?.script?.c3,
+      m4: format_script?.qcMain?.qcScript?.script?.m4,
+      c4: format_script?.qcMain?.qcScript?.script?.c4,
     }));
   };
 
-  const clickTest = async () => {
+  const clickTest = async (state: string) => {
     recordedRef.current = false;
     if (!currentCOMPort) {
       Swal.fire({
@@ -314,24 +269,6 @@ export default function MainTempTest() {
       });
       return;
     }
-    const commandData = await settingSensor();
-    if (!commandData) {
-      Swal.fire({
-        icon: "error",
-        title: "เกิดข้อผิดพลาด",
-        text: "กรุณาตั้งค่าSensor",
-      });
-      return;
-    }
-    setSendData(commandData);
-
-    if (disAbleClick) return;
-
-    setDisAbleClick(true); //กดไม่ได้
-
-    setTimeout(() => {
-      setDisAbleClick(false); //กดได้
-    }, 2000);
 
     try {
       const checkSerialNumber = async () => {
@@ -349,12 +286,18 @@ export default function MainTempTest() {
         }
       };
       checkSerialNumber();
+      if (disAbleClick) return;
+      setDisAbleClick(true); //กดไม่ได้
+
+      setTimeout(() => {
+        setDisAbleClick(false); //กดได้
+      }, 2000);
 
       await window.electronAPI.openPort(String(currentCOMPort));
       await new Promise((resolve) => setTimeout(resolve, 2000));
       await window.electronAPI.writeData({
         port: currentCOMPort,
-        command: { ...commandData, state: "on" },
+        command: { ...sendData, state: state },
       });
     } catch (error) {
       const errStr = String(error ?? "").trim(); // รับรองเป็น string
@@ -459,11 +402,11 @@ export default function MainTempTest() {
   return (
     <div className="flex h-screen">
       <SideBar />
-      <div className="flex flex-col w-full h-full overflow-y-auto">
+      <div className="flex flex-col w-full h-full  overflow-y-auto">
         <Breadcrumb />
         <div className="flex flex-col bg-white w-full h-full overflow-y-auto whitespace-nowrap place-items-center">
           {/* Select Bar */}
-          <div className="w-full flex flex-col 2x:flex-row">
+          <div className="w-full flex flex-col 2x:flex-row ">
             <ul
               className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg 
             md:flex-row md:gap-10 md:items-center"
@@ -529,22 +472,6 @@ export default function MainTempTest() {
                     return;
                   }}
                 />
-              </li>
-              <li className="flex flex-col gap-3 h-full items-center justify-center relative">
-                <div className="w-full h-full flex items-center justify-center">
-                  <button
-                    onClick={openCalibratePopup}
-                    className="px-4 h-full bg-gray-500 text-white text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-normal rounded-xl hover:bg-gray-700"
-                  >
-                    ตั้งค่าSensor
-                  </button>
-                </div>
-
-                {calibratePopup && (
-                  <Popup onClose={closeCalibratePopup}>
-                    <CalibrateFile />
-                  </Popup>
-                )}
               </li>
             </ul>
           </div>
@@ -703,7 +630,7 @@ export default function MainTempTest() {
             >
               {/* กระแส อุณหภูมิ */}
               <div
-                className="flex flex-col w-full h-full gap-10 justify-between  text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl
+                className="flex flex-col w-full h-full gap-10 justify-between text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl
                 lg:items-start lg:pl-10"
               >
                 <div className="flex gap-10">
@@ -744,72 +671,33 @@ export default function MainTempTest() {
 
               {/* ปุ่มกดทดสอบ หยุด */}
               <div
-                className="flex flex-col h-[300px] min-h-full w-full items-center gap-2
-                lg:items-end"
+                className="flex flex-col h-[300px] min-h-full w-full items-center gap-10
+                  lg:items-end"
               >
-                {activeMode && (
-                  <div className="flex justify-center items-center gap-2 px-3 py-2 text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl rounded-md bg-amber-50 text-amber-700">
-                    {activeMode === "emissivity" ? (
-                      <>
-                        <img
-                          src="/check.png"
-                          className="w-7 h-7"
-                        />
-                        <span>Emissivity : </span>
-                        <span className="font-semibold">
-                          {activeEmissivity}
-                        </span>
-                      </>
-                    ) : activeMode === "file" ? (
-                      <>
-                      <img
-                          src="/check.png"
-                          className="w-7 h-7"
-                        />
-                        <span>ไฟล์ : </span>
-                        <span className="font-semibold">{activeFile}</span>
-                      </>
-                    ) : (
-                      <>
-                      <img
-                          src="/warning.png"
-                          className="w-7 h-7"
-                        />
-                      <span>ยังไม่ได้ตั้งค่า sensor</span>
-                      </>
-                    )}
-                  </div>
-                )}
-
                 <button
                   id="test"
-                  className={`w-[50%] h-[90%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl 
+                  className={`w-[50%] h-[20%] lg:h-[30%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl 
                   rounded-lg font-semibold text-white transition duration-200
                   ${
                     disAbleClick
                       ? "bg-[#001F3F]/60 cursor-not-allowed"
                       : "bg-[#003366] hover:bg-[#001F3F] hover:cursor-pointer"
                   }`}
-                  onClick={clickTest}
+                  onClick={() => clickTest("on")}
                 >
                   ทดสอบ
                 </button>
                 <button
-                  className="w-[50%] h-[90%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-lg bg-red-500 hover:cursor-pointer text-xl text-white font-semibold 
+                  className="w-[50%] h-[20%] lg:h-[30%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-lg bg-red-500 hover:cursor-pointer text-xl text-white font-semibold 
                   transition duration-300 hover:bg-red-600"
-                  onClick={async () => {
-                    await window.electronAPI.writeData({
-                      port: currentCOMPort,
-                      command: { ...sendData, state: "stop" },
-                    });
-                  }}
+                  onClick={() => clickTest("stop")}
                 >
                   หยุด
                 </button>
               </div>
             </div>
           </div>
-          <div className="flex flex-col-reverse place-content-center mt-auto ">
+          <div className="flex flex-col-reverse place-content-center mt-auto">
             <Footer />
           </div>
         </div>

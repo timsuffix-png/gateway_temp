@@ -4,6 +4,9 @@ import SideBar from "@/components/sidebar";
 import Breadcrumb from "@/components/breadcrumb";
 import Footer from "@/components/footer";
 import { useState, useEffect } from "react";
+import { localStorageWeb } from "@/utils/localstorage";
+import Popup from "@/components/popup";
+import CalibrateFile from "@/components/temperature/carlibrateFile";
 import BackButton from "@/components/backButton";
 import SubmitButton from "@/components/submitButton";
 import Swal from "sweetalert2";
@@ -33,6 +36,15 @@ type QcScriptTemperature = {
   CurrentMax: number;
   StartMoment: number;
   EndMoment: number;
+  emissivity: number;
+  m1: number;
+  c1: number;
+  m2: number;
+  c2: number;
+  m3: number;
+  c3: number;
+  m4: number;
+  c4: number;
 };
 export default function EditTestSetting() {
   const auth = useAuth();
@@ -43,6 +55,18 @@ export default function EditTestSetting() {
   const [qcScript, setQcScript] = useState<
     QcScriptSeaward | QcScriptTemperature | null
   >(null);
+  const [disAbleClick, setDisAbleClick] = useState(false);
+  const [calibratePopup, setCalibratePopup] = useState(false);
+  const openCalibratePopup = () => setCalibratePopup(true);
+  const closeCalibratePopup = async () => {
+    setCalibratePopup(false);
+    if (qcType.name === "temperature") {
+      const updated = await calibrateScript();
+      if (updated) {
+        setQcScript(updated as QcScriptTemperature);
+      }
+    }
+  };
 
   //  const [qcScriptTemp, setQcScriptTemp] = useState({
   //     TemperatureMax: 0,
@@ -53,54 +77,93 @@ export default function EditTestSetting() {
   const [name, setName] = useState("");
   const [detail, setDetail] = useState("");
 
-  useEffect(() => {
-    fetchData();
-  }, [auth]);
+  async function calibrateScript(){
+    const activeFile = localStorageWeb.getItem("fileCalibrate");
+    const emissivity = localStorageWeb.getItem("emissivity");
+    if (!activeFile || emissivity === null || emissivity === undefined) return qcScript;
+    const res = await window.electronAPI.readCalibrateFile(activeFile);
+    if (!res?.status) {
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: res.text,
+      });
+      return qcScript;
+    }
+
+    const pairs: Array<{ x: number; y: number }> = Array.isArray(res.text)
+      ? res.text
+      : [];
+
+    return {
+      ...(qcScript as QcScriptTemperature),
+      emissivity: Number(emissivity),
+      m1: pairs[0]?.x ?? 0.0,
+      c1: pairs[0]?.y ?? 0.0,
+      m2: pairs[1]?.x ?? 0.0,
+      c2: pairs[1]?.y ?? 0.0,
+      m3: pairs[2]?.x ?? 0.0,
+      c3: pairs[2]?.y ?? 0.0,
+      m4: pairs[3]?.x ?? 0.0,
+      c4: pairs[3]?.y ?? 0.0,
+    } as QcScriptTemperature;
+  }
 
   const editTest = async () => {
+    if (disAbleClick) return;
+    setDisAbleClick(true);
+    setTimeout(() => {
+      setDisAbleClick(false);
+    }, 2000);
     if (!name || !qcType.value) {
       Swal.fire({
         icon: "error",
         title: "กรอกข้อมูลไม่ครบ",
         text: "กรุณากรอกข้อมูลให้ครบตามช่องที่มี * สีแดง",
       });
+      return;
     }
-      var data = await window.electronAPI.fetchAPI({
-        method: "PATCH",
-        URL: `qc/main/${param}`,
-        body: {
-          testName: name,
-          detail: detail,
-          script: qcScript,
-        },
-      });
-      if (!data) {
-        Swal.fire({
-          icon: "error",
-          title: "ตรวจสอบข้อมูลใหม่อีกครั้ง",
-          text: "ชื่อการทดสอบไม่สามารถซ้ำกับของที่มีอยู่ได้ และข้อมูลที่จำเป็นต้องกรอกกรอกครบเรียบร้อยแล้ว",
-        });
-      } else {
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "บันทึกข้อมูลเรียบร้อย",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
-      }
+    const checkSettingSensor = qcType.name === "temperature" ? await calibrateScript() : null;
+    const script =
+      qcType.name === "temperature"
+        ? { ...(qcScript as any), ...(checkSettingSensor as any) }
+        : qcScript;
 
+    var data = await window.electronAPI.fetchAPI({
+      method: "PATCH",
+      URL: `qc/main/${param}`,
+      body: {
+        testName: name,
+        detail: detail,
+        script: script,
+      },
+    });
+    if (!data) {
+      Swal.fire({
+        icon: "error",
+        title: "ตรวจสอบข้อมูลใหม่อีกครั้ง",
+        text: "ชื่อการทดสอบไม่สามารถซ้ำกับของที่มีอยู่ได้ และข้อมูลที่จำเป็นต้องกรอกกรอกครบเรียบร้อยแล้ว",
+      });
+    } else {
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "บันทึกข้อมูลเรียบร้อย",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    }
   };
 
   const fetchData = async () => {
     const qcMainData = await fetchQcMainData();
     setQcType({
-    name: qcMainData.data.qcType.name,
-    value: qcMainData.data.qcType.ID, 
-  });
+      name: qcMainData.data.qcType.name,
+      value: qcMainData.data.qcType.ID,
+    });
     setName(qcMainData.data.testName);
     setDetail(qcMainData.data.detail);
     setQcScript(qcMainData.data.qcScript?.script);
@@ -125,7 +188,9 @@ export default function EditTestSetting() {
     qcType?.name === "temperature" && qcScript
       ? (qcScript as QcScriptTemperature)
       : null;
-
+  useEffect(() => {
+    fetchData();
+  }, [auth]);
   return (
     <>
       <div className="flex w-screen h-screen">
@@ -460,37 +525,73 @@ export default function EditTestSetting() {
                   )}
                   {TemperatureScript && (
                     <div className="grid grid-cols-2 rounded-xl border">
-                      {Object.keys(qcScript as QcScriptTemperature).map(
-                        (key, index) => (
-                          <div key={index}>
-                            <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
-                              <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-                                {key}
-                                <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                                  &nbsp;*
-                                </span>
-                              </h4>
-                              <input
-                                className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
-                                type="number"
-                                placeholder=""
-                                value={
-                                  (qcScript as QcScriptTemperature)[
-                                    key as keyof QcScriptTemperature
-                                  ]
-                                }
-                                onChange={(e) =>
-                                  setQcScript({
-                                    ...(qcScript as QcScriptTemperature),
-                                    [key]: Number(e.target.value),
-                                  } as QcScriptTemperature)
-                                }
-                                required
-                              />
-                            </label>
-                          </div>
-                        )
-                      )}
+                      <div className="col-span-2 flex pl-4 py-2">
+                        <button
+                          onClick={openCalibratePopup}
+                          className="h-[40px] md:h-[50px] w-auto mt-1 px-3 text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md bg-gray-200 hover:bg-gray-300"
+                        >
+                          ตั้งค่าSensor
+                        </button>
+                        {calibratePopup && (
+                          <Popup onClose={closeCalibratePopup}>
+                            <CalibrateFile />
+                          </Popup>
+                        )}
+                      </div>
+                      {[
+                        "TemperatureMax",
+                        "CurrentMax",
+                        "StartMoment",
+                        "EndMoment",
+                      ].map((key, index) => (
+                        <div key={index}>
+                          <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
+                            <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                              {key}
+                              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                                &nbsp;*
+                              </span>
+                            </h4>
+                            <input
+                              className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
+                              type="number"
+                              value={(TemperatureScript as any)[key]}
+                              onChange={(e) =>
+                                setQcScript({
+                                  ...(qcScript as QcScriptTemperature),
+                                  [key]: Number(e.target.value),
+                                } as QcScriptTemperature)
+                              }
+                              required
+                            />
+                          </label>
+                        </div>
+                      ))}
+                      {[
+                        "emissivity",
+                        "m1",
+                        "c1",
+                        "m2",
+                        "c2",
+                        "m3",
+                        "c3",
+                        "m4",
+                        "c4",
+                      ].map((key, index) => (
+                        <div key={index}>
+                          <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
+                            <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                              {key}
+                            </h4>
+                            <input
+                              className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md bg-gray-100"
+                              type="number"
+                              value={(TemperatureScript as any)[key] ?? 0}
+                              disabled
+                            />
+                          </label>
+                        </div>
+                      ))}
                     </div>
                   )}
                   <div className="flex md:hidden w-full place-content-end mr-20 mt-5">

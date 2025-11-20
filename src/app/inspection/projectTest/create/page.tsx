@@ -15,6 +15,7 @@ export default function CreateQcproject() {
   const [name, setName] = useState("");
   const [qcMain, setQcMain] =
     useState<MultiValue<{ value: string; label: string }>>();
+  const [disAbleClick, setDisAbleClick] = useState(false);
 
   const [qcMainList, setQcMainList] = useState<{
     error: boolean;
@@ -33,6 +34,11 @@ export default function CreateQcproject() {
   } | null>();
 
   const createQcProject = async () => {
+    if (disAbleClick) return;
+    setDisAbleClick(true);
+    setTimeout(() => {
+      setDisAbleClick(false);
+    }, 2000);
     if (!qcMain?.length)
       return Swal.fire({
         icon: "error",

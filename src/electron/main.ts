@@ -1,5 +1,5 @@
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
-import { readFileSync, writeFileSync, existsSync, readdirSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync, unlinkSync } from "fs";
 import path, { resolve } from "path";
 import { pathToFileURL } from "url";
 import { SerialPort } from "serialport";
@@ -87,42 +87,59 @@ app.on("ready", () => {
     }
   });
 
-  // อัปโหลดไฟล์คาลิเบรตจากไฟล์ที่เลือกใน Renderer (bytes)
-  ipcMain.handle("uploadCalibrateFile", async (event, arg: any) => {
+  ipcMain.handle("uploadCalibrateFileDialog", async () => {
     const dataDir = path.join(process.cwd(), "data");
     if (!existsSync(dataDir)) {
       require("fs").mkdirSync(dataDir, { recursive: true });
     }
-
+    const fileDialog = await dialog.showOpenDialog({
+      properties: ["openFile"],
+      filters: [{ name: "Text Files", extensions: ["txt"] }],
+    });
+    if (fileDialog.canceled || !fileDialog.filePaths.length) {
+      return { status: false, error: "canceled" };
+    }
     try {
-      if (
-        !arg ||
-        typeof arg !== "object" ||
-        !("name" in arg) ||
-        !("bytes" in arg)
-      ) {
-        return { status: false, error: "invalid args" };
-      }
-      const name = String(arg.name);
-      const ext = path.extname(name).toLowerCase();
-      if (ext !== ".txt") {
-        return { status: false, error: "only .txt allowed" };
-      }
-      const bytes: any = (arg as any).bytes;
-      let buffer: Buffer;
-      if (bytes instanceof Uint8Array) {
-        buffer = Buffer.from(bytes);
-      } else if (bytes instanceof ArrayBuffer) {
-        buffer = Buffer.from(new Uint8Array(bytes));
-      } else {
-        return { status: false, error: "invalid bytes" };
-      }
-
-      const destPath = path.join(dataDir, path.basename(name));
-      writeFileSync(destPath, buffer);
-      return { status: true, path: destPath };
+      const src = fileDialog.filePaths[0];
+      const name = path.basename(src);
+      const buffer = readFileSync(src);
+      const dest = path.join(dataDir, name);
+      writeFileSync(dest, buffer);
+      return { status: true, name, path: dest };
     } catch (e: any) {
-      return { status: false, error: e?.message || "write failed" };
+      return { status: false, error: e?.message || "upload failed" };
+    }
+  });
+
+  ipcMain.handle("listDataFiles", async () => {
+    const dataDir = path.join(process.cwd(), "data");
+    if (!existsSync(dataDir)) {
+      return { status: false, error: "Directory not found", files: [] };
+    }
+    try {
+      const names = readdirSync(dataDir)
+        .filter((n) => path.extname(n).toLowerCase() === ".txt")
+        .sort((a, b) => a.localeCompare(b));
+      return { status: true, files: names };
+    } catch (e: any) {
+      return { status: false, error: e?.message || "list failed", files: [] };
+    }
+  });
+
+  ipcMain.handle("deleteDataFile", async (event, name: string) => {
+    const dataDir = path.join(process.cwd(), "data");
+    if (!existsSync(dataDir)) {
+      return { status: false, error: "Directory not found" };
+    }
+    try {
+      const target = path.join(dataDir, path.basename(name));
+      if (!existsSync(target)) {
+        return { status: false, error: "File not found" };
+      }
+      unlinkSync(target);
+      return { status: true };
+    } catch (e: any) {
+      return { status: false, error: e?.message || "delete failed" };
     }
   });
 
@@ -435,55 +452,6 @@ app.on("ready", () => {
   });
 
   ipcMain.handle("writeData", async (event, args) => {
-    // return new Promise(async (resolve, reject) => {
-    //   const win = BrowserWindow.getAllWindows()[0];
-    //   const state_command = args.command.state.trim();
-    //   const cleanCmd = `${args.command.state.trim()},${args.command.tempLim},${
-    //     args.command.currentLim
-    //   },${args.command.startMoment},${args.command.endMoment}`;
-
-    //   if (state_command === "stop") {
-    //     if (port && port.isOpen) {
-    //       port.write("stop" + "\n");
-    //       return resolve("Stopped");
-    //     }
-
-    //     console.log("State on : " + cleanCmd);
-    //     //เขียนคำสั่งไปarduino
-    //     port!.write(cleanCmd + "\n", (err) => {
-    //       if (err) return reject(err);
-    //     });
-
-    //     // ทุกครั้งให้แน่ใจว่า parser ถูกสร้าง/มีอยู่ก่อนใช้งาน
-    //     if (!parser && port) {
-    //       parser = port.pipe(new ReadlineParser({ delimiter: "\n" }));
-    //     }
-    //     if (parser) {
-    //       parser.removeAllListeners("data");
-    //     }
-
-    //     const onData = (data: Buffer | string): void => {
-    //       const str = data.toString().trim();
-    //       console.log("Data from Arduino:", str);
-    //       // ส่งข้อมูลไป renderer ทันทีทีละบรรทัด
-    //       win.webContents.send("serial-data", str);
-    //       // 👉 ฝั่ง renderer จะได้ทีละรอบ เรียลไทม์
-
-    //       const index_data = str.split(",");
-    //       // ตรวจความยาวก่อนเข้าถึง index 9 (state)
-    //       if (index_data.length == 12) {
-    //         const state_data = index_data[0].trim();
-    //         // ถ้า state ไม่เท่ากับ "on" ให้จบการรับข้อมูล
-    //         if (state_data !== "on") {
-    //           if (parser) parser.removeListener("data", onData);
-    //         }
-    //       }
-    //     };
-
-    //     if (parser) parser.on("data", onData);
-    //     // resolve("Open port in writeSerial func.");
-    //   }
-    // });
     return new Promise((resolve, reject) => {
       if (!port || !port.isOpen) return reject("Port not open");
 

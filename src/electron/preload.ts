@@ -7,12 +7,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getImg: async (args: { method: string; URL: string }) =>
     ipcRenderer.invoke("getImg", args),
 
-  // อัปโหลดไฟล์คาลิเบรตด้วย Dialog (ไม่ต้องส่งพาธ)
+
   uploadCalibrateFileDialog: async () => ipcRenderer.invoke("uploadCalibrateFileDialog"),
-  // อัปโหลดไฟล์คาลิเบรตจากไฟล์ที่ผู้ใช้เลือกในหน้า (bytes)
-  uploadCalibrateFile: async (payload: { name: string; bytes: ArrayBuffer | Uint8Array }) => ipcRenderer.invoke("uploadCalibrateFile", payload),
-  // อ่านไฟล์คาลิเบรตจากโฟลเดอร์ data (แยกจาก upload)
   readCalibrateFile: async (name?: string) => ipcRenderer.invoke("readCalibrateFile", name),
+  listDataFiles: async () => ipcRenderer.invoke("listDataFiles"),
+  deleteDataFile: async (name: string) => ipcRenderer.invoke("deleteDataFile", name),
   
   portlist: (callback: (portList: any) => void) =>
     ipcRenderer.on("portlist", (event, portList) => callback(portList)),
