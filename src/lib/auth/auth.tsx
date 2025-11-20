@@ -4,6 +4,9 @@ export const signIn = async (credentials: {
   username: string;
   password: string;
 }) => {
+  if (!credentials.username?.trim() || !credentials.password?.trim()) {
+    throw new Error("Missing credentials");
+  }
   const data = await window.electronAPI.fetchAPI({
     method: "POST",
     URL: "user/auth",

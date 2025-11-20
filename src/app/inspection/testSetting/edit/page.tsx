@@ -48,7 +48,7 @@ type QcScriptTemperature = {
 };
 export default function EditTestSetting() {
   const auth = useAuth();
-  const param = localStorage.getItem("param");
+  const [param, setParam] = useState<string | null>(null);
 
   const [qcType, setQcType] = useState({ name: "", value: "" });
 
@@ -189,8 +189,16 @@ export default function EditTestSetting() {
       ? (qcScript as QcScriptTemperature)
       : null;
   useEffect(() => {
-    fetchData();
-  }, [auth]);
+    if (typeof window !== "undefined") {
+      setParam(localStorageWeb.getItem("param"));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (param) {
+      fetchData();
+    }
+  }, [auth, param]);
   return (
     <>
       <div className="flex w-screen h-screen">

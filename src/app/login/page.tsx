@@ -34,6 +34,26 @@ export default function Login() {
   }, [auth]);
 
   const fetchData = async () => {
+    const api = await window.electronAPI.getAPIPath();
+    if (!api || api.length < 10) {
+      Swal.fire({
+        icon: "warning",
+        title: "กรุณาตั้งค่า API ก่อนเข้าสู่ระบบ",
+        text: "ไปที่ \"เปลี่ยนเส้นทางบันทึกข้อมูล\" เพื่อกำหนดค่า",
+      });
+      return;
+    }
+    if (!username.trim() || !password.trim()) {
+      Swal.fire({
+        title: "กรุณากรอกชื่อผู้ใช้และรหัสผ่าน",
+        position: "bottom-end",
+        timer: 1500,
+        showConfirmButton: false,
+        icon: "error",
+        width: "20rem",
+      });
+      return;
+    }
     try {
       await auth.handleLogin({ username, password });
       Swal.fire({
