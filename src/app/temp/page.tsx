@@ -56,6 +56,7 @@ export default function MainTempTest() {
   const ironImageRef = useRef<any | null>(null);
   const [sendData, setSendData] = useState<{
     state: string;
+    tempMin: number;
     tempLim: number;
     currentLim: number;
     startMoment: number;
@@ -71,6 +72,7 @@ export default function MainTempTest() {
     c4: number;
   }>({
     state: "on",
+    tempMin: 0.0,
     tempLim: 0.0,
     currentLim: 0.0,
     startMoment: 0.0,
@@ -104,9 +106,20 @@ export default function MainTempTest() {
               qcScript: {
                 ID: string;
                 script: {
-                  script_1: number;
-                  script_2: number;
-                  script_3: number;
+                  TemperatureMin?: number;
+                  TemperatureMax?: number;
+                  CurrentMax?: number;
+                  StartMoment?: number;
+                  EndMoment?: number;
+                  emissivity?: number;
+                  m1?: number;
+                  c1?: number;
+                  m2?: number;
+                  c2?: number;
+                  m3?: number;
+                  c3?: number;
+                  m4?: number;
+                  c4?: number;
                 };
               };
               status: string | null; //ค่าสถานะ
@@ -215,33 +228,40 @@ export default function MainTempTest() {
     if (!rawData) {
       throw new Error("Failed to fetch data");
     }
-    const format_script = await rawData?.data?.find(
+    const format_script = (rawData?.data || []).find(
       (data: any) =>
-        //api kla
-        data.qcMain?.qcType?.ID === "96accb41-4eae-43af-853b-bedcae094c10"
-      //api  P' Bright
-      // data.qcMain?.qcType?.ID === "796a7f7f-3aa0-4e8a-98b1-b6f7dbeeb600"
+        String(data?.qcMain?.qcType?.name || "").toLowerCase() ===
+        "temperature"
     );
+
 
     setSendData((prev) => ({
       ...prev,
-      tempLim: format_script?.qcMain?.qcScript?.script?.TemperatureMax,
-      currentLim: format_script?.qcMain?.qcScript?.script?.CurrentMax,
-      startMoment: format_script?.qcMain?.qcScript?.script?.StartMoment,
-      endMoment: format_script?.qcMain?.qcScript?.script?.EndMoment,
-      emissivity: format_script?.qcMain?.qcScript?.script?.emissivity,
-      m1: format_script?.qcMain?.qcScript?.script?.m1,
-      c1: format_script?.qcMain?.qcScript?.script?.c1,
-      m2: format_script?.qcMain?.qcScript?.script?.m2,
-      c2: format_script?.qcMain?.qcScript?.script?.c2,
-      m3: format_script?.qcMain?.qcScript?.script?.m3,
-      c3: format_script?.qcMain?.qcScript?.script?.c3,
-      m4: format_script?.qcMain?.qcScript?.script?.m4,
-      c4: format_script?.qcMain?.qcScript?.script?.c4,
+      tempMin:
+        format_script?.qcMain?.qcScript?.script?.TemperatureMin ?? 0.0,
+      tempLim:
+        format_script?.qcMain?.qcScript?.script?.TemperatureMax ?? 0.0,
+      currentLim:
+        format_script?.qcMain?.qcScript?.script?.CurrentMax ?? 0.0,
+      startMoment:
+        format_script?.qcMain?.qcScript?.script?.StartMoment ?? 0.0,
+      endMoment:
+        format_script?.qcMain?.qcScript?.script?.EndMoment ?? 0.0,
+      emissivity:
+        format_script?.qcMain?.qcScript?.script?.emissivity ?? 0.0,
+      m1: format_script?.qcMain?.qcScript?.script?.m1 ?? 0.0,
+      c1: format_script?.qcMain?.qcScript?.script?.c1 ?? 0.0,
+      m2: format_script?.qcMain?.qcScript?.script?.m2 ?? 0.0,
+      c2: format_script?.qcMain?.qcScript?.script?.c2 ?? 0.0,
+      m3: format_script?.qcMain?.qcScript?.script?.m3 ?? 0.0,
+      c3: format_script?.qcMain?.qcScript?.script?.c3 ?? 0.0,
+      m4: format_script?.qcMain?.qcScript?.script?.m4 ?? 0.0,
+      c4: format_script?.qcMain?.qcScript?.script?.c4 ?? 0.0,
     }));
   };
 
   const clickTest = async (state: string) => {
+    console.log("senData :", sendData);
     recordedRef.current = false;
     if (!currentCOMPort) {
       Swal.fire({
@@ -293,6 +313,7 @@ export default function MainTempTest() {
         setDisAbleClick(false); //กดได้
       }, 2000);
 
+      
       await window.electronAPI.openPort(String(currentCOMPort));
       await new Promise((resolve) => setTimeout(resolve, 2000));
       await window.electronAPI.writeData({

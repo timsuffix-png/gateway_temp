@@ -31,6 +31,7 @@ type QcScriptSeaward = {
 };
 
 type QcScriptTemperature = {
+  TemperatureMin: number;
   TemperatureMax: number;
   CurrentMax: number;
   StartMoment: number;
@@ -83,6 +84,7 @@ export default function CreateTestSetting() {
       script_16: 0,
     },
     temperature: {
+      TemperatureMin: 0,
       TemperatureMax: 0,
       CurrentMax: 0,
       StartMoment: 0,
@@ -153,7 +155,7 @@ export default function CreateTestSetting() {
 
       const script =
         qcType.name === "temperature"
-          ?    {  ...(checkSettingSensor || {}) }
+          ? { ...(qcScript as QcScriptTemperature), ...(checkSettingSensor || {}) }
           : (qcScript as QcScriptSeaward);
       if (!name || !qcType.value) {
         Swal.fire({
@@ -646,6 +648,7 @@ export default function CreateTestSetting() {
                   )}
                 </div>
                 {[
+                  "TemperatureMin",
                   "TemperatureMax",
                   "CurrentMax",
                   "StartMoment",

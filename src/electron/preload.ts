@@ -7,12 +7,14 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getImg: async (args: { method: string; URL: string }) =>
     ipcRenderer.invoke("getImg", args),
 
-
-  uploadCalibrateFileDialog: async () => ipcRenderer.invoke("uploadCalibrateFileDialog"),
-  readCalibrateFile: async (name?: string) => ipcRenderer.invoke("readCalibrateFile", name),
+  uploadCalibrateFileDialog: async () =>
+    ipcRenderer.invoke("uploadCalibrateFileDialog"),
+  readCalibrateFile: async (name?: string) =>
+    ipcRenderer.invoke("readCalibrateFile", name),
   listDataFiles: async () => ipcRenderer.invoke("listDataFiles"),
-  deleteDataFile: async (name: string) => ipcRenderer.invoke("deleteDataFile", name),
-  
+  deleteDataFile: async (name: string) =>
+    ipcRenderer.invoke("deleteDataFile", name),
+
   portlist: (callback: (portList: any) => void) =>
     ipcRenderer.on("portlist", (event, portList) => callback(portList)),
   getPort: () => ipcRenderer.invoke("getPort"),
@@ -29,7 +31,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   removeSerialDataListener: (callback: (data: string) => void) => {
     ipcRenderer.removeListener("serial-data", (_event, data) => callback(data));
   },
-  
+
   openPort: (portName: string) => ipcRenderer.invoke("openPort", portName),
   //ปิดพอต  	Renderer → Main
   closePort: () => ipcRenderer.invoke("closePort"),
@@ -37,11 +39,20 @@ contextBridge.exposeInMainWorld("electronAPI", {
     port: string;
     command: {
       state: string;
+      tempMin: number;
       tempLim: number;
       currentLim: number;
       startMoment: number;
       endMoment: number;
-
+      emissivity: number;
+      m1: number;
+      c1: number;
+      m2: number;
+      c2: number;
+      m3: number;
+      c3: number;
+      m4: number;
+      c4: number;
     };
   }) => ipcRenderer.invoke("writeData", args),
 });

@@ -32,6 +32,7 @@ type QcScriptSeaward = {
 };
 
 type QcScriptTemperature = {
+  TemperatureMin: number;
   TemperatureMax: number;
   CurrentMax: number;
   StartMoment: number;
@@ -547,6 +548,7 @@ export default function EditTestSetting() {
                         )}
                       </div>
                       {[
+                        "TemperatureMin",
                         "TemperatureMax",
                         "CurrentMax",
                         "StartMoment",
