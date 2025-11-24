@@ -456,8 +456,7 @@ app.on("ready", () => {
       if (!port || !port.isOpen) return reject("Port not open");
 
       const command = args.command;
-      const cleanCmd = `${command.state},${command.tempMin},${command.tempLim},${command.currentLim},${command.startMoment},${command.endMoment},
-      ${command.emissivity},${command.m1},${command.c1},${command.m2},${command.c2},${command.m3},${command.c3},${command.m4},${command.c4}`;
+      const cleanCmd = `${command.state},${command.tempMin},${command.tempLim},${command.currentLim},${command.startMoment},${command.endMoment},${command.emissivity},${command.m1},${command.c1},${command.m2},${command.c2},${command.m3},${command.c3},${command.m4},${command.c4}`;
 
       if (command.state === "stop") {
         port.write("stop\n");
