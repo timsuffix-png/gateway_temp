@@ -234,6 +234,14 @@ export default function CreateTestSetting() {
     fetchData();
   }, []);
 
+  const unitLabel: Record<string, string> = {
+    TemperatureMin: "TemperatureMin (°C)",
+    TemperatureMax: "TemperatureMax (°C)",
+    CurrentMax: "CurrentMax (แอมแปร์)",
+    StartMoment: "StartMoment (วินาที)",
+    EndMoment: "EndMoment (วินาที)",
+  };
+
   return (
     <div className="flex h-screen">
       <SideBar />
@@ -657,7 +665,7 @@ export default function CreateTestSetting() {
                   <div key={index}>
                     <div className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
                       <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-                        {key}
+                        {unitLabel[key] ?? key}
                         <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                           &nbsp;*
                         </span>

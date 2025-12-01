@@ -34,13 +34,14 @@ export default function Login() {
   }, [auth]);
 
   const fetchData = async () => {
-    const api = await window.electronAPI.getAPIPath();
-    if (!api || api.length < 10) {
+    const api = (await window.electronAPI.getAPIPath())?.trim();
+    if (!api || !/^https?:\/\//i.test(api)) {
       Swal.fire({
         icon: "warning",
         title: "กรุณาตั้งค่า API ก่อนเข้าสู่ระบบ",
         text: "ไปที่ \"เปลี่ยนเส้นทางบันทึกข้อมูล\" เพื่อกำหนดค่า",
       });
+      openPopup();
       return;
     }
     if (!username.trim() || !password.trim()) {
@@ -55,7 +56,16 @@ export default function Login() {
       return;
     }
     try {
-      await auth.handleLogin({ username, password });
+      const checklogin = await auth.handleLogin({ username, password });
+      if (!checklogin || !checklogin.success) {
+        return Swal.fire({
+          title: "Login failed",
+          position: "bottom-end",
+          timer: 1000,
+          showConfirmButton: false,
+          icon: "error",
+        });
+      }
       Swal.fire({
         title: "Login success",
         position: "bottom-end",

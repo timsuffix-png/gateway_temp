@@ -63,11 +63,15 @@ export default function AuthProvider({
       setUserData(user);
       localStorageWeb.setItem("ID", user.data.ID);
       window.location.reload();
+      return { success: true, user };
     } catch (err:any) {
       setStatus("unauthenticated");
       setUserData(null);
       localStorageWeb.removeItem("ID");
-      throw new Error(err);
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : String(err),
+      };
     }
   };
 

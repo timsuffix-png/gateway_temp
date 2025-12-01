@@ -138,7 +138,7 @@ export default function CalibrateFile() {
             className={`px-4 py-2 rounded-md border text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ${mode === "emissivity" ? "bg-gray-200" : "bg-white"}`}
             onClick={() => setMode("emissivity")}
           >
-            ใช้ค่า Emissivity
+          ใช้ค่า Emissivity
           </button>
           <button
             className={`px-4 py-2 rounded-md border text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ${mode === "file" ? "bg-gray-200" : "bg-white"}`}
@@ -154,7 +154,7 @@ export default function CalibrateFile() {
             style={{ width: currentWidth / 2 }}
           >
             <label className="text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-              กำหนดค่า Emissivity
+              กำหนดค่า Emissivity (ε)
             </label>
             <input
               type="number"

@@ -646,32 +646,33 @@ export default function MainTempTest() {
             </div>
 
             <div
-              className="w-full h-full flex flex-col justify-between gap-10 pt-10 
-              lg:pt-0 lg:flex-row lg:gap-0"
+              className="w-full h-full flex flex-col justify-between gap-6 pt-6 sm:gap-8 sm:pt-8 lg:pt-0 lg:flex-row lg:gap-0"
             >
               {/* กระแส อุณหภูมิ */}
               <div
-                className="flex flex-col w-full h-full gap-10 justify-between text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl
+                className="flex flex-col w-full h-full gap-6 justify-between text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl
                 lg:items-start lg:pl-10"
               >
-                <div className="flex gap-10">
+                <div className="flex flex-col pt-10 lg:flex-row lg:pt-0 gap-4 sm:gap-8">
                   <div className="flex items-center gap-4">
                     <p>กระแสไฟฟ้า :</p>
                     <input
-                      className="w-25 h-10 text-center border rounded-sm "
+                      className="w-20 sm:w-24 md:w-28 h-8 sm:h-9 md:h-10 text-center border rounded-sm"
                       type="text"
                       value={current ? current : 0}
                       readOnly
                     ></input>
+                    <span>แอมแปร์</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <p>เวลา :</p>
                     <input
-                      className="w-25 h-10 text-center border rounded-sm "
+                      className="w-20 sm:w-24 md:w-28 h-8 sm:h-9 md:h-10 text-center border rounded-sm"
                       type="text"
                       value={time ? time : 0}
                       readOnly
                     ></input>
+                    <span>วินาที</span>
                   </div>
                 </div>
                 <div className="flex flex-col gap-10 items-start">
@@ -692,12 +693,11 @@ export default function MainTempTest() {
 
               {/* ปุ่มกดทดสอบ หยุด */}
               <div
-                className="flex flex-col h-[300px] min-h-full w-full items-center gap-10
-                  lg:items-end"
+                className="flex flex-col h-auto w-full items-center gap-6 py-6 sm:gap-8 lg:items-end"
               >
                 <button
                   id="test"
-                  className={`w-[50%] h-[20%] lg:h-[30%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl 
+                  className={`w-full sm:w-[70%] lg:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl 
                   rounded-lg font-semibold text-white transition duration-200
                   ${
                     disAbleClick
@@ -709,18 +709,20 @@ export default function MainTempTest() {
                   ทดสอบ
                 </button>
                 <button
-                  className="w-[50%] h-[20%] lg:h-[30%] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-lg bg-red-500 hover:cursor-pointer text-xl text-white font-semibold 
+                  className="w-full sm:w-[70%] lg:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl rounded-lg bg-red-500 hover:cursor-pointer text-white font-semibold 
                   transition duration-300 hover:bg-red-600"
                   onClick={() => clickTest("stop")}
                 >
                   หยุด
                 </button>
               </div>
+              
             </div>
-          </div>
-          <div className="flex flex-col-reverse place-content-center mt-auto">
+             <div className="flex flex-col-reverse place-content-center mt-auto">
             <Footer />
           </div>
+          </div>
+         
         </div>
       </div>
     </div>
