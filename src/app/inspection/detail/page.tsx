@@ -21,17 +21,48 @@ export default function QcDetail() {
       method: "POST",
       URL: `qc/record/findBySerialNumber`,
       body: {
-        serialNumber: param
-      }
+        serialNumber: param,
+      },
     });
     if (!data) throw new Error("Failed to fetch data.");
 
     return data;
   };
 
+  const fetchFailedReason = async (qcRecordId: string) => {
+    const res = await window.electronAPI.fetchAPI({
+      method: "GET",
+      URL: `qc/status/${qcRecordId}?limit=5&page=1&type=both`
+    });
+
+    if (!res) throw new Error("Failed to fetchFailedReason data.");
+    const detailString = res.data[0].detail.split(",");
+    console.log("detailString : ",detailString);
+    return detailString[detailString.length - 1];
+  };
+
   const refreshData = async () => {
     const data = await fetchData();
-    setRecord(data.data);
+
+    const fetchPromises = data.data.map(async (item: any) => {
+      if (item.tag === "qcRecord" && item.statusOverView === "Failed") {
+        try {
+          const failedReasonText = await fetchFailedReason(item.ID);
+          return { ...item, failedReasonText };
+        } catch (error) {
+          console.error(
+            `Error fetching failed reason for ID ${item.ID}:`,
+            error
+          );
+          return { ...item, failedReasonText: "ไม่สามารถดึงข้อมูลสาเหตุได้" };
+        }
+      }
+      return item;
+    });
+
+    //รอให้ Promise ทั้งหมดเสร็จสิ้นพร้อมกัน
+    const updatedRecords: any = await Promise.all(fetchPromises);
+    setRecord(updatedRecords);
   };
 
   return (
@@ -48,10 +79,8 @@ export default function QcDetail() {
                 <div
                   tabIndex={0}
                   onClick={() => {
-                   
                     localStorageWeb.setItem("currentUrl", "qc");
                     window.location.reload();
-                    
                   }}
                   className="ml-5 sm:ml-20 cursor-pointer"
                 >
@@ -64,7 +93,7 @@ export default function QcDetail() {
             </div>
             <div className="flex flex-col w-full sm:w-10/12 md:w-7/12 h-auto">
               {record.length ? (
-                record.map((data:any) => {
+                record.map((data: any) => {
                   if (data.tag === "qcRecord") {
                     return (
                       <div
@@ -100,6 +129,12 @@ export default function QcDetail() {
                             </h1>
                           </div>
                         </div>
+                        <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
+                          สาเหตุ :{" "}
+                          {data.statusOverView === "Failed"
+                            ? data.failedReasonText
+                            : "-"}
+                        </h1>
                         <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
                           ทดสอบโดย
                         </h1>
