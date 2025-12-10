@@ -362,15 +362,15 @@ export default function MainTempTest() {
       }
 
       console.log("qcMainRed : ", qcMainsRef.current?.data[0]?.qcMain?.ID);
+      const qcMainTemp = qcMainsRef.current?.data.find((d: any) => d?.qcMain?.qcType?.name === "temperature")?.qcMain?.ID
+
       const res = await window.electronAPI.fetchAPI({
         method: "POST",
         URL: "qc/status",
         body: {
           qcRecordID: record.data[0].ID,
-          // qcMainID: qcMainsRef.current?.data[0]?.qcMain?.ID,
-          qcMainID: qcMainsRef.current?.data
-            .filter((data_qcmain) => data_qcmain?.qcMain?.qcType?.name === "temperature")
-            .map((data) => data?.qcMain?.ID),
+          // เลือก qcMainID เฉพาะที่ qcType.name === "temperature"
+          qcMainID: qcMainTemp,
 
           result: statusRef.current,
           status: statusRef.current,
