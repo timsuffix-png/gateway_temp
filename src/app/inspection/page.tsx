@@ -210,28 +210,28 @@ export default function Inspection() {
                   <div className="w-[98%] my-[20px]">
                     <div className="text-black font-bold">
                       <div className="bg-[#6494d3] rounded-t-3xl flex flex-row h-10 place-items-center">
-                        <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-center text-xl 3xl:text-2xl  4xl:text-3xl font-bold  text-ellipsis overflow-hidden">
+                      <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
                           รหัสสินค้า
                         </div>
-                        <div className="w-2/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-2/12 sm:w-1/12 lg:w-1/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
                           ประเภท
                         </div>
-                        <div className="w-2/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
-                          โปรเจกต์การทดสอบ
+                        <div className="w-2/12 lg:w-2/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                          โปรเจ็คการทดสอบ
                         </div>
-                        <div className="hidden lg:block w-2/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
+                        <div className="hidden lg:block w-2/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
                           ชื่อล็อตการผลิต
                         </div>
-                        <div className="hidden sm:block w-2/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
+                        <div className="hidden sm:block sm:w-2/12 lg:w-1/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
                           ชื่อผู้ทดสอบ
                         </div>
-                        <div className="w-1/12 sm:w-2/12 lg:w-1/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-1/12 sm:w-1/12 lg:w-1/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
                           สถานะ
                         </div>
-                        <div className="hidden md:block w-2/12 lg:w-1/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
+                        <div className="hidden md:block w-2/12 lg:w-1/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
                           เวลา
                         </div>
-                        <div className="w-1/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-1/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
                           ข้อมูล
                         </div>
                       </div>
@@ -241,9 +241,9 @@ export default function Inspection() {
                         return (
                           <div
                             key={data.ID}
-                            className="flex flex-row w-full h-12  hover:bg-gray-200 "
+                            className="flex flex-row w-full h-12 hover:bg-gray-200"
                           >
-                            <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-items-center">
+                            <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
                               <div className="hidden xl:block">
                                 {Translator.item.icon}
                               </div>
@@ -251,7 +251,7 @@ export default function Inspection() {
                                 {data.construct.ID}
                               </h5>
                             </div>
-                            <div className="w-2/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-content-center place-items-center">
+                            <div className="w-2/12 sm:w-1/12 lg:w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex items-center justify-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {
                                   data.qcProject.qcItemProject[0].qcMain.qcType
@@ -259,12 +259,12 @@ export default function Inspection() {
                                 }
                               </div>
                             </div>
-                            <div className="w-2/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-content-center place-items-center">
+                            <div className="w-2/12 lg:w-2/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {data.qcProject.projectName}
                               </div>
                             </div>
-                            <div className="hidden lg:flex w-2/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   place-content-start place-items-center">
+                            <div className="hidden lg:flex w-2/12 text-center text-base lg:text-lg font-['Sarabun'] items-center justify-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {
                                   data.construct.productionSub.productionLot
@@ -272,7 +272,7 @@ export default function Inspection() {
                                 }
                               </div>
                             </div>
-                            <div className="hidden sm:flex w-2/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   place-items-center">
+                            <div className="hidden sm:flex sm:w-2/12 lg:w-1/12 text-center text-base lg:text-lg font-['Sarabun'] items-center justify-center">
                               <div className="hidden xl:block">
                                 {Translator.user.icon}
                               </div>
@@ -280,7 +280,7 @@ export default function Inspection() {
                                 {data.testBy.name + " " + data.testBy.surname}
                               </h5>
                             </div>
-                            <div className="w-1/12 sm:w-2/12 lg:w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-content-center place-items-center">
+                            <div className="w-1/12 sm:w-1/12 lg:w-1/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
                               {data.statusOverView === "Passed" ? (
                                 <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
                                   ผ่าน

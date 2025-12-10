@@ -348,7 +348,6 @@ export default function MainTempTest() {
         URL: "qc/record",
         body: {
           qcProjectID: qcProjectRef.current,
-          //99202509160012055701
           serialNumber: serialNumberRef.current,
           testBy: auth.user.data.ID,
         },
@@ -361,12 +360,18 @@ export default function MainTempTest() {
         });
         return;
       }
+
+      console.log("qcMainRed : ", qcMainsRef.current?.data[0]?.qcMain?.ID);
       const res = await window.electronAPI.fetchAPI({
         method: "POST",
         URL: "qc/status",
         body: {
           qcRecordID: record.data[0].ID,
-          qcMainID: qcMainsRef.current?.data[0]?.qcMain?.ID,
+          // qcMainID: qcMainsRef.current?.data[0]?.qcMain?.ID,
+          qcMainID: qcMainsRef.current?.data
+            .filter((data_qcmain) => data_qcmain?.qcMain?.qcType?.name === "temperature")
+            .map((data) => data?.qcMain?.ID),
+
           result: statusRef.current,
           status: statusRef.current,
           detail: lastResult.join(",").trim(),
