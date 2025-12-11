@@ -220,16 +220,31 @@ export default function MainTempTest() {
     }
     return data;
   };
+  // MainTempTest.tsx
 
-  const fetchScript = async (idProject: string) => {
-    if (qcProject && qcProject?.length > 0 && !isSelectedCard) {
-      const rawData = await window.electronAPI.fetchAPI({
+  const fetchScript = async (
+    projectID: string | null,
+    isCardSelected: boolean,
+    currentQcMains: typeof qcMains
+  ) => {
+    let rawData = null;
+    let dataToProcess = null;
+    //ถ้ามีการเลือกcard
+    if (isCardSelected && currentQcMains && currentQcMains.data.length > 0) {
+      dataToProcess = currentQcMains.data;
+    } 
+     //ถ้าไม่มีการเลือกcard
+    else if (projectID && projectID.length > 0 && !isCardSelected) {
+      rawData = await window.electronAPI.fetchAPI({
         method: "GET",
-        URL: `qc/itemProject/${idProject}`,
+        URL: `qc/itemProject/${projectID}`,
       });
-      setQcMains(rawData);
+      setQcMains(rawData); 
+      dataToProcess = rawData?.data;
+    } 
 
-      const format_script = (rawData?.data || []).find(
+    if (dataToProcess) {
+      const format_script = (dataToProcess || []).find(
         (data: any) =>
           String(data?.qcMain?.qcType?.name || "").toLowerCase() ===
           "temperature"
@@ -431,9 +446,8 @@ export default function MainTempTest() {
   }, [isSelectedCard]);
 
   useEffect(() => {
-    if (!qcProject) return;
-    fetchScript(qcProject);
-  }, [qcProject]);
+    fetchScript(qcProject, isSelectedCard, qcMains);
+  }, [qcProject, isSelectedCard, qcMains]);
 
   return (
     <div className="flex h-screen">

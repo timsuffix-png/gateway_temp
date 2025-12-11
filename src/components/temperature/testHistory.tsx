@@ -187,7 +187,8 @@ export default function TestHistory({
       let buffer: any = [];
       if (testHistory && remainingTest && remainingTest[index]) {
       for (let test of remainingTest[index]) {
-        console.log("test.qcScript ,"+ test+ " : "+ test?.qcScript);
+        console.log("qcScript:", test.qcScript);
+        console.log("qcScript.script:", test.qcScript?.script);
         buffer.push({
           ID: testHistory[index].ID,
           qcMain: {
