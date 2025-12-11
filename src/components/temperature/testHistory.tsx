@@ -28,20 +28,20 @@ export default function TestHistory({
               qcScript: {
                 ID: string;
                 script: {
-                  TemperatureMin?: number;
-                  TemperatureMax?: number;
-                  CurrentMax?: number;
-                  StartMoment?: number;
-                  EndMoment?: number;
-                  emissivity?: number;
-                  m1?: number;
-                  c1?: number;
-                  m2?: number;
-                  c2?: number;
-                  m3?: number;
-                  c3?: number;
-                  m4?: number;
-                  c4?: number;
+                  TemperatureMin: number;
+                  TemperatureMax: number;
+                  CurrentMax: number;
+                  StartMoment: number;
+                  EndMoment: number;
+                  emissivity: number;
+                  m1: number;
+                  c1: number;
+                  m2: number;
+                  c2: number;
+                  m3: number;
+                  c3: number;
+                  m4: number;
+                  c4: number;
                 };
               };
               status: string | null; //ค่าสถานะ
@@ -187,7 +187,11 @@ export default function TestHistory({
       let buffer: any = [];
       if (testHistory && remainingTest && remainingTest[index]) {
       for (let test of remainingTest[index]) {
+<<<<<<< HEAD
            console.log("qcScript:", test.qcScript);
+=======
+        console.log("qcScript:", test.qcScript);
+>>>>>>> cb0f6fb129d2b7031c3a10b7cd823d0f812ca81a
         console.log("qcScript.script:", test.qcScript?.script);
         buffer.push({
           ID: testHistory[index].ID,
