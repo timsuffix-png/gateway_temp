@@ -470,11 +470,13 @@ export default function MainTempTest() {
                 )}
               </li>
               <li className="w-full text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:basis-60">
-                <div className="flex pb-3">
+                <div className="flex flex-col pb-3">
+                  <div className="flex">
                   <p className="">โปรเจกต์การทดสอบ</p>
                   <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                     &nbsp;*
                   </span>
+                  </div>
                   {!isSelectedCard ? (
                     <Select
                       className="rounded-sm border"
