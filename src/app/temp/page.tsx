@@ -213,7 +213,7 @@ export default function MainTempTest() {
   const fetchQcProjectList = async () => {
     const data = await window.electronAPI.fetchAPI({
       method: "GET",
-      URL: `qc/project/extend?limit=100&page=1`,
+      URL: `qc/project/extend?limit=999999999999&page=1`,
     });
     if (!data) {
       throw new Error("Failed to fetch data");
@@ -222,44 +222,38 @@ export default function MainTempTest() {
   };
 
   const fetchScript = async (idProject: string) => {
-    const rawData = await window.electronAPI.fetchAPI({
-      method: "GET",
-      URL: `qc/itemProject/${idProject}`,
-    });
-    setQcMains(rawData);
-    if (!rawData) {
-      throw new Error("Failed to fetch data");
+    if (qcProject && qcProject?.length > 0 && !isSelectedCard) {
+      const rawData = await window.electronAPI.fetchAPI({
+        method: "GET",
+        URL: `qc/itemProject/${idProject}`,
+      });
+      setQcMains(rawData);
+
+      const format_script = (rawData?.data || []).find(
+        (data: any) =>
+          String(data?.qcMain?.qcType?.name || "").toLowerCase() ===
+          "temperature"
+      );
+
+      setSendData((prev) => ({
+        ...prev,
+        tempMin: format_script?.qcMain?.qcScript?.script?.TemperatureMin ?? 0.0,
+        tempLim: format_script?.qcMain?.qcScript?.script?.TemperatureMax ?? 0.0,
+        currentLim: format_script?.qcMain?.qcScript?.script?.CurrentMax ?? 0.0,
+        startMoment:
+          format_script?.qcMain?.qcScript?.script?.StartMoment ?? 0.0,
+        endMoment: format_script?.qcMain?.qcScript?.script?.EndMoment ?? 0.0,
+        emissivity: format_script?.qcMain?.qcScript?.script?.emissivity ?? 0.0,
+        m1: format_script?.qcMain?.qcScript?.script?.m1 ?? 0.0,
+        c1: format_script?.qcMain?.qcScript?.script?.c1 ?? 0.0,
+        m2: format_script?.qcMain?.qcScript?.script?.m2 ?? 0.0,
+        c2: format_script?.qcMain?.qcScript?.script?.c2 ?? 0.0,
+        m3: format_script?.qcMain?.qcScript?.script?.m3 ?? 0.0,
+        c3: format_script?.qcMain?.qcScript?.script?.c3 ?? 0.0,
+        m4: format_script?.qcMain?.qcScript?.script?.m4 ?? 0.0,
+        c4: format_script?.qcMain?.qcScript?.script?.c4 ?? 0.0,
+      }));
     }
-    const format_script = (rawData?.data || []).find(
-      (data: any) =>
-        String(data?.qcMain?.qcType?.name || "").toLowerCase() ===
-        "temperature"
-    );
-
-
-    setSendData((prev) => ({
-      ...prev,
-      tempMin:
-        format_script?.qcMain?.qcScript?.script?.TemperatureMin ?? 0.0,
-      tempLim:
-        format_script?.qcMain?.qcScript?.script?.TemperatureMax ?? 0.0,
-      currentLim:
-        format_script?.qcMain?.qcScript?.script?.CurrentMax ?? 0.0,
-      startMoment:
-        format_script?.qcMain?.qcScript?.script?.StartMoment ?? 0.0,
-      endMoment:
-        format_script?.qcMain?.qcScript?.script?.EndMoment ?? 0.0,
-      emissivity:
-        format_script?.qcMain?.qcScript?.script?.emissivity ?? 0.0,
-      m1: format_script?.qcMain?.qcScript?.script?.m1 ?? 0.0,
-      c1: format_script?.qcMain?.qcScript?.script?.c1 ?? 0.0,
-      m2: format_script?.qcMain?.qcScript?.script?.m2 ?? 0.0,
-      c2: format_script?.qcMain?.qcScript?.script?.c2 ?? 0.0,
-      m3: format_script?.qcMain?.qcScript?.script?.m3 ?? 0.0,
-      c3: format_script?.qcMain?.qcScript?.script?.c3 ?? 0.0,
-      m4: format_script?.qcMain?.qcScript?.script?.m4 ?? 0.0,
-      c4: format_script?.qcMain?.qcScript?.script?.c4 ?? 0.0,
-    }));
   };
 
   const clickTest = async (state: string) => {
@@ -292,22 +286,27 @@ export default function MainTempTest() {
       return;
     }
 
-    try {
-      const checkSerialNumber = async () => {
-        const response = await window.electronAPI.fetchAPI({
-          method: "GET",
-          URL: `construct/${serialNumber}`,
-        });
-        if (!response) {
-          Swal.fire({
-            icon: "error",
-            title: "เกิดข้อผิดพลาด",
-            text: "รหัสสินค้าไม่ถูกต้อง",
-          });
-          return;
-        }
+    if (qcMains) {
+      const newQcMains = {
+        ...qcMains,
+        data: qcMains.data.map((item) => ({
+          ...item,
+          qcMain: item.qcMain
+            ? {
+                ...item.qcMain,
+                status: null,
+                result: null,
+                allResult: null,
+              }
+            : undefined,
+        })),
       };
-      checkSerialNumber();
+      setQcMains(newQcMains as any);
+    }
+
+    try {
+     
+
       if (disAbleClick) return;
       setDisAbleClick(true); //กดไม่ได้
 
@@ -315,7 +314,6 @@ export default function MainTempTest() {
         setDisAbleClick(false); //กดได้
       }, 2000);
 
-      
       await window.electronAPI.openPort(String(currentCOMPort));
       await new Promise((resolve) => setTimeout(resolve, 2000));
       await window.electronAPI.writeData({
@@ -343,28 +341,38 @@ export default function MainTempTest() {
     // //   ["45", "3", "4", "in process"]
     // // ]
     // let splitResultArray = splitData[splitData.length - 1]; // ผลลัพธ์: [" 8.4S", " 249", " 500.000000","Passed",""Cus termostate is cut in time.]
-
     try {
-      const record = await window.electronAPI.fetchAPI({
-        method: "POST",
-        URL: "qc/record",
-        body: {
-          qcProjectID: qcProjectRef.current,
-          serialNumber: serialNumberRef.current,
-          testBy: auth.user.data.ID,
-        },
-      });
-      if (!record) {
-        Swal.fire({
-          icon: "error",
-          title: "เกิดข้อผิดพลาดทางซอฟเเวร์",
-          text: "ไม่สามารถบันทึกค่าได้",
+       let record: any;
+      if (!isSelectedCard) {
+        const record = await window.electronAPI.fetchAPI({
+          method: "POST",
+          URL: "qc/record",
+          body: {
+            qcProjectID: qcProjectRef.current,
+            serialNumber: serialNumberRef.current,
+            testBy: auth.user.data.ID,
+          },
         });
-        return;
+        if (!record) {
+          Swal.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาดทางซอฟเเวร์",
+            text: "ไม่สามารถบันทึกค่าได้",
+          });
+          return;
+        }
+        if (!record)
+          return Swal.fire({
+            icon: "error",
+            title: "รหัสสินค้าผิด",
+          });
+      } else {
+        record = qcMains;
       }
-
-      console.log("qcMainRed : ", qcMainsRef.current?.data[0]?.qcMain?.ID);
-      const qcMainTemp = qcMainsRef.current?.data.find((d: any) => d?.qcMain?.qcType?.name === "temperature")?.qcMain?.ID
+      
+      const qcMainTemp = qcMainsRef.current?.data.find(
+        (d: any) => d?.qcMain?.qcType?.name === "temperature"
+      )?.qcMain?.ID;
 
       const res = await window.electronAPI.fetchAPI({
         method: "POST",
@@ -496,8 +504,7 @@ export default function MainTempTest() {
                   onClick={(e: any) => {
                     e.target.value = "";
                     setSerialNumber("");
-                      setIsSelectedCard(false);
-
+                    setIsSelectedCard(false);
                   }}
                   onChange={(e) => {
                     setSerialNumber(e.target.value);
@@ -513,15 +520,16 @@ export default function MainTempTest() {
           <div
             className="w-full h-full flex px-[20%] flex-col justify-between 
           lg:gap-10 lg:px-[10%] lg:my-2 "
-          ><div>
+          >
+            <div>
               {serialNumber && (
-              <TestHistory
-                serialNumber={serialNumber}
-                setData={(data: any) => setQcMains(data)}
-                isChecked={setIsSelectedCard}
-              />
-            )}
-          </div>
+                <TestHistory
+                  serialNumber={serialNumber}
+                  setData={(data: any) => setQcMains(data)}
+                  isChecked={setIsSelectedCard}
+                />
+              )}
+            </div>
             {/* ภาพเตารีด */}
             <div className="relative self-center pt-10 pb-10">
               <img
@@ -533,8 +541,7 @@ export default function MainTempTest() {
               />
 
               <div>
-               
-                <div >
+                <div>
                   {/* บน */}
                   <div className="absolute left-1/2 -translate-x-1/2 -top-7 text-[#d6bb0fff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                     {temp3} °C
@@ -665,9 +672,7 @@ export default function MainTempTest() {
               </div>
             </div>
 
-            <div
-              className="w-full h-full flex flex-col justify-between gap-6 pt-6 sm:gap-8 sm:pt-8 lg:pt-0 lg:flex-row lg:gap-0"
-            >
+            <div className="w-full h-full flex flex-col justify-between gap-6 pt-6 sm:gap-8 sm:pt-8 lg:pt-0 lg:flex-row lg:gap-0">
               {/* กระแส อุณหภูมิ */}
               <div
                 className="flex flex-col w-full h-full gap-6 justify-between text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl
@@ -712,9 +717,7 @@ export default function MainTempTest() {
               </div>
 
               {/* ปุ่มกดทดสอบ หยุด */}
-              <div
-                className="flex flex-col h-auto w-full items-center gap-6 py-6 sm:gap-8 lg:items-end"
-              >
+              <div className="flex flex-col h-auto w-full items-center gap-6 py-6 sm:gap-8 lg:items-end">
                 <button
                   id="test"
                   className={`w-full sm:w-[70%] lg:w-[70%] xl:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl 
@@ -736,13 +739,11 @@ export default function MainTempTest() {
                   หยุด
                 </button>
               </div>
-              
             </div>
-             <div className="flex flex-col-reverse place-content-center mt-auto">
-            <Footer />
+            <div className="flex flex-col-reverse place-content-center mt-auto">
+              <Footer />
+            </div>
           </div>
-          </div>
-         
         </div>
       </div>
     </div>
