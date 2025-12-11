@@ -108,20 +108,20 @@ export default function MainTempTest() {
               qcScript: {
                 ID: string;
                 script: {
-                  TemperatureMin?: number;
-                  TemperatureMax?: number;
-                  CurrentMax?: number;
-                  StartMoment?: number;
-                  EndMoment?: number;
-                  emissivity?: number;
-                  m1?: number;
-                  c1?: number;
-                  m2?: number;
-                  c2?: number;
-                  m3?: number;
-                  c3?: number;
-                  m4?: number;
-                  c4?: number;
+                  TemperatureMin: number;
+                  TemperatureMax: number;
+                  CurrentMax: number;
+                  StartMoment: number;
+                  EndMoment: number;
+                  emissivity: number;
+                  m1: number;
+                  c1: number;
+                  m2: number;
+                  c2: number;
+                  m3: number;
+                  c3: number;
+                  m4: number;
+                  c4: number;
                 };
               };
               status: string | null; //ค่าสถานะ
