@@ -11,6 +11,7 @@ import SideBar from "@/components/sidebar";
 import Breadcrumb from "@/components/breadcrumb";
 import { useAuth } from "@/lib/auth/authProvider";
 import { localStorageWeb } from "@/utils/localstorage";
+import TestHistory from "@/components/temperature/testHistory";
 
 const statusMap: Record<string, { css: string; stateName: string }> = {
   stop: { css: "bg-red-600", stateName: "STOP" },
@@ -22,6 +23,7 @@ const statusMap: Record<string, { css: string; stateName: string }> = {
 export default function MainTempTest() {
   // Selectbar
   const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า
+  const [isSelectedCard, setIsSelectedCard] = useState<boolean | null>(false);
   const [currentCOMPort, setCurrentCOMPort] = useState<number | null>();
   const [popup, setPopup] = useState(false);
   const openPopup = () => setPopup(true);
@@ -34,7 +36,7 @@ export default function MainTempTest() {
 
   const auth = useAuth();
 
-  const [qcProject, setQcProject] = useState(""); //qcProject ID
+  const [qcProject, setQcProject] = useState<string | null>(null); //qcProject ID
   const [temp1, setTemp1] = useState<number | 0>(0); //หันหน้าเข้าแผ่นเตารีด ขวา
   const [temp2, setTemp2] = useState<number | 0>(0); //หันหน้าเข้าแผ่นเตารีด ซ้าย
   const [temp3, setTemp3] = useState<number | 0>(0); //บนหน้าเตารีด
@@ -369,9 +371,7 @@ export default function MainTempTest() {
         URL: "qc/status",
         body: {
           qcRecordID: record.data[0].ID,
-          // เลือก qcMainID เฉพาะที่ qcType.name === "temperature"
           qcMainID: qcMainTemp,
-
           result: statusRef.current,
           status: statusRef.current,
           detail: lastResult.join(",").trim(),
@@ -419,6 +419,10 @@ export default function MainTempTest() {
   useEffect(() => {
     refreshData();
   }, []);
+
+  useEffect(() => {
+    setQcProject(null);
+  }, [isSelectedCard]);
 
   useEffect(() => {
     if (!qcProject) return;
@@ -492,6 +496,8 @@ export default function MainTempTest() {
                   onClick={(e: any) => {
                     e.target.value = "";
                     setSerialNumber("");
+                      setIsSelectedCard(false);
+
                   }}
                   onChange={(e) => {
                     setSerialNumber(e.target.value);
@@ -507,7 +513,15 @@ export default function MainTempTest() {
           <div
             className="w-full h-full flex px-[20%] flex-col justify-between 
           lg:gap-10 lg:px-[10%] lg:my-2 "
-          >
+          ><div>
+              {serialNumber && (
+              <TestHistory
+                serialNumber={serialNumber}
+                setData={(data: any) => setQcMains(data)}
+                isChecked={setIsSelectedCard}
+              />
+            )}
+          </div>
             {/* ภาพเตารีด */}
             <div className="relative self-center pt-10 pb-10">
               <img
@@ -519,7 +533,8 @@ export default function MainTempTest() {
               />
 
               <div>
-                <div>
+               
+                <div >
                   {/* บน */}
                   <div className="absolute left-1/2 -translate-x-1/2 -top-7 text-[#d6bb0fff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                     {temp3} °C
@@ -656,7 +671,7 @@ export default function MainTempTest() {
               {/* กระแส อุณหภูมิ */}
               <div
                 className="flex flex-col w-full h-full gap-6 justify-between text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl
-                lg:items-start lg:pl-10"
+                lg:items-start "
               >
                 <div className="flex flex-col pt-10 lg:flex-row lg:pt-0 gap-4 sm:gap-8">
                   <div className="flex items-center gap-4">
@@ -702,7 +717,7 @@ export default function MainTempTest() {
               >
                 <button
                   id="test"
-                  className={`w-full sm:w-[70%] lg:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl 
+                  className={`w-full sm:w-[70%] lg:w-[70%] xl:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl 
                   rounded-lg font-semibold text-white transition duration-200
                   ${
                     disAbleClick
@@ -714,7 +729,7 @@ export default function MainTempTest() {
                   ทดสอบ
                 </button>
                 <button
-                  className="w-full sm:w-[70%] lg:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl rounded-lg bg-red-500 hover:cursor-pointer text-white font-semibold 
+                  className="w-full sm:w-[70%] lg:w-[70%] xl:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl rounded-lg bg-red-500 hover:cursor-pointer text-white font-semibold 
                   transition duration-300 hover:bg-red-600"
                   onClick={() => clickTest("stop")}
                 >
