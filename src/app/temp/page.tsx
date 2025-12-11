@@ -268,7 +268,7 @@ export default function MainTempTest() {
       return;
     }
 
-    if (!qcProject) {
+    if (!isSelectedCard && !qcProject) {
       Swal.fire({
         icon: "error",
         title: "เกิดข้อผิดพลาด",
@@ -305,8 +305,6 @@ export default function MainTempTest() {
     }
 
     try {
-     
-
       if (disAbleClick) return;
       setDisAbleClick(true); //กดไม่ได้
 
@@ -342,7 +340,7 @@ export default function MainTempTest() {
     // // ]
     // let splitResultArray = splitData[splitData.length - 1]; // ผลลัพธ์: [" 8.4S", " 249", " 500.000000","Passed",""Cus termostate is cut in time.]
     try {
-       let record: any;
+      let record: any;
       if (!isSelectedCard) {
         const record = await window.electronAPI.fetchAPI({
           method: "POST",
@@ -369,7 +367,7 @@ export default function MainTempTest() {
       } else {
         record = qcMains;
       }
-      
+
       const qcMainTemp = qcMainsRef.current?.data.find(
         (d: any) => d?.qcMain?.qcType?.name === "temperature"
       )?.qcMain?.ID;
@@ -477,18 +475,24 @@ export default function MainTempTest() {
                   <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                     &nbsp;*
                   </span>
+                  {!isSelectedCard ? (
+                    <Select
+                      className="rounded-sm border"
+                      closeMenuOnSelect={true}
+                      options={qcProjectList?.data?.map((data) => ({
+                        value: data.ID,
+                        label: data.projectName,
+                      }))}
+                      onChange={(e) => {
+                        setQcProject(e ? e.value : "");
+                      }}
+                    />
+                  ) : (
+                    <h1 className="text-red-600 text-lg xl:text-xl h-10 flex place-items-end">
+                      มีการทดสอบที่ถูกเลือกแล้ว
+                    </h1>
+                  )}
                 </div>
-
-                <Select
-                  className="rounded-sm border"
-                  options={qcProjectList?.data?.map((data) => ({
-                    value: data.ID,
-                    label: data.projectName,
-                  }))}
-                  onChange={(e) => {
-                    setQcProject(e ? e.value : "");
-                  }}
-                />
               </li>
               <li className="w-full md:flex-grow md:w-auto text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
                 <div className="flex pb-3">
