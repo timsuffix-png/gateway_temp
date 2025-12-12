@@ -166,6 +166,7 @@ export default function TestHistory({
         (refIndex.childNodes[2] as HTMLElement).className = (refIndex.childNodes[2] as HTMLElement).className.replaceAll("flex", "hidden");
       }
     }
+     // กำลังเลือก Card อยู่" และผู้ใช้คลิกที่ Card ใบเดิมซ้ำ
     if (selectedCard === index) {
       isChecked(false);
       setSelectedCard(null);

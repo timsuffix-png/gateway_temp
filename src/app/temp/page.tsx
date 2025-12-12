@@ -161,6 +161,7 @@ export default function MainTempTest() {
   } | null>();
 
   const recordedRef = useRef(false);
+  const isSelectedCardRef = useRef(isSelectedCard);
   const qcMainsRef = useRef(qcMains);
   const qcProjectRef = useRef(qcProject);
   const serialNumberRef = useRef(serialNumber);
@@ -272,7 +273,7 @@ export default function MainTempTest() {
   };
 
   const clickTest = async (state: string) => {
-    console.log("senData :", sendData);
+    // console.log("senData :", sendData);
     recordedRef.current = false;
     if (!currentCOMPort) {
       Swal.fire({
@@ -356,8 +357,9 @@ export default function MainTempTest() {
     // let splitResultArray = splitData[splitData.length - 1]; // ผลลัพธ์: [" 8.4S", " 249", " 500.000000","Passed",""Cus termostate is cut in time.]
     try {
       let record: any;
-      if (!isSelectedCard) {
-        console.log("false isSelectedCard status :", isSelectedCard);
+      
+      if (!isSelectedCardRef.current) {
+        console.log("false isSelectedCardRef.current status :", isSelectedCardRef.current);
         record = await window.electronAPI.fetchAPI({
           method: "POST",
           URL: "qc/record",
@@ -373,10 +375,9 @@ export default function MainTempTest() {
             title: record.message || "เกิดข้อผิดพลาด",
           });
       } else {
-        record = qcMains;
+        record = qcMainsRef.current;
       }
       
-
       const qcMainTemp = qcMainsRef.current?.data.find(
         (d: any) => d?.qcMain?.qcType?.name === "temperature"
       )?.qcMain?.ID;
@@ -385,10 +386,10 @@ export default function MainTempTest() {
         method: "POST",
         URL: "qc/status",
         body: {
-          qcRecordID: record.data[0].ID,
+          qcRecordID: record?.data?.[0]?.ID,
           qcMainID: qcMainTemp,
-          result: statusRef.current,
-          status: statusRef.current,
+          result: lastResult[11].trim(),
+          status: lastResult[11].trim(),
           detail: lastResult.join(",").trim(),
         },
       });
@@ -402,10 +403,10 @@ export default function MainTempTest() {
     setQcProjectList(data);
   };
 
-  useEffect(() => {
-    console.log("isSelectedCard changed :", isSelectedCard);
-  }, [isSelectedCard]);
 
+  useEffect(() => {
+    isSelectedCardRef.current = isSelectedCard;
+  }, [isSelectedCard]);
   useEffect(() => {
     qcProjectRef.current = qcProject;
   }, [qcProject]);
