@@ -8,7 +8,7 @@ export default function TestHistory({
   setData,
 }: {
   serialNumber: string;
-  isChecked: React.Dispatch<React.SetStateAction<boolean | null>>;
+  isChecked: React.Dispatch<React.SetStateAction<boolean>>;
   setData: React.Dispatch<
     React.SetStateAction<{
     error: boolean;

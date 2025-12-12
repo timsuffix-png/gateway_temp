@@ -403,6 +403,10 @@ export default function MainTempTest() {
   };
 
   useEffect(() => {
+    console.log("isSelectedCard changed :", isSelectedCard);
+  }, [isSelectedCard]);
+
+  useEffect(() => {
     qcProjectRef.current = qcProject;
   }, [qcProject]);
   useEffect(() => {
@@ -522,7 +526,6 @@ export default function MainTempTest() {
                   onClick={(e: any) => {
                     e.target.value = "";
                     setSerialNumber("");
-                    setIsSelectedCard(false);
                   }}
                   onChange={(e) => {
                     setSerialNumber(e.target.value);
