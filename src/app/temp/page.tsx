@@ -357,7 +357,7 @@ export default function MainTempTest() {
     try {
       let record: any;
       if (!isSelectedCard) {
-        const record = await window.electronAPI.fetchAPI({
+        record = await window.electronAPI.fetchAPI({
           method: "POST",
           URL: "qc/record",
           body: {
@@ -382,6 +382,7 @@ export default function MainTempTest() {
       } else {
         record = qcMains;
       }
+      console.log("record :", record);
 
       const qcMainTemp = qcMainsRef.current?.data.find(
         (d: any) => d?.qcMain?.qcType?.name === "temperature"
