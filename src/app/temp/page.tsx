@@ -23,7 +23,7 @@ const statusMap: Record<string, { css: string; stateName: string }> = {
 export default function MainTempTest() {
   // Selectbar
   const [serialNumber, setSerialNumber] = useState(""); //รหัสสินค้า
-  const [isSelectedCard, setIsSelectedCard] = useState<boolean | null>(false);
+  const [isSelectedCard, setIsSelectedCard] = useState<boolean>(false);
   const [currentCOMPort, setCurrentCOMPort] = useState<number | null>();
   const [popup, setPopup] = useState(false);
   const openPopup = () => setPopup(true);
@@ -357,6 +357,7 @@ export default function MainTempTest() {
     try {
       let record: any;
       if (!isSelectedCard) {
+        console.log("false isSelectedCard status :", isSelectedCard);
         record = await window.electronAPI.fetchAPI({
           method: "POST",
           URL: "qc/record",
@@ -366,23 +367,15 @@ export default function MainTempTest() {
             testBy: auth.user.data.ID,
           },
         });
-        if (!record) {
-          Swal.fire({
-            icon: "error",
-            title: "เกิดข้อผิดพลาดทางซอฟเเวร์",
-            text: "ไม่สามารถบันทึกค่าได้",
-          });
-          return;
-        }
         if (!record)
           return Swal.fire({
             icon: "error",
-            title: "รหัสสินค้าผิด",
+            title: record.message || "เกิดข้อผิดพลาด",
           });
       } else {
         record = qcMains;
       }
-      console.log("record :", record);
+      
 
       const qcMainTemp = qcMainsRef.current?.data.find(
         (d: any) => d?.qcMain?.qcType?.name === "temperature"
@@ -443,6 +436,10 @@ export default function MainTempTest() {
   }, []);
 
   useEffect(() => {
+    console.log("qcProject isSelectedCard changed :", qcProject);
+    console.log("qcMain isSelectedCard changed :", qcMains);
+
+    if(isSelectedCard) return 
     setQcProject(null);
   }, [isSelectedCard]);
 
