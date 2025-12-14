@@ -36,8 +36,7 @@ export default function QcDetail() {
     });
 
     if (!res) throw new Error("Failed to fetchFailedReason data.");
-    const detailString = res.data[0].detail.split(",");
-    console.log("detailString : ",detailString);
+    const detailString = res.data[res.data.length-1].detail.split(",");
     return detailString[detailString.length - 1];
   };
 
