@@ -32,22 +32,69 @@ export default function QcDetail() {
   const fetchFailedReason = async (qcRecordId: string) => {
     const res = await window.electronAPI.fetchAPI({
       method: "GET",
-      URL: `qc/status/${qcRecordId}?limit=5&page=1&type=both`
+      URL: `qc/status/type/${qcRecordId}?limit=99999&page=1&type=both`,
     });
 
     if (!res) throw new Error("Failed to fetchFailedReason data.");
+<<<<<<< HEAD
     const detailString = res.data[res.data.length-1].detail.split(",");
     return detailString[detailString.length - 1];
+=======
+
+    const has_seaward_data = res.data.some(
+      (item: any) => item.qcMain?.qcType?.name === "seaward"
+    );
+    const has_temp_data = res.data.some(
+      (item: any) => item.qcMain?.qcType?.name === "temperature"
+    );
+
+    const failed_seaward_item = res.data.filter(
+      (item: any) =>
+        item.qcMain?.qcType?.name === "seaward" && item.status === "Failed"
+    );
+
+    const failed_temperature_item = res.data.find(
+      (item: any) =>
+        item.qcMain?.qcType?.name === "temperature" && item.status === "Failed"
+    );
+
+    const seaward_details = failed_seaward_item?.map((item: any) => item.qcMain?.testName.trim()) ?? [];
+    const temperature_details =
+      failed_temperature_item?.detail?.split(",") ?? [];
+      console.log("failed_temperature_item", failed_temperature_item);
+      console.log("temperature_details", temperature_details);
+
+
+    return {
+      seaward: failed_seaward_item?.length > 0 ? "Failed" : has_seaward_data ? "Passed" : "-",
+      seaward_failed: seaward_details,
+      temperature: failed_temperature_item
+        ? "Failed"
+        : has_temp_data
+          ? "Passed"
+          : "-",
+
+      temperature_failed: temperature_details[temperature_details.length - 1]?.trim(),
+    };
+>>>>>>> 066fa4b84bc4d49d162835858d3c92e3f750f66d
   };
 
   const refreshData = async () => {
     const data = await fetchData();
 
     const fetchPromises = data.data.map(async (item: any) => {
-      if (item.tag === "qcRecord" && item.statusOverView === "Failed") {
+      if (item.tag === "qcRecord") {
         try {
           const failedReasonText = await fetchFailedReason(item.ID);
-          return { ...item, failedReasonText };
+          return {
+            ...item,
+            status: {
+              seaward: failedReasonText.seaward,
+              seaward_failed: failedReasonText.seaward_failed,
+              temperature: failedReasonText.temperature,
+              temperature_failed: failedReasonText.temperature_failed,
+            },
+          };
         } catch (error) {
           console.error(
             `Error fetching failed reason for ID ${item.ID}:`,
@@ -128,12 +175,30 @@ export default function QcDetail() {
                             </h1>
                           </div>
                         </div>
-                        <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
-                          สาเหตุ :{" "}
-                          {data.statusOverView === "Failed"
-                            ? data.failedReasonText
-                            : "-"}
+                        <h1 className="text-start pl-[20%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                          Seaward : {data?.status?.seaward}
+                          {data?.status?.seaward === "Failed" && (
+                            <span className="text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                              {" "}
+                              {"("}{" "}
+                              {data.status.seaward_failed
+                                .map((item: any) => item.trim())
+                                .join(", ")}
+                              {" )"}
+                            </span>
+                          )}
                         </h1>
+
+                        <h1 className="text-start pl-[20%] text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                          Temperature : {data?.status?.temperature}
+                          {data?.status?.temperature === "Failed" && (
+                            <span className="text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                              {" "}
+                              {"("} {data.status.temperature_failed} {" )"}
+                            </span>
+                          )}
+                        </h1>
+
                         <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
                           ทดสอบโดย
                         </h1>

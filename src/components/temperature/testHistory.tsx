@@ -1,5 +1,16 @@
 import { useState, useEffect, useRef } from "react";
-import moment from "moment";
+
+const formatSince = (iso?: string) => {
+  if (!iso) return "";
+  const t = new Date(iso);
+  const diffMs = Date.now() - t.getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 60) return `${minutes} นาทีที่แล้ว`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} ชั่วโมงที่แล้ว`;
+  const days = Math.floor(hours / 24);
+  return `${days} วันที่แล้ว`;
+};
 
 
 export default function TestHistory({
@@ -161,29 +172,28 @@ export default function TestHistory({
   };
 
   const selectCard = (index: number) => {
-  for (const refIndex of cardRef.current) {
-      if (refIndex) {
-        (refIndex.childNodes[2] as HTMLElement).className = (refIndex.childNodes[2] as HTMLElement).className.replaceAll("flex", "hidden");
+    for (const refIndex of cardRef.current) {
+      if (refIndex && refIndex.children.length >= 3) {
+        const mark = refIndex.children[2] as HTMLElement;
+        mark.className = mark.className.replaceAll("flex", "hidden");
       }
     }
      // กำลังเลือก Card อยู่" และผู้ใช้คลิกที่ Card ใบเดิมซ้ำ
     if (selectedCard === index) {
       isChecked(false);
       setSelectedCard(null);
-      if (cardRef.current[index]) {
-          (cardRef.current[index].childNodes[2] as HTMLElement).className = (cardRef.current[
-            index
-          ].childNodes[2] as HTMLElement).className.replaceAll("flex", "hidden");
+      if (cardRef.current[index] && cardRef.current[index]!.children.length >= 3) {
+        const mark = cardRef.current[index]!.children[2] as HTMLElement;
+        mark.className = mark.className.replaceAll("flex", "hidden");
       }
       
       setData(null);
     }else {
       isChecked(true);
       setSelectedCard(index);
-      if (cardRef.current[index]) {
-            (cardRef.current[index].childNodes[2] as HTMLElement).className = (
-              cardRef.current[index].childNodes[2] as HTMLElement
-            ).className.replaceAll("hidden", "flex");
+      if (cardRef.current[index] && cardRef.current[index]!.children.length >= 3) {
+        const mark = cardRef.current[index]!.children[2] as HTMLElement;
+        mark.className = mark.className.replaceAll("hidden", "flex");
       }
       let buffer: any = [];
       if (testHistory && remainingTest && remainingTest[index]) {
@@ -259,16 +269,7 @@ export default function TestHistory({
                       <h1 className="text-sm">
                         {data && data.testBy ? data.testBy.name + " " + data.testBy.surname : ""}
                       </h1>
-                      <h1 className="text-xs">
-                        {moment().diff(data.updatedAt, "minutes") < 60
-                          ? moment().diff(data.updatedAt, "minutes") +
-                            " นาทีที่แล้ว"
-                          : moment().diff(data.updatedAt, "hours") < 24
-                          ? moment().diff(data.updatedAt, "hours") +
-                            " ชั่วโมงที่แล้ว"
-                          : moment().diff(data.updatedAt, "days") +
-                            " วันที่แล้ว"}
-                      </h1>
+                      <h1 className="text-xs">{formatSince(data.updatedAt || data.createdAt)}</h1>
                     </div>
                     <div className="absolute left-0 top-0 rounded-xl hidden">
                       <svg
