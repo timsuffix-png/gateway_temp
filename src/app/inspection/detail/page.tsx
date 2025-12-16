@@ -35,7 +35,7 @@ const fetchFailedReason = async (qcRecordId: string) => {
     URL: `qc/status/type/${qcRecordId}?limit=99999&page=1&type=both`,
   });
 
-  if (!res) throw new Error("Failed to fetchFailedReason data.");
+    if (!res) throw new Error("Failed to fetchFailedReason data.");
 
   const has_seaward_data = res.data?.some(
     (item: any) => item.qcMain?.qcType?.name === "seaward"
@@ -60,24 +60,18 @@ const fetchFailedReason = async (qcRecordId: string) => {
   const temperature_details =
     failed_temperature_item?.detail?.split(",") ?? [];
 
-  return {
-    seaward:
-      (failed_seaward_item?.length ?? 0) > 0
+    return {
+      seaward: failed_seaward_item?.length > 0 ? "Failed" : has_seaward_data ? "Passed" : "-",
+      seaward_failed: seaward_details,
+      temperature: failed_temperature_item
         ? "Failed"
-        : has_seaward_data
-        ? "Passed"
-        : "-",
-    seaward_failed: seaward_details,
+        : has_temp_data
+          ? "Passed"
+          : "-",
 
-    temperature: failed_temperature_item
-      ? "Failed"
-      : has_temp_data
-      ? "Passed"
-      : "-",
-    temperature_failed: temperature_details[temperature_details.length - 1]?.trim(),
+      temperature_failed: temperature_details[temperature_details.length - 1]?.trim(),
+    };
   };
-};
-
 
   const refreshData = async () => {
     const data = await fetchData();
