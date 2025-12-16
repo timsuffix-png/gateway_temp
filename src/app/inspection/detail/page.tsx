@@ -29,55 +29,55 @@ export default function QcDetail() {
     return data;
   };
 
-  const fetchFailedReason = async (qcRecordId: string) => {
-    const res = await window.electronAPI.fetchAPI({
-      method: "GET",
-      URL: `qc/status/type/${qcRecordId}?limit=99999&page=1&type=both`,
-    });
+const fetchFailedReason = async (qcRecordId: string) => {
+  const res = await window.electronAPI.fetchAPI({
+    method: "GET",
+    URL: `qc/status/type/${qcRecordId}?limit=99999&page=1&type=both`,
+  });
 
-    if (!res) throw new Error("Failed to fetchFailedReason data.");
-<<<<<<< HEAD
-    const detailString = res.data[res.data.length-1].detail.split(",");
-    return detailString[detailString.length - 1];
-=======
+  if (!res) throw new Error("Failed to fetchFailedReason data.");
 
-    const has_seaward_data = res.data.some(
-      (item: any) => item.qcMain?.qcType?.name === "seaward"
-    );
-    const has_temp_data = res.data.some(
-      (item: any) => item.qcMain?.qcType?.name === "temperature"
-    );
+  const has_seaward_data = res.data?.some(
+    (item: any) => item.qcMain?.qcType?.name === "seaward"
+  );
+  const has_temp_data = res.data?.some(
+    (item: any) => item.qcMain?.qcType?.name === "temperature"
+  );
 
-    const failed_seaward_item = res.data.filter(
-      (item: any) =>
-        item.qcMain?.qcType?.name === "seaward" && item.status === "Failed"
-    );
+  const failed_seaward_item = res.data?.filter(
+    (item: any) =>
+      item.qcMain?.qcType?.name === "seaward" && item.status === "Failed"
+  );
 
-    const failed_temperature_item = res.data.find(
-      (item: any) =>
-        item.qcMain?.qcType?.name === "temperature" && item.status === "Failed"
-    );
+  const failed_temperature_item = res.data?.find(
+    (item: any) =>
+      item.qcMain?.qcType?.name === "temperature" && item.status === "Failed"
+  );
 
-    const seaward_details = failed_seaward_item?.map((item: any) => item.qcMain?.testName.trim()) ?? [];
-    const temperature_details =
-      failed_temperature_item?.detail?.split(",") ?? [];
-      console.log("failed_temperature_item", failed_temperature_item);
-      console.log("temperature_details", temperature_details);
+  const seaward_details =
+    failed_seaward_item?.map((item: any) => item.qcMain?.testName?.trim()) ?? [];
 
+  const temperature_details =
+    failed_temperature_item?.detail?.split(",") ?? [];
 
-    return {
-      seaward: failed_seaward_item?.length > 0 ? "Failed" : has_seaward_data ? "Passed" : "-",
-      seaward_failed: seaward_details,
-      temperature: failed_temperature_item
+  return {
+    seaward:
+      (failed_seaward_item?.length ?? 0) > 0
         ? "Failed"
-        : has_temp_data
-          ? "Passed"
-          : "-",
+        : has_seaward_data
+        ? "Passed"
+        : "-",
+    seaward_failed: seaward_details,
 
-      temperature_failed: temperature_details[temperature_details.length - 1]?.trim(),
-    };
->>>>>>> 066fa4b84bc4d49d162835858d3c92e3f750f66d
+    temperature: failed_temperature_item
+      ? "Failed"
+      : has_temp_data
+      ? "Passed"
+      : "-",
+    temperature_failed: temperature_details[temperature_details.length - 1]?.trim(),
   };
+};
+
 
   const refreshData = async () => {
     const data = await fetchData();
