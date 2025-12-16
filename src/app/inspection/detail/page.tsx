@@ -38,7 +38,7 @@ export default function QcDetail() {
     if (!res) throw new Error("Failed to fetchFailedReason data.");
 
     const has_seaward_data = res.data.some(
-      (item: any) => item.qcMain?.qcType?.name === "seaward"
+      (item: any) => item.qcMain?.qcType?.name === "seaward" 
     );
     const has_temp_data = res.data.some(
       (item: any) => item.qcMain?.qcType?.name === "temperature"
@@ -46,12 +46,12 @@ export default function QcDetail() {
 
     const failed_seaward_item = res.data.filter(
       (item: any) =>
-        item.qcMain?.qcType?.name === "seaward" && item.status === "Failed"
+        item.qcMain?.qcType?.name === "seaward" && item.status === "Failed" 
     );
 
     const failed_temperature_item = res.data.find(
       (item: any) =>
-        item.qcMain?.qcType?.name === "temperature" && item.status === "Failed"
+        item.qcMain?.qcType?.name === "temperature" && item.status === "Failed" 
     );
 
     const seaward_details = failed_seaward_item?.map((item: any) => item.qcMain?.testName.trim()) ?? [];
@@ -143,9 +143,7 @@ export default function QcDetail() {
                       >
                         <div className="w-full flex px-5 pt-3 pb-2 place-content-between place-items-center bg-[#76a0d6] rounded-t-2xl">
                           <div className="flex w-1/2">
-                            <h1 className="text-black  text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal">
-                              ทดสอบ
-                            </h1>
+                            {/* /ผลลัพธ์การทดสอบ/ */}
                             <div className="ml-2 overflow-hidden text-ellipsis">
                               {data.statusOverView === "Passed" ? (
                                 <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
@@ -170,21 +168,21 @@ export default function QcDetail() {
                             </h1>
                           </div>
                         </div>
-                        <h1 className="text-start pl-[20%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                        <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
                           Seaward : {data?.status?.seaward}
                           {data?.status?.seaward === "Failed" && (
-                            <span className="text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                            <label className="whitespace-normal text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5 ">
                               {" "}
                               {"("}{" "}
                               {data.status.seaward_failed
                                 .map((item: any) => item.trim())
                                 .join(", ")}
                               {" )"}
-                            </span>
+                            </label>
                           )}
                         </h1>
 
-                        <h1 className="text-start pl-[20%] text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                        <h1 className="text-start pl-[15%] text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
                           Temperature : {data?.status?.temperature}
                           {data?.status?.temperature === "Failed" && (
                             <span className="text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">

@@ -359,14 +359,7 @@ export default function MainTempTest() {
       let record: any;
       
       if (!isSelectedCardRef.current) {
-        if (!qcProjectRef.current) {
-          Swal.fire({
-            icon: "error",
-            title: "เกิดข้อผิดพลาด",
-            text: "กรุณาเลือกโปรเจกต์การทดสอบ",
-          });
-          return;
-        }
+        console.log("false isSelectedCardRef.current status :", isSelectedCardRef.current);
         record = await window.electronAPI.fetchAPI({
           method: "POST",
           URL: "qc/record",
@@ -451,7 +444,8 @@ export default function MainTempTest() {
     console.log("qcProject isSelectedCard changed :", qcProject);
     console.log("qcMain isSelectedCard changed :", qcMains);
 
-    if (isSelectedCard) setQcProject(null);
+    if(isSelectedCard) return 
+    setQcProject(null);
   }, [isSelectedCard]);
 
   useEffect(() => {
@@ -536,7 +530,6 @@ export default function MainTempTest() {
                   }}
                   onChange={(e) => {
                     setSerialNumber(e.target.value);
-                    setIsSelectedCard(false);
                     return;
                   }}
                 />
