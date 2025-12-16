@@ -36,10 +36,7 @@ export default function QcDetail() {
     });
 
     if (!res) throw new Error("Failed to fetchFailedReason data.");
-<<<<<<< HEAD
-    const detailString = res.data[res.data.length-1].detail.split(",");
-    return detailString[detailString.length - 1];
-=======
+
 
     const has_seaward_data = res.data.some(
       (item: any) => item.qcMain?.qcType?.name === "seaward" 
@@ -76,7 +73,6 @@ export default function QcDetail() {
 
       temperature_failed: temperature_details[temperature_details.length - 1]?.trim(),
     };
->>>>>>> 066fa4b84bc4d49d162835858d3c92e3f750f66d
   };
 
   const refreshData = async () => {

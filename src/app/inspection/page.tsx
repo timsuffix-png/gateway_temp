@@ -214,7 +214,7 @@ export default function Inspection() {
                           รหัสสินค้า
                         </div>
                         <div className="w-2/12 sm:w-1/12 lg:w-1/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
-                          ประเภท
+                          ประเภทการทดสอบ
                         </div>
                         <div className="w-2/12 lg:w-2/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
                           โปรเจ็คการทดสอบ
