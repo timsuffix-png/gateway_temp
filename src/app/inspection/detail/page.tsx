@@ -148,9 +148,7 @@ const fetchFailedReason = async (qcRecordId: string) => {
                       >
                         <div className="w-full flex px-5 pt-3 pb-2 place-content-between place-items-center bg-[#76a0d6] rounded-t-2xl">
                           <div className="flex w-1/2">
-                            <h1 className="text-black  text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal">
-                              ทดสอบ
-                            </h1>
+                            {/* /ผลลัพธ์การทดสอบ/ */}
                             <div className="ml-2 overflow-hidden text-ellipsis">
                               {data.statusOverView === "Passed" ? (
                                 <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
@@ -175,21 +173,21 @@ const fetchFailedReason = async (qcRecordId: string) => {
                             </h1>
                           </div>
                         </div>
-                        <h1 className="text-start pl-[20%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                        <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
                           Seaward : {data?.status?.seaward}
                           {data?.status?.seaward === "Failed" && (
-                            <span className="text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                            <label className="whitespace-normal text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5 ">
                               {" "}
                               {"("}{" "}
                               {data.status.seaward_failed
                                 .map((item: any) => item.trim())
                                 .join(", ")}
                               {" )"}
-                            </span>
+                            </label>
                           )}
                         </h1>
 
-                        <h1 className="text-start pl-[20%] text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                        <h1 className="text-start pl-[15%] text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
                           Temperature : {data?.status?.temperature}
                           {data?.status?.temperature === "Failed" && (
                             <span className="text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
