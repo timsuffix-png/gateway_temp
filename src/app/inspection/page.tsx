@@ -210,10 +210,10 @@ export default function Inspection() {
                   <div className="w-[98%] my-[20px]">
                     <div className="text-black font-bold">
                       <div className="bg-[#6494d3] rounded-t-3xl flex flex-row h-10 place-items-center">
-                      <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                      <div className="w-7/12 sm:w-4/12 md:w-3/12 lg:w-2/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
                           รหัสสินค้า
                         </div>
-                        <div className="w-2/12 sm:w-1/12 lg:w-1/12 text-center text-base text-xl 3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
+                        <div className="w-3/12 sm:w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
                           ประเภทการทดสอบ
                         </div>
                         <div className="w-2/12 lg:w-2/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
@@ -243,7 +243,7 @@ export default function Inspection() {
                             key={data.ID}
                             className="flex flex-row w-full h-12 hover:bg-gray-200"
                           >
-                            <div className="w-8/12 sm:w-5/12 md:w-4/12 lg:w-3/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
+                            <div className="w-7/12 sm:w-4/12 md:w-3/12 lg:w-2/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
                               <div className="hidden xl:block">
                                 {Translator.item.icon}
                               </div>
@@ -251,7 +251,7 @@ export default function Inspection() {
                                 {data.construct.ID}
                               </h5>
                             </div>
-                            <div className="w-2/12 sm:w-1/12 lg:w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex items-center justify-center">
+                            <div className="w-3/12 sm:w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl   flex items-center justify-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {
                                   data.qcProject.qcItemProject[0].qcMain.qcType
