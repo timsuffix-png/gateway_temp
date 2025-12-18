@@ -65,7 +65,7 @@ export default function Routing() {
       case "qc/testSetting/create/qcType/edit":
         return <EditQcType />;
 
-      case "temperature":
+      case "thermostat":
         return <MainTemp />;
 
       default:

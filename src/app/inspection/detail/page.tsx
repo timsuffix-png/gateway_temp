@@ -38,10 +38,10 @@ const fetchFailedReason = async (qcRecordId: string) => {
     if (!res) throw new Error("Failed to fetchFailedReason data.");
 
   const has_seaward_data = res.data?.some(
-    (item: any) => item.qcMain?.qcType?.name === "seaward"
+    (item: any) => item.qcMain?.qcType?.name === "seaward" && ["Passed", "Failed", "In progress"].includes(item.status)
   );
   const has_temp_data = res.data?.some(
-    (item: any) => item.qcMain?.qcType?.name === "temperature"
+    (item: any) => item.qcMain?.qcType?.name === "thermostat" && ["Passed", "Failed", "In progress"].includes(item.status)
   );
 
   const failed_seaward_item = res.data?.filter(
@@ -49,27 +49,27 @@ const fetchFailedReason = async (qcRecordId: string) => {
       item.qcMain?.qcType?.name === "seaward" && item.status === "Failed"
   );
 
-  const failed_temperature_item = res.data?.find(
+  const failed_thermostat_item = res.data?.find(
     (item: any) =>
-      item.qcMain?.qcType?.name === "temperature" && item.status === "Failed"
+      item.qcMain?.qcType?.name === "thermostat" && item.status === "Failed"
   );
 
   const seaward_details =
     failed_seaward_item?.map((item: any) => item.qcMain?.testName?.trim()) ?? [];
 
-  const temperature_details =
-    failed_temperature_item?.detail?.split(",") ?? [];
+  const thermostat_details =
+    failed_thermostat_item?.detail?.split(",") ?? [];
 
     return {
       seaward: failed_seaward_item?.length > 0 ? "Failed" : has_seaward_data ? "Passed" : "-",
       seaward_failed: seaward_details,
-      temperature: failed_temperature_item
+      thermostat: failed_thermostat_item
         ? "Failed"
         : has_temp_data
           ? "Passed"
           : "-",
 
-      temperature_failed: temperature_details[temperature_details.length - 1]?.trim(),
+      thermostat_failed: thermostat_details[thermostat_details.length - 1]?.trim(),
     };
   };
 
@@ -85,8 +85,8 @@ const fetchFailedReason = async (qcRecordId: string) => {
             status: {
               seaward: failedReasonText.seaward,
               seaward_failed: failedReasonText.seaward_failed,
-              temperature: failedReasonText.temperature,
-              temperature_failed: failedReasonText.temperature_failed,
+              thermostat: failedReasonText.thermostat,
+              thermostat_failed: failedReasonText.thermostat_failed,
             },
           };
         } catch (error) {
@@ -182,11 +182,11 @@ const fetchFailedReason = async (qcRecordId: string) => {
                         </h1>
 
                         <h1 className="text-start pl-[15%] text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
-                          Temperature : {data?.status?.temperature}
-                          {data?.status?.temperature === "Failed" && (
+                          Thermostat : {data?.status?.thermostat}
+                          {data?.status?.thermostat === "Failed" && (
                             <span className="text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
                               {" "}
-                              {"("} {data.status.temperature_failed} {" )"}
+                              {"("} {data.status.thermostat_failed} {" )"}
                             </span>
                           )}
                         </h1>

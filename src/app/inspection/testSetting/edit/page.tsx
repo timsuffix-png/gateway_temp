@@ -61,7 +61,7 @@ export default function EditTestSetting() {
   const openCalibratePopup = () => setCalibratePopup(true);
   const closeCalibratePopup = async () => {
     setCalibratePopup(false);
-    if (qcType.name === "temperature") {
+    if (qcType.name === "thermostat") {
       const updated = await calibrateScript();
       if (updated) {
         setQcScript(updated as QcScriptTemperature);
@@ -124,9 +124,9 @@ export default function EditTestSetting() {
       });
       return;
     }
-    const checkSettingSensor = qcType.name === "temperature" ? await calibrateScript() : null;
+    const checkSettingSensor = qcType.name === "thermostat" ? await calibrateScript() : null;
     const script =
-      qcType.name === "temperature"
+      qcType.name === "thermostat"
         ? { ...(qcScript as any), ...(checkSettingSensor as any) }
         : qcScript;
 
@@ -186,7 +186,7 @@ export default function EditTestSetting() {
       ? (qcScript as QcScriptSeaward)
       : null;
   const TemperatureScript =
-    qcType?.name === "temperature" && qcScript
+    qcType?.name === "thermostat" && qcScript
       ? (qcScript as QcScriptTemperature)
       : null;
   useEffect(() => {

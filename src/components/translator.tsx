@@ -401,8 +401,8 @@ export const Translator: any = {
       </svg>
     ),
   },
-  temperature: {
-    name: "Temperature",
+  thermostat: {
+    name: "Thermostat",
     icon: (
       <svg
         fill="#EE6C4D"

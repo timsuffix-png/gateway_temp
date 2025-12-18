@@ -248,7 +248,7 @@ export default function MainTempTest() {
       const format_script = (dataToProcess || []).find(
         (data: any) =>
           String(data?.qcMain?.qcType?.name || "").toLowerCase() ===
-          "temperature"
+          "thermostat"
       );
 
       setSendData((prev) => ({
@@ -379,7 +379,7 @@ export default function MainTempTest() {
       }
       
       const qcMainTemp = qcMainsRef.current?.data.find(
-        (d: any) => d?.qcMain?.qcType?.name === "temperature"
+        (d: any) => d?.qcMain?.qcType?.name === "thermostat"
       )?.qcMain?.ID;
 
       const res = await window.electronAPI.fetchAPI({
@@ -487,8 +487,8 @@ export default function MainTempTest() {
                 )}
               </li>
               <li className="w-full text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:basis-60">
-                <div className="flex flex-col pb-3">
-                  <div className="flex">
+                <div className="flex flex-col">
+                  <div className="flex pb-3">
                   <p className="">โปรเจกต์การทดสอบ</p>
                   <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                     &nbsp;*
@@ -604,7 +604,7 @@ export default function MainTempTest() {
                   <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
                     อุณหภูมิรอบข้าง : {ambient4} °C
                   </div>
-                  <div className="flex flex-col absolute left-23 top-40 items-center">
+                  <div className="flex flex-col absolute left-23 top-45 items-center">
                     <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#66f0ffff]">
                       กลาง
                     </label>
@@ -630,13 +630,13 @@ export default function MainTempTest() {
                 </div>
 
                 {/* ซ้าย */}
-                <div className="absolute right-58 top-50 text-[#0fb500ff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                <div className="absolute right-58 bottom-36 text-[#0fb500ff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                   {temp2} °C
                 </div>
-                <div className="absolute right-58 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
+                <div className="absolute right-58 bottom-28 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
                   อุณหภูมิรอบข้าง : {ambient2} °C
                 </div>
-                <div className="flex flex-col absolute left-6 top-55 items-center">
+                <div className="flex flex-col absolute left-6 bottom-30 items-center">
                   <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#61ff53ff]">
                     ซ้าย
                   </label>
@@ -662,13 +662,13 @@ export default function MainTempTest() {
 
               {/* ขวา */}
               <div>
-                <div className="absolute left-58 top-50 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                <div className="absolute left-58 bottom-36 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                   {temp1} °C
                 </div>
-                <div className="absolute  left-58 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
+                <div className="absolute  left-58 bottom-28 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
                   อุณหภูมิรอบข้าง : {ambient1} °C
                 </div>
-                <div className="flex flex-col absolute right-5 top-55 items-center">
+                <div className="flex flex-col absolute right-5 bottom-30 items-center">
                   <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#FFB8DF]">
                     ขวา
                   </label>
