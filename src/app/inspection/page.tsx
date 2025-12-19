@@ -137,10 +137,8 @@ export default function Inspection() {
                 <div
                   tabIndex={0}
                   onClick={() => {
-                   
                     localStorageWeb.setItem("currentUrl", "qc/testSetting");
                     window.location.reload();
-                    
                   }}
                   className="ml-10 sm:mr-3"
                 >
@@ -210,7 +208,7 @@ export default function Inspection() {
                   <div className="w-[98%] my-[20px]">
                     <div className="text-black font-bold">
                       <div className="bg-[#6494d3] rounded-t-3xl flex flex-row h-10 place-items-center">
-                      <div className="w-7/12 sm:w-4/12 md:w-3/12 lg:w-2/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
+                        <div className="w-7/12 sm:w-4/12 md:w-3/12 lg:w-2/12 text-center text-base lg:text-lg font-bold font-['Sarabun'] text-ellipsis overflow-hidden">
                           รหัสสินค้า
                         </div>
                         <div className="w-3/12 sm:w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl  font-bold  text-ellipsis overflow-hidden">
@@ -238,6 +236,8 @@ export default function Inspection() {
                     </div>
                     <div className="text-black">
                       {qcRecords?.data?.map((data) => {
+                        const type =
+                          data.qcProject.qcItemProject[0].qcMain.qcType.name;
                         return (
                           <div
                             key={data.ID}
@@ -253,18 +253,19 @@ export default function Inspection() {
                             </div>
                             <div className="w-3/12 sm:w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl   flex items-center justify-center">
                               <div className="text-ellipsis overflow-hidden">
-                                {
-                                  data.qcProject.qcItemProject[0].qcMain.qcType
-                                    .name
-                                }
+                                {type === "thermostat"
+                                  ? "เทอร์โมสตัท"
+                                  : type === "seaward"
+                                    ? "ซีเวิร์ด"
+                                    : type}
                               </div>
                             </div>
-                            <div className="w-2/12 lg:w-2/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
+                            <div className="w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] flex items-center justify-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {data.qcProject.projectName}
                               </div>
                             </div>
-                            <div className="hidden lg:flex w-2/12 text-center text-base lg:text-lg font-['Sarabun'] items-center justify-center">
+                            <div className="hidden lg:flex w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] items-center justify-center">
                               <div className="text-ellipsis overflow-hidden">
                                 {
                                   data.construct.productionSub.productionLot
@@ -272,7 +273,7 @@ export default function Inspection() {
                                 }
                               </div>
                             </div>
-                            <div className="hidden sm:flex sm:w-2/12 lg:w-1/12 text-center text-base lg:text-lg font-['Sarabun'] items-center justify-center">
+                            <div className="hidden sm:flex sm:w-2/12 lg:w-1/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] items-center justify-center">
                               <div className="hidden xl:block">
                                 {Translator.user.icon}
                               </div>
@@ -280,7 +281,7 @@ export default function Inspection() {
                                 {data.testBy.name + " " + data.testBy.surname}
                               </h5>
                             </div>
-                            <div className="w-1/12 sm:w-1/12 lg:w-1/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
+                            <div className="w-1/12 sm:w-1/12 lg:w-1/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] flex items-center justify-center">
                               {data.statusOverView === "Passed" ? (
                                 <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
                                   ผ่าน

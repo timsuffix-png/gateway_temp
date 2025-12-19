@@ -469,7 +469,7 @@ export default function MainTempTest() {
              md:basis-40"
               >
                 <h4 className="flex-nowrap pb-3 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
-                  Temperature port
+                  Thermostat port
                   <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                     &nbsp;*
                   </span>
