@@ -160,6 +160,26 @@ export default function MainTempTest() {
     allPage: number;
   } | null>();
 
+  const detailTemp: Record<string, Record<string, string>> = {
+    ironError: {
+      "010": "sensor2มีปัญหาในการอ่านค่า",
+      "011": "sensor3มีปัญหาในการอ่านค่า",
+      "012": "sensor4มีปัญหาในการอ่านค่า",
+      "013": "sensor5มีปัญหาในการอ่านค่า",
+      "000": "โปรดตรวจเช็คว่าเครื่องเปิดหรือว่าเสียบปลั๊กหรือยัง",
+    },
+    detailFailed: {
+      "888": "ผ่าน",
+      "020": "อุณหภูมิเกินกว่าค่าที่กำหนด",
+      "021": "อุณหภูมิต่ำกว่าค่าที่กำหนด",
+      "030": "เทอโมสตัดตัดก่อนกำหนด",
+      "031": "เทอโมสตัดตัดหลังกำหนด",
+      "040": "กระแสไฟฟ้าเกิน",
+      "666": "กำลังดำเนินการ",
+      "777": "หยุดโดยผู้ใช้งาน",
+    },
+  };
+
   const recordedRef = useRef(false);
   const isSelectedCardRef = useRef(isSelectedCard);
   const qcMainsRef = useRef(qcMains);
@@ -182,6 +202,9 @@ export default function MainTempTest() {
   const handleSerialData = (data: string) => {
     const parts = data.split(",");
     if (parts.length > 10) {
+      const detail = parts[12]?.trim();
+      const status = parts[11].trim();
+
       setTemp1(parseFloat(parts[0]));
       setTemp2(parseFloat(parts[1]));
       setTemp3(parseFloat(parts[2]));
@@ -194,13 +217,12 @@ export default function MainTempTest() {
 
       setTime(parseInt(parts[9]));
       setCurrent(parseFloat(parts[10]));
-      setStatus(parts[11].trim());
-      setDetail(parts[12].trim());
+      setStatus(status);
+      setDetail(detailTemp.detailFailed[detail] || "-");
 
       if (
-        parts[11].trim() === "Passed" ||
-        (parts[11].trim() === "Failed" && parts[12] !== "Please check iron.") ||
-        (parts[11].trim() === "Failed" && parts[12].includes("broken"))
+        status === "Passed" ||
+        (status === "Failed" && !(detail in detailTemp.ironError))
       ) {
         if (!recordedRef.current) {
           recordedRef.current = true;
@@ -233,16 +255,16 @@ export default function MainTempTest() {
     //ถ้ามีการเลือกcard
     if (isCardSelected && currentQcMains && currentQcMains.data.length > 0) {
       dataToProcess = currentQcMains.data;
-    } 
-     //ถ้าไม่มีการเลือกcard
+    }
+    //ถ้าไม่มีการเลือกcard
     else if (projectID && projectID.length > 0 && !isCardSelected) {
       rawData = await window.electronAPI.fetchAPI({
         method: "GET",
         URL: `qc/itemProject/${projectID}`,
       });
-      setQcMains(rawData); 
+      setQcMains(rawData);
       dataToProcess = rawData?.data;
-    } 
+    }
 
     if (dataToProcess) {
       const format_script = (dataToProcess || []).find(
@@ -357,9 +379,12 @@ export default function MainTempTest() {
     // let splitResultArray = splitData[splitData.length - 1]; // ผลลัพธ์: [" 8.4S", " 249", " 500.000000","Passed",""Cus termostate is cut in time.]
     try {
       let record: any;
-      
+
       if (!isSelectedCardRef.current) {
-        console.log("false isSelectedCardRef.current status :", isSelectedCardRef.current);
+        console.log(
+          "false isSelectedCardRef.current status :",
+          isSelectedCardRef.current
+        );
         record = await window.electronAPI.fetchAPI({
           method: "POST",
           URL: "qc/record",
@@ -377,7 +402,7 @@ export default function MainTempTest() {
       } else {
         record = qcMainsRef.current;
       }
-      
+
       const qcMainTemp = qcMainsRef.current?.data.find(
         (d: any) => d?.qcMain?.qcType?.name === "thermostat"
       )?.qcMain?.ID;
@@ -403,10 +428,9 @@ export default function MainTempTest() {
     setQcProjectList(data);
   };
 
-
   useEffect(() => {
-    isSelectedCardRef.current = isSelectedCard;
-  }, [isSelectedCard]);
+    isSelectedCardRef.current = isSelectedCard;
+  }, [isSelectedCard]);
   useEffect(() => {
     qcProjectRef.current = qcProject;
   }, [qcProject]);
@@ -444,7 +468,7 @@ export default function MainTempTest() {
     console.log("qcProject isSelectedCard changed :", qcProject);
     console.log("qcMain isSelectedCard changed :", qcMains);
 
-    if(isSelectedCard) return 
+    if (isSelectedCard) return;
     setQcProject(null);
   }, [isSelectedCard]);
 
@@ -489,10 +513,10 @@ export default function MainTempTest() {
               <li className="w-full text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:basis-60">
                 <div className="flex flex-col">
                   <div className="flex pb-3">
-                  <p className="">โปรเจกต์การทดสอบ</p>
-                  <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                    &nbsp;*
-                  </span>
+                    <p className="">โปรเจกต์การทดสอบ</p>
+                    <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                      &nbsp;*
+                    </span>
                   </div>
                   {!isSelectedCard ? (
                     <Select
