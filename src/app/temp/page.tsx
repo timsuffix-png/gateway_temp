@@ -97,38 +97,38 @@ export default function MainTempTest() {
       {
         ID: string;
         qcMain:
-          | {
-              qcType: {
-                ID: string;
-                name: string;
-              };
-              ID: string;
-              testName: string;
-              detail: string;
-              qcScript: {
-                ID: string;
-                script: {
-                  TemperatureMin: number;
-                  TemperatureMax: number;
-                  CurrentMax: number;
-                  StartMoment: number;
-                  EndMoment: number;
-                  emissivity: number;
-                  m1: number;
-                  c1: number;
-                  m2: number;
-                  c2: number;
-                  m3: number;
-                  c3: number;
-                  m4: number;
-                  c4: number;
-                };
-              };
-              status: string | null; //ค่าสถานะ
-              result: string | null; //ผลลัพธ์ล่าสุด
-              allResult: string[] | null; //ข้อมูลทั้งหมด
-            }
-          | undefined;
+        | {
+          qcType: {
+            ID: string;
+            name: string;
+          };
+          ID: string;
+          testName: string;
+          detail: string;
+          qcScript: {
+            ID: string;
+            script: {
+              TemperatureMin: number;
+              TemperatureMax: number;
+              CurrentMax: number;
+              StartMoment: number;
+              EndMoment: number;
+              emissivity: number;
+              m1: number;
+              c1: number;
+              m2: number;
+              c2: number;
+              m3: number;
+              c3: number;
+              m4: number;
+              c4: number;
+            };
+          };
+          status: string | null; //ค่าสถานะ
+          result: string | null; //ผลลัพธ์ล่าสุด
+          allResult: string[] | null; //ข้อมูลทั้งหมด
+        }
+        | undefined;
         qcProject: {
           ID: string;
           projectName: string;
@@ -160,6 +160,26 @@ export default function MainTempTest() {
     allPage: number;
   } | null>();
 
+  const detailTemp: Record<string, Record<string, string>> = {
+    ironError: {
+      "010": "sensor2มีปัญหาในการอ่านค่า",
+      "011": "sensor3มีปัญหาในการอ่านค่า",
+      "012": "sensor4มีปัญหาในการอ่านค่า",
+      "013": "sensor5มีปัญหาในการอ่านค่า",
+      "000": "โปรดตรวจเช็คว่าเครื่องเปิดหรือว่าเสียบปลั๊กหรือยัง",
+    },
+    detailFailed: {
+      "888": "ผ่าน",
+      "020": "อุณหภูมิเกินกว่าค่าที่กำหนด",
+      "021": "อุณหภูมิต่ำกว่าค่าที่กำหนด",
+      "030": "เทอโมสตัดตัดก่อนกำหนด",
+      "031": "เทอโมสตัดตัดหลังกำหนด",
+      "040": "กระแสไฟฟ้าเกิน",
+      "666": "กำลังดำเนินการ",
+      "777": "หยุดโดยผู้ใช้งาน",
+    },
+  };
+
   const recordedRef = useRef(false);
   const isSelectedCardRef = useRef(isSelectedCard);
   const qcMainsRef = useRef(qcMains);
@@ -180,8 +200,12 @@ export default function MainTempTest() {
 
   //ฟังชั่นรับserial Data
   const handleSerialData = (data: string) => {
+    //0ขวา, 1กลาง, 2ซ้าย , 3บน
     const parts = data.split(",");
     if (parts.length > 10) {
+      const detail = parts[12]?.trim();
+      const status = parts[11].trim();
+
       setTemp1(parseFloat(parts[0]));
       setTemp2(parseFloat(parts[1]));
       setTemp3(parseFloat(parts[2]));
@@ -194,13 +218,12 @@ export default function MainTempTest() {
 
       setTime(parseInt(parts[9]));
       setCurrent(parseFloat(parts[10]));
-      setStatus(parts[11].trim());
-      setDetail(parts[12].trim());
+      setStatus(status);
+      setDetail(detailTemp.detailFailed[detail] || "-");
 
       if (
-        parts[11].trim() === "Passed" ||
-        (parts[11].trim() === "Failed" && parts[12] !== "Please check iron.") ||
-        (parts[11].trim() === "Failed" && parts[12].includes("broken"))
+        status === "Passed" ||
+        (status === "Failed" && !(detail in detailTemp.ironError))
       ) {
         if (!recordedRef.current) {
           recordedRef.current = true;
@@ -233,22 +256,22 @@ export default function MainTempTest() {
     //ถ้ามีการเลือกcard
     if (isCardSelected && currentQcMains && currentQcMains.data.length > 0) {
       dataToProcess = currentQcMains.data;
-    } 
-     //ถ้าไม่มีการเลือกcard
+    }
+    //ถ้าไม่มีการเลือกcard
     else if (projectID && projectID.length > 0 && !isCardSelected) {
       rawData = await window.electronAPI.fetchAPI({
         method: "GET",
         URL: `qc/itemProject/${projectID}`,
       });
-      setQcMains(rawData); 
+      setQcMains(rawData);
       dataToProcess = rawData?.data;
-    } 
+    }
 
     if (dataToProcess) {
       const format_script = (dataToProcess || []).find(
         (data: any) =>
           String(data?.qcMain?.qcType?.name || "").toLowerCase() ===
-          "temperature"
+          "thermostat"
       );
 
       setSendData((prev) => ({
@@ -309,11 +332,11 @@ export default function MainTempTest() {
           ...item,
           qcMain: item.qcMain
             ? {
-                ...item.qcMain,
-                status: null,
-                result: null,
-                allResult: null,
-              }
+              ...item.qcMain,
+              status: null,
+              result: null,
+              allResult: null,
+            }
             : undefined,
         })),
       };
@@ -357,9 +380,12 @@ export default function MainTempTest() {
     // let splitResultArray = splitData[splitData.length - 1]; // ผลลัพธ์: [" 8.4S", " 249", " 500.000000","Passed",""Cus termostate is cut in time.]
     try {
       let record: any;
-      
+
       if (!isSelectedCardRef.current) {
-        console.log("false isSelectedCardRef.current status :", isSelectedCardRef.current);
+        console.log(
+          "false isSelectedCardRef.current status :",
+          isSelectedCardRef.current
+        );
         record = await window.electronAPI.fetchAPI({
           method: "POST",
           URL: "qc/record",
@@ -377,9 +403,9 @@ export default function MainTempTest() {
       } else {
         record = qcMainsRef.current;
       }
-      
+
       const qcMainTemp = qcMainsRef.current?.data.find(
-        (d: any) => d?.qcMain?.qcType?.name === "temperature"
+        (d: any) => d?.qcMain?.qcType?.name === "thermostat"
       )?.qcMain?.ID;
 
       const res = await window.electronAPI.fetchAPI({
@@ -403,10 +429,9 @@ export default function MainTempTest() {
     setQcProjectList(data);
   };
 
-
   useEffect(() => {
-    isSelectedCardRef.current = isSelectedCard;
-  }, [isSelectedCard]);
+    isSelectedCardRef.current = isSelectedCard;
+  }, [isSelectedCard]);
   useEffect(() => {
     qcProjectRef.current = qcProject;
   }, [qcProject]);
@@ -444,7 +469,7 @@ export default function MainTempTest() {
     console.log("qcProject isSelectedCard changed :", qcProject);
     console.log("qcMain isSelectedCard changed :", qcMains);
 
-    if(isSelectedCard) return 
+    if (isSelectedCard) return;
     setQcProject(null);
   }, [isSelectedCard]);
 
@@ -469,7 +494,7 @@ export default function MainTempTest() {
              md:basis-40"
               >
                 <h4 className="flex-nowrap pb-3 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
-                  Temperature port
+                  Thermostat port
                   <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                     &nbsp;*
                   </span>
@@ -487,12 +512,12 @@ export default function MainTempTest() {
                 )}
               </li>
               <li className="w-full text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:basis-60">
-                <div className="flex flex-col pb-3">
-                  <div className="flex">
-                  <p className="">โปรเจกต์การทดสอบ</p>
-                  <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                    &nbsp;*
-                  </span>
+                <div className="flex flex-col">
+                  <div className="flex pb-3">
+                    <p className="">โปรเจกต์การทดสอบ</p>
+                    <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                      &nbsp;*
+                    </span>
                   </div>
                   {!isSelectedCard ? (
                     <Select
@@ -566,10 +591,10 @@ export default function MainTempTest() {
                 <div>
                   {/* บน */}
                   <div className="absolute left-1/2 -translate-x-1/2 -top-7 text-[#d6bb0fff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
-                    {temp3} °C
+                    {temp4} °C
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 top-3 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
-                    อุณหภูมิรอบข้าง : {ambient3} °C
+                    อุณหภูมิรอบข้าง : {temp4} °C
                   </div>
                   <div className="flex flex-col absolute left-25 top-20 items-center">
                     <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#fbff00ff]">
@@ -599,12 +624,12 @@ export default function MainTempTest() {
                 <div>
                   {/* กลาง */}
                   <div className="absolute absolute left-1/2 -translate-x-1/2 bottom-1 text-[#1496ecff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
-                    {temp4} °C
+                    {temp2} °C
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
-                    อุณหภูมิรอบข้าง : {ambient4} °C
+                    อุณหภูมิรอบข้าง : {temp2} °C
                   </div>
-                  <div className="flex flex-col absolute left-23 top-40 items-center">
+                  <div className="flex flex-col absolute left-23 top-45 items-center">
                     <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#66f0ffff]">
                       กลาง
                     </label>
@@ -630,13 +655,13 @@ export default function MainTempTest() {
                 </div>
 
                 {/* ซ้าย */}
-                <div className="absolute right-58 top-50 text-[#0fb500ff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
-                  {temp2} °C
+                <div className="absolute right-58 bottom-36 text-[#0fb500ff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                  {temp3} °C
                 </div>
-                <div className="absolute right-58 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
-                  อุณหภูมิรอบข้าง : {ambient2} °C
+                <div className="absolute right-58 bottom-28 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
+                  อุณหภูมิรอบข้าง : {temp3} °C
                 </div>
-                <div className="flex flex-col absolute left-6 top-55 items-center">
+                <div className="flex flex-col absolute left-6 bottom-30 items-center">
                   <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#61ff53ff]">
                     ซ้าย
                   </label>
@@ -662,13 +687,13 @@ export default function MainTempTest() {
 
               {/* ขวา */}
               <div>
-                <div className="absolute left-58 top-50 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
+                <div className="absolute left-58 bottom-36 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
                   {temp1} °C
                 </div>
-                <div className="absolute  left-58 top-58 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
+                <div className="absolute  left-58 bottom-28 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
                   อุณหภูมิรอบข้าง : {ambient1} °C
                 </div>
-                <div className="flex flex-col absolute right-5 top-55 items-center">
+                <div className="flex flex-col absolute right-5 bottom-30 items-center">
                   <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#FFB8DF]">
                     ขวา
                   </label>
@@ -744,11 +769,10 @@ export default function MainTempTest() {
                   id="test"
                   className={`w-full sm:w-[70%] lg:w-[70%] xl:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl 
                   rounded-lg font-semibold text-white transition duration-200
-                  ${
-                    disAbleClick
+                  ${disAbleClick
                       ? "bg-[#001F3F]/60 cursor-not-allowed"
                       : "bg-[#003366] hover:bg-[#001F3F] hover:cursor-pointer"
-                  }`}
+                    }`}
                   onClick={() => clickTest("on")}
                 >
                   ทดสอบ

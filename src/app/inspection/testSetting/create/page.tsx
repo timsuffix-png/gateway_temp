@@ -154,7 +154,7 @@ export default function CreateTestSetting() {
       const checkSettingSensor = await settingSensor();
 
       const script =
-        qcType.name === "temperature"
+        qcType.name === "thermostat"
           ? { ...(qcScript as QcScriptTemperature), ...(checkSettingSensor || {}) }
           : (qcScript as QcScriptSeaward);
       if (!name || !qcType.value) {
@@ -226,7 +226,7 @@ export default function CreateTestSetting() {
       ? (qcScript as QcScriptSeaward)
       : null;
   const TemperatureScript =
-    qcType?.name === "temperature" && qcScript
+    qcType?.name === "thermostat" && qcScript
       ? (qcScript as QcScriptTemperature)
       : null;
 

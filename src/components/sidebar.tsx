@@ -19,7 +19,6 @@ export default function SideBar() {
       : []; // ค่าเริ่มต้นเป็น array ว่าง
 
   useEffect(() => {
-    console.log("Temp : " + Translator.temperature);
     const handleResize = () => {
       setCurrentWidth(window.innerWidth);
     };
@@ -46,7 +45,7 @@ export default function SideBar() {
 
   var menus: any = {
     qc: Translator.qc,
-    temperature: Translator.temperature,
+    thermostat: Translator.thermostat,
   };
 
   if (!auth.user) return <Index />;

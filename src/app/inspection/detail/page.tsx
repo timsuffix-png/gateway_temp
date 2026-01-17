@@ -29,47 +29,66 @@ export default function QcDetail() {
     return data;
   };
 
-const fetchFailedReason = async (qcRecordId: string) => {
-  const res = await window.electronAPI.fetchAPI({
-    method: "GET",
-    URL: `qc/status/type/${qcRecordId}?limit=99999&page=1&type=both`,
-  });
+  const fetchFailedReason = async (qcRecordId: string) => {
+    const res = await window.electronAPI.fetchAPI({
+      method: "GET",
+      URL: `qc/status/type/${qcRecordId}?limit=99999&page=1&type=both`,
+    });
 
     if (!res) throw new Error("Failed to fetchFailedReason data.");
 
-  const has_seaward_data = res.data?.some(
-    (item: any) => item.qcMain?.qcType?.name === "seaward"
-  );
-  const has_temp_data = res.data?.some(
-    (item: any) => item.qcMain?.qcType?.name === "temperature"
-  );
+    const has_seaward_data = res.data?.some(
+      (item: any) =>
+        item.qcMain?.qcType?.name === "seaward" &&
+        ["Passed", "Failed", "In progress"].includes(item.status)
+    );
+    const has_temp_data = res.data?.some(
+      (item: any) =>
+        item.qcMain?.qcType?.name === "thermostat" &&
+        ["Passed", "Failed", "In progress"].includes(item.status)
+    );
 
-  const failed_seaward_item = res.data?.filter(
-    (item: any) =>
-      item.qcMain?.qcType?.name === "seaward" && item.status === "Failed"
-  );
+    const failed_seaward_item = res.data?.filter(
+      (item: any) =>
+        item.qcMain?.qcType?.name === "seaward" && item.status === "Failed"
+    );
 
-  const failed_temperature_item = res.data?.find(
-    (item: any) =>
-      item.qcMain?.qcType?.name === "temperature" && item.status === "Failed"
-  );
+    const failed_thermostat_item = res.data?.find(
+      (item: any) =>
+        item.qcMain?.qcType?.name === "thermostat" && item.status === "Failed"
+    );
 
-  const seaward_details =
-    failed_seaward_item?.map((item: any) => item.qcMain?.testName?.trim()) ?? [];
+    const seaward_details =
+      failed_seaward_item?.map((item: any) => item.qcMain?.testName?.trim()) ??
+      [];
 
-  const temperature_details =
-    failed_temperature_item?.detail?.split(",") ?? [];
+    const thermostat_details = failed_thermostat_item?.detail?.split(",") ?? [];
+    const script_temp = failed_thermostat_item?.qcMain?.qcScript?.script;
 
     return {
-      seaward: failed_seaward_item?.length > 0 ? "Failed" : has_seaward_data ? "Passed" : "-",
+      seaward:
+        failed_seaward_item?.length > 0
+          ? "Failed"
+          : has_seaward_data
+            ? "Passed"
+            : "-",
       seaward_failed: seaward_details,
-      temperature: failed_temperature_item
+      thermostat: failed_thermostat_item
         ? "Failed"
         : has_temp_data
           ? "Passed"
           : "-",
 
-      temperature_failed: temperature_details[temperature_details.length - 1]?.trim(),
+      thermostat_failed:
+        thermostat_details[thermostat_details.length - 1]?.trim(),
+      result: {
+        time: thermostat_details[9]?.trim(),
+        temp0: thermostat_details[0]?.trim(),
+        temp1: thermostat_details[1]?.trim(),
+        temp2: thermostat_details[2]?.trim(),
+        temp3: thermostat_details[3]?.trim(),
+      },
+      script_temp: script_temp ?? "-",
     };
   };
 
@@ -85,8 +104,10 @@ const fetchFailedReason = async (qcRecordId: string) => {
             status: {
               seaward: failedReasonText.seaward,
               seaward_failed: failedReasonText.seaward_failed,
-              temperature: failedReasonText.temperature,
-              temperature_failed: failedReasonText.temperature_failed,
+              thermostat: failedReasonText.thermostat,
+              thermostat_failed: failedReasonText.thermostat_failed,
+              result: failedReasonText.result,
+              script_temp: failedReasonText.script_temp,
             },
           };
         } catch (error) {
@@ -168,7 +189,7 @@ const fetchFailedReason = async (qcRecordId: string) => {
                           </div>
                         </div>
                         <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
-                          Seaward : {data?.status?.seaward}
+                          ซีเวิร์ด : {data?.status?.seaward}
                           {data?.status?.seaward === "Failed" && (
                             <label className="whitespace-normal text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5 ">
                               {" "}
@@ -181,20 +202,67 @@ const fetchFailedReason = async (qcRecordId: string) => {
                           )}
                         </h1>
 
-                        <h1 className="text-start pl-[15%] text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
-                          Temperature : {data?.status?.temperature}
-                          {data?.status?.temperature === "Failed" && (
-                            <span className="text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
-                              {" "}
-                              {"("} {data.status.temperature_failed} {" )"}
-                            </span>
-                          )}
-                        </h1>
+                        <div className="mt-5 w-full text-center">
+                          <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
+                            เทอร์โมสตัท : {data?.status?.thermostat}
+                            {data?.status?.thermostat === "Failed" && (
+                              <span className="whitespace-normal text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
+                                {" ( "}
+                                {data.status.thermostat_failed}
+                                {" )"}
+                              </span>
+                            )}
+                          </h1>
 
-                        <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
+                          {/* Test Time Details */}
+                          <div className=" pl-[17%] flex gap-[10%] items-start">
+                            <div className=" text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
+                              <h1 className="mb-2 underline">ค่าที่กำหนด</h1>
+                              <h1>
+                                เวลาเริ่มต้น : {data.status?.script_temp?.StartMoment ?? "-"}
+                              </h1>
+                              <h1>
+                                เวลาสิ้นสุด : {data.status?.script_temp?.EndMoment ?? "-"}
+                              </h1>
+                              <h1>
+                                อุณหภูมิต่ำสุด :{" "}
+                                {data.status?.script_temp?.TemperatureMin ?? "-"}
+                              </h1>
+                              <h1>
+                                อุณหภูมิสูงสุด :{" "}
+                                {data.status?.script_temp?.TemperatureMax ?? "-"}
+                              </h1>
+                            </div>
+                            <div className=" text-start  whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
+                              <h1 className="mb-2 underline">ผลลัพธ์</h1>
+                              <h1>
+                                เวลา : {data?.status?.result?.time ?? "-"}{" "}
+                                วินาที
+                              </h1>
+                              <h1>
+                                อุณหภูมิขวา :{" "}
+                                {data?.status?.result?.temp0 ?? "-"} องศา
+                              </h1>
+                              <h1>
+                                อุณหภูมิซ้าย :{" "}
+                                {data?.status?.result?.temp1 ?? "-"} องศา
+                              </h1>
+                              <h1>
+                                อุณหภูมิบน :{" "}
+                                {data?.status?.result?.temp2 ?? "-"} องศา
+                              </h1>
+                              <h1>
+                                อุณหภูมิกลาง :{" "}
+                                {data?.status?.result?.temp3 ?? "-"} องศา
+                              </h1>
+                            </div>
+                          </div>
+                        </div>
+
+                        <h1 className="text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
                           ทดสอบโดย
                         </h1>
-                        <h1 className="text-black font-normal  text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl w-full text-center mt-5">
+                        <h1 className="text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
                           ผู้ใช้: {data.testBy.name + " " + data.testBy.surname}
                         </h1>
                       </div>
