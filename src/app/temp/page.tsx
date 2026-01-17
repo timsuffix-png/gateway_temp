@@ -97,38 +97,38 @@ export default function MainTempTest() {
       {
         ID: string;
         qcMain:
-          | {
-              qcType: {
-                ID: string;
-                name: string;
-              };
-              ID: string;
-              testName: string;
-              detail: string;
-              qcScript: {
-                ID: string;
-                script: {
-                  TemperatureMin: number;
-                  TemperatureMax: number;
-                  CurrentMax: number;
-                  StartMoment: number;
-                  EndMoment: number;
-                  emissivity: number;
-                  m1: number;
-                  c1: number;
-                  m2: number;
-                  c2: number;
-                  m3: number;
-                  c3: number;
-                  m4: number;
-                  c4: number;
-                };
-              };
-              status: string | null; //ค่าสถานะ
-              result: string | null; //ผลลัพธ์ล่าสุด
-              allResult: string[] | null; //ข้อมูลทั้งหมด
-            }
-          | undefined;
+        | {
+          qcType: {
+            ID: string;
+            name: string;
+          };
+          ID: string;
+          testName: string;
+          detail: string;
+          qcScript: {
+            ID: string;
+            script: {
+              TemperatureMin: number;
+              TemperatureMax: number;
+              CurrentMax: number;
+              StartMoment: number;
+              EndMoment: number;
+              emissivity: number;
+              m1: number;
+              c1: number;
+              m2: number;
+              c2: number;
+              m3: number;
+              c3: number;
+              m4: number;
+              c4: number;
+            };
+          };
+          status: string | null; //ค่าสถานะ
+          result: string | null; //ผลลัพธ์ล่าสุด
+          allResult: string[] | null; //ข้อมูลทั้งหมด
+        }
+        | undefined;
         qcProject: {
           ID: string;
           projectName: string;
@@ -200,6 +200,7 @@ export default function MainTempTest() {
 
   //ฟังชั่นรับserial Data
   const handleSerialData = (data: string) => {
+    //0ขวา, 1กลาง, 2ซ้าย , 3บน
     const parts = data.split(",");
     if (parts.length > 10) {
       const detail = parts[12]?.trim();
@@ -331,11 +332,11 @@ export default function MainTempTest() {
           ...item,
           qcMain: item.qcMain
             ? {
-                ...item.qcMain,
-                status: null,
-                result: null,
-                allResult: null,
-              }
+              ...item.qcMain,
+              status: null,
+              result: null,
+              allResult: null,
+            }
             : undefined,
         })),
       };
@@ -590,10 +591,10 @@ export default function MainTempTest() {
                 <div>
                   {/* บน */}
                   <div className="absolute left-1/2 -translate-x-1/2 -top-7 text-[#d6bb0fff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
-                    {temp3} °C
+                    {temp4} °C
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 top-3 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
-                    อุณหภูมิรอบข้าง : {ambient3} °C
+                    อุณหภูมิรอบข้าง : {temp4} °C
                   </div>
                   <div className="flex flex-col absolute left-25 top-20 items-center">
                     <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#fbff00ff]">
@@ -623,10 +624,10 @@ export default function MainTempTest() {
                 <div>
                   {/* กลาง */}
                   <div className="absolute absolute left-1/2 -translate-x-1/2 bottom-1 text-[#1496ecff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
-                    {temp4} °C
+                    {temp2} °C
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
-                    อุณหภูมิรอบข้าง : {ambient4} °C
+                    อุณหภูมิรอบข้าง : {temp2} °C
                   </div>
                   <div className="flex flex-col absolute left-23 top-45 items-center">
                     <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#66f0ffff]">
@@ -655,10 +656,10 @@ export default function MainTempTest() {
 
                 {/* ซ้าย */}
                 <div className="absolute right-58 bottom-36 text-[#0fb500ff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  font-bold">
-                  {temp2} °C
+                  {temp3} °C
                 </div>
                 <div className="absolute right-58 bottom-28 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
-                  อุณหภูมิรอบข้าง : {ambient2} °C
+                  อุณหภูมิรอบข้าง : {temp3} °C
                 </div>
                 <div className="flex flex-col absolute left-6 bottom-30 items-center">
                   <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#61ff53ff]">
@@ -768,11 +769,10 @@ export default function MainTempTest() {
                   id="test"
                   className={`w-full sm:w-[70%] lg:w-[70%] xl:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl 
                   rounded-lg font-semibold text-white transition duration-200
-                  ${
-                    disAbleClick
+                  ${disAbleClick
                       ? "bg-[#001F3F]/60 cursor-not-allowed"
                       : "bg-[#003366] hover:bg-[#001F3F] hover:cursor-pointer"
-                  }`}
+                    }`}
                   onClick={() => clickTest("on")}
                 >
                   ทดสอบ
