@@ -594,7 +594,7 @@ export default function MainTempTest() {
                     {temp4} °C
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 top-3 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
-                    อุณหภูมิรอบข้าง : {temp4} °C
+                    อุณหภูมิรอบข้าง : {ambient4} °C
                   </div>
                   <div className="flex flex-col absolute left-25 top-20 items-center">
                     <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#fbff00ff]">
@@ -627,7 +627,7 @@ export default function MainTempTest() {
                     {temp2} °C
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold">
-                    อุณหภูมิรอบข้าง : {temp2} °C
+                    อุณหภูมิรอบข้าง : {ambient2} °C
                   </div>
                   <div className="flex flex-col absolute left-23 top-45 items-center">
                     <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#66f0ffff]">
@@ -659,7 +659,7 @@ export default function MainTempTest() {
                   {temp3} °C
                 </div>
                 <div className="absolute right-58 bottom-28 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl  font-semibold">
-                  อุณหภูมิรอบข้าง : {temp3} °C
+                  อุณหภูมิรอบข้าง : {ambient3} °C
                 </div>
                 <div className="flex flex-col absolute left-6 bottom-30 items-center">
                   <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#61ff53ff]">
