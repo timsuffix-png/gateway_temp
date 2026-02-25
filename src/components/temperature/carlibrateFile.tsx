@@ -7,7 +7,17 @@ import SubmitButton from "../submitButton";
 import Swal from "sweetalert2";
 import ButtonBlue from "../buttonBlue";
 
-export default function CalibrateFile() {
+type CalibrationData = {
+  emissivity?: number;
+  m1?: number;
+  c1?: number;
+  m2?: number;
+  c2?: number;
+  k?: number;
+  x0?: number;
+};
+
+export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationData) => void }) {
   const [currentWidth, setCurrentWidth] = useState(0); //ขนาดความกว้างของหน้าจอ
   const [existingFileName, setExistingFileName] = useState<string | null>(null);
   const [mode, setMode] = useState<"emissivity" | "file">("emissivity");
@@ -38,7 +48,7 @@ export default function CalibrateFile() {
     loadExisting();
   }, []);
 
-  
+
 
 
   useEffect(() => {
@@ -72,6 +82,21 @@ export default function CalibrateFile() {
     if (res?.status) {
       localStorageWeb.setItem("fileCalibrate", selectedFile);
       setExistingFileName(selectedFile);
+
+      // อ่านค่าจากไฟล์และส่งกลับผ่าน onSave
+      const emissivityVal = Number(localStorageWeb.getItem("emissivity") ?? 0);
+      const pairs: Array<{ x: number; y: number }> = Array.isArray(res.text) ? res.text : [];
+      if (onSave) {
+        onSave({
+          emissivity: emissivityVal,
+          m1: pairs[0]?.x ?? 0,
+          c1: pairs[0]?.y ?? 0,
+          m2: pairs[1]?.x ?? 0,
+          c2: pairs[1]?.y ?? 0,
+          k: pairs[2]?.x ?? 0,
+          x0: pairs[2]?.y ?? 0,
+        });
+      }
       Swal.fire({ icon: "success", title: "เลือกไฟล์สำเร็จ" });
     } else {
       Swal.fire({ icon: "error", title: res?.error || "ไม่สามารถอ่านไฟล์ได้" });
@@ -124,6 +149,9 @@ export default function CalibrateFile() {
       return;
     }
     localStorageWeb.setItem("emissivity", String(val));
+    if (onSave) {
+      onSave({ emissivity: val });
+    }
     Swal.fire({ icon: "success", title: "บันทึกค่า Emissivity สำเร็จ" });
   };
 
@@ -138,7 +166,7 @@ export default function CalibrateFile() {
             className={`px-4 py-2 rounded-md border text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ${mode === "emissivity" ? "bg-gray-200" : "bg-white"}`}
             onClick={() => setMode("emissivity")}
           >
-          ใช้ค่า Emissivity
+            ใช้ค่า Emissivity
           </button>
           <button
             className={`px-4 py-2 rounded-md border text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ${mode === "file" ? "bg-gray-200" : "bg-white"}`}

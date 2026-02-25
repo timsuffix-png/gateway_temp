@@ -188,9 +188,8 @@ app.on("ready", () => {
     formData.append(
       "file",
       new Blob([file], {
-        type: `image/${
-          path.extname(filePath[filePath.length - 1]).split(".")[1]
-        }`,
+        type: `image/${path.extname(filePath[filePath.length - 1]).split(".")[1]
+          }`,
       }),
       filePath[filePath.length - 1]
     );
