@@ -49,10 +49,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
       c1: number;
       m2: number;
       c2: number;
-      m3: number;
-      c3: number;
-      m4: number;
-      c4: number;
+      k: number;   // เพิ่มค่า k สำหรับความสมูทของกราฟ
+      x0: number;  // เพิ่มค่า x0 สำหรับจุดตัดสมการ
     };
   }) => ipcRenderer.invoke("writeData", args),
 });
