@@ -1,12 +1,26 @@
 export const localStorageWeb = {
-  getItem: (key: string) =>
-    typeof window !== "undefined" ? localStorage.getItem(key) : null,
+  getItem: (key: string) => {
+    try {
+      if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {}
+    return null;
+  },
 
   setItem: (key: string, value: string) => {
-    if (typeof window !== "undefined") localStorage.setItem(key, value);
+    try {
+      if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
+        window.localStorage.setItem(key, value);
+      }
+    } catch (e) {}
   },
 
   removeItem: (key: string) => {
-    if (typeof window !== "undefined") localStorage.removeItem(key);
+    try {
+      if (typeof window !== "undefined" && typeof window.localStorage !== "undefined") {
+        window.localStorage.removeItem(key);
+      }
+    } catch (e) {}
   },
 };

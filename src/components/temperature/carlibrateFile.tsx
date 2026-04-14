@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { useEffect, useState } from "react";
 import Select from "react-select";
@@ -38,7 +40,7 @@ export default function CalibrateFile() {
     loadExisting();
   }, []);
 
-  
+
 
 
   useEffect(() => {
@@ -138,7 +140,7 @@ export default function CalibrateFile() {
             className={`px-4 py-2 rounded-md border text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ${mode === "emissivity" ? "bg-gray-200" : "bg-white"}`}
             onClick={() => setMode("emissivity")}
           >
-          ใช้ค่า Emissivity
+            ใช้ค่า Emissivity
           </button>
           <button
             className={`px-4 py-2 rounded-md border text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ${mode === "file" ? "bg-gray-200" : "bg-white"}`}
