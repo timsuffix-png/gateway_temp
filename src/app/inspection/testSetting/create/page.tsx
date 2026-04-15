@@ -83,7 +83,7 @@ export default function CreateTestSetting() {
       script_15: 0,
       script_16: 0,
     },
-    temperature: {
+    thermostat: {
       TemperatureMin: 0,
       TemperatureMax: 0,
       CurrentMax: 0,
@@ -298,7 +298,7 @@ export default function CreateTestSetting() {
                       });
                       setQcScript(
                         defaultScripts[
-                          e.target.options[e.target.selectedIndex].text
+                        e.target.options[e.target.selectedIndex].text
                         ] || null
                       );
                     }}
@@ -550,89 +550,89 @@ export default function CreateTestSetting() {
                   </label>
                   {(qcScript as QcScriptSeaward).script_1?.indexOf("PWRLK") !==
                     -1 && (
-                    <>
-                      <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                          LeakageLowLimit
-                          <span className="text-red-600">&nbsp;*</span>
-                        </h4>
-                        <input
-                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
-                          type="number"
-                          maxLength={50}
-                          placeholder="LeakageLowLimit"
-                          value={(qcScript as QcScriptSeaward).script_13}
-                          onChange={(e) =>
-                            setQcScript({
-                              ...(qcScript as QcScriptSeaward),
-                              script_13: Number(e.target.value),
-                            })
-                          }
-                          required
-                        />
-                      </label>
-                      <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                          PowerHighLimit
-                          <span className="text-red-600">&nbsp;*</span>
-                        </h4>
-                        <input
-                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
-                          type="number"
-                          maxLength={50}
-                          placeholder="PowerHighLimit"
-                          value={(qcScript as QcScriptSeaward).script_14}
-                          onChange={(e) =>
-                            setQcScript({
-                              ...(qcScript as QcScriptSeaward),
-                              script_14: Number(e.target.value),
-                            })
-                          }
-                          required
-                        />
-                      </label>
-                      <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                          PowerLowLimit
-                          <span className="text-red-600">&nbsp;*</span>
-                        </h4>
-                        <input
-                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
-                          type="number"
-                          maxLength={50}
-                          placeholder="PowerLowLimit"
-                          value={(qcScript as QcScriptSeaward).script_15}
-                          onChange={(e) =>
-                            setQcScript({
-                              ...(qcScript as QcScriptSeaward),
-                              script_15: Number(e.target.value),
-                            })
-                          }
-                          required
-                        />
-                      </label>
-                      <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
-                        <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                          LeakageHighLimit
-                          <span className="text-red-600">&nbsp;*</span>
-                        </h4>
-                        <input
-                          className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
-                          type="number"
-                          maxLength={50}
-                          placeholder="LeakageHighLimit"
-                          value={(qcScript as QcScriptSeaward).script_16}
-                          onChange={(e) =>
-                            setQcScript({
-                              ...(qcScript as QcScriptSeaward),
-                              script_16: Number(e.target.value),
-                            })
-                          }
-                          required
-                        />
-                      </label>
-                    </>
-                  )}
+                      <>
+                        <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
+                          <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
+                            LeakageLowLimit
+                            <span className="text-red-600">&nbsp;*</span>
+                          </h4>
+                          <input
+                            className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
+                            type="number"
+                            maxLength={50}
+                            placeholder="LeakageLowLimit"
+                            value={(qcScript as QcScriptSeaward).script_13}
+                            onChange={(e) =>
+                              setQcScript({
+                                ...(qcScript as QcScriptSeaward),
+                                script_13: Number(e.target.value),
+                              })
+                            }
+                            required
+                          />
+                        </label>
+                        <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
+                          <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
+                            PowerHighLimit
+                            <span className="text-red-600">&nbsp;*</span>
+                          </h4>
+                          <input
+                            className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
+                            type="number"
+                            maxLength={50}
+                            placeholder="PowerHighLimit"
+                            value={(qcScript as QcScriptSeaward).script_14}
+                            onChange={(e) =>
+                              setQcScript({
+                                ...(qcScript as QcScriptSeaward),
+                                script_14: Number(e.target.value),
+                              })
+                            }
+                            required
+                          />
+                        </label>
+                        <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
+                          <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
+                            PowerLowLimit
+                            <span className="text-red-600">&nbsp;*</span>
+                          </h4>
+                          <input
+                            className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
+                            type="number"
+                            maxLength={50}
+                            placeholder="PowerLowLimit"
+                            value={(qcScript as QcScriptSeaward).script_15}
+                            onChange={(e) =>
+                              setQcScript({
+                                ...(qcScript as QcScriptSeaward),
+                                script_15: Number(e.target.value),
+                              })
+                            }
+                            required
+                          />
+                        </label>
+                        <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
+                          <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
+                            LeakageHighLimit
+                            <span className="text-red-600">&nbsp;*</span>
+                          </h4>
+                          <input
+                            className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
+                            type="number"
+                            maxLength={50}
+                            placeholder="LeakageHighLimit"
+                            value={(qcScript as QcScriptSeaward).script_16}
+                            onChange={(e) =>
+                              setQcScript({
+                                ...(qcScript as QcScriptSeaward),
+                                script_16: Number(e.target.value),
+                              })
+                            }
+                            required
+                          />
+                        </label>
+                      </>
+                    )}
                 </div>
               </div>
             )}
@@ -675,7 +675,7 @@ export default function CreateTestSetting() {
                         type="number"
                         value={
                           (qcScript as QcScriptTemperature)[
-                            key as keyof QcScriptTemperature
+                          key as keyof QcScriptTemperature
                           ]
                         }
                         onChange={(e) =>
