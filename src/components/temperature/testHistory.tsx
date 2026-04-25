@@ -11,110 +11,106 @@ export default function TestHistory({
   isChecked: React.Dispatch<React.SetStateAction<boolean>>;
   setData: React.Dispatch<
     React.SetStateAction<{
-    error: boolean;
-    message: string;
-    data: [
-      {
-        ID: string;
-        qcMain:
-          | {
-              qcType: {
-                ID: string;
-                name: string;
-              };
-              ID: string;
-              testName: string;
-              detail: string;
-              qcScript: {
-                ID: string;
-                script: {
-                  TemperatureMin: number;
-                  TemperatureMax: number;
-                  CurrentMax: number;
-                  StartMoment: number;
-                  EndMoment: number;
-                  emissivity: number;
-                  m1: number;
-                  c1: number;
-                  m2: number;
-                  c2: number;
-                  m3: number;
-                  c3: number;
-                  m4: number;
-                  c4: number;
-                };
-              };
-              status: string | null; //ค่าสถานะ
-              result: string | null; //ผลลัพธ์ล่าสุด
-              allResult: string[] | null; //ข้อมูลทั้งหมด
-            }
-          | undefined;
-        qcProject: {
+      error: boolean;
+      message: string;
+      data: [
+        {
           ID: string;
-          projectName: string;
-          detail: string;
-        };
-      },
-    ];
-  }  | null>
-  > ;
+          qcMain:
+          | {
+            qcType: {
+              ID: string;
+              name: string;
+            };
+            ID: string;
+            testName: string;
+            detail: string;
+            qcScript: {
+              ID: string;
+              script: {
+                TemperatureMin: number;
+                TemperatureMax: number;
+                CurrentMax: number;
+                StartMoment: number;
+                EndMoment: number;
+                m1: number;
+                c1: number;
+                m2: number;
+                c2: number;
+                k: number;
+                x0: number;
+                emissivity: number;
+              };
+            };
+            status: string | null; //ค่าสถานะ
+            result: string | null; //ผลลัพธ์ล่าสุด
+            allResult: string[] | null; //ข้อมูลทั้งหมด
+          }
+          | undefined;
+          qcProject: {
+            ID: string;
+            projectName: string;
+            detail: string;
+          };
+        },
+      ];
+    } | null>
+  >;
 }) {
   let elementKey1 = 0;
   let elementKey2 = 0;
   const [testHistory, setTestHistory] = useState<
     | [
-        {
+      {
+        ID: string;
+        createdAt: string;
+        updatedAt: string | null;
+        statusOverView: string | null;
+        qcProject: {
           ID: string;
-          createdAt: string;
-          updatedAt: string | null;
-          statusOverView: string | null;
-          qcProject: {
-            ID: string;
-            projectName: string;
-          };
-          testBy: {
-            ID: string;
-            name: string;
-            surname: string;
-          } | null;
-          repairBy: {
-            ID: string;
-            name: string;
-            surname: string;
-          } | null;
-          tag: string;
-        }
-      ]
+          projectName: string;
+        };
+        testBy: {
+          ID: string;
+          name: string;
+          surname: string;
+        } | null;
+        repairBy: {
+          ID: string;
+          name: string;
+          surname: string;
+        } | null;
+        tag: string;
+      }
+    ]
     | null
   >();
   const [remainingTest, setRemainingTest] = useState<
     | {
+      ID: string;
+      testName: string;
+      qcType: {
         ID: string;
-        testName: string;
-        qcType: {
-          ID: string;
-          name: string;
+        name: string;
+      };
+      qcScript: {
+        ID: string;
+        script: {
+          TemperatureMin: number;
+          TemperatureMax: number;
+          CurrentMax: number;
+          StartMoment: number;
+          EndMoment: number;
+          m1: number;
+          c1: number;
+          m2: number;
+          c2: number;
+          k: number;
+          x0: number;
+          emissivity: number;
         };
-        qcScript: {
-          ID: string;
-          script: {
-              TemperatureMin: number;
-                    TemperatureMax: number;
-                    CurrentMax: number;
-                    StartMoment: number;
-                    EndMoment: number;
-                    emissivity: number;
-                    m1: number;
-                    c1: number;
-                    m2: number;
-                    c2: number;
-                    m3: number;
-                    c3: number;
-                    m4: number;
-                    c4: number;
-          };
-        };
-      }[][]
+      };
+    }[][]
     | null
   >();
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
@@ -161,49 +157,49 @@ export default function TestHistory({
   };
 
   const selectCard = (index: number) => {
-  for (const refIndex of cardRef.current) {
+    for (const refIndex of cardRef.current) {
       if (refIndex) {
         (refIndex.childNodes[2] as HTMLElement).className = (refIndex.childNodes[2] as HTMLElement).className.replaceAll("flex", "hidden");
       }
     }
-     // กำลังเลือก Card อยู่" และผู้ใช้คลิกที่ Card ใบเดิมซ้ำ
+    // กำลังเลือก Card อยู่" และผู้ใช้คลิกที่ Card ใบเดิมซ้ำ
     if (selectedCard === index) {
       isChecked(false);
       setSelectedCard(null);
       if (cardRef.current[index]) {
-          (cardRef.current[index].childNodes[2] as HTMLElement).className = (cardRef.current[
-            index
-          ].childNodes[2] as HTMLElement).className.replaceAll("flex", "hidden");
+        (cardRef.current[index].childNodes[2] as HTMLElement).className = (cardRef.current[
+          index
+        ].childNodes[2] as HTMLElement).className.replaceAll("flex", "hidden");
       }
-      
+
       setData(null);
-    }else {
+    } else {
       isChecked(true);
       setSelectedCard(index);
       if (cardRef.current[index]) {
-            (cardRef.current[index].childNodes[2] as HTMLElement).className = (
-              cardRef.current[index].childNodes[2] as HTMLElement
-            ).className.replaceAll("hidden", "flex");
+        (cardRef.current[index].childNodes[2] as HTMLElement).className = (
+          cardRef.current[index].childNodes[2] as HTMLElement
+        ).className.replaceAll("hidden", "flex");
       }
       let buffer: any = [];
       if (testHistory && remainingTest && remainingTest[index]) {
-      for (let test of remainingTest[index]) {
-        buffer.push({
-          ID: testHistory[index].ID,
-          qcMain: {
-            ID: test.ID,
-            qcType: test.qcType,
-            testName: test.testName,  
-            detail: "",
-            qcScript: test.qcScript,
-            status: null,
-            result: null,
-            allResult: null,
-          },
-          qcProject: testHistory[index].qcProject,
-        });
+        for (let test of remainingTest[index]) {
+          buffer.push({
+            ID: testHistory[index].ID,
+            qcMain: {
+              ID: test.ID,
+              qcType: test.qcType,
+              testName: test.testName,
+              detail: "",
+              qcScript: test.qcScript,
+              status: null,
+              result: null,
+              allResult: null,
+            },
+            qcProject: testHistory[index].qcProject,
+          });
+        }
       }
-    }
       setData(null);
       setData({
         error: false,
@@ -224,7 +220,7 @@ export default function TestHistory({
                 data.tag === "qcRecord" &&
                 remainingTest &&
                 remainingTest[index].filter(
-                  (v) => v.qcType.name.toLowerCase() == "thermostat"
+                  (v) => v.qcType.name.toLowerCase() === "thermostat"
                 ).length > 0
               ) {
                 return (
@@ -242,7 +238,7 @@ export default function TestHistory({
                       <div className="mt-2">
                         {remainingTest &&
                           remainingTest[index].map((test) => {
-                            if (test.qcType.name.toLowerCase() == "thermostat")
+                            if (test.qcType.name.toLowerCase() === "thermostat")
                               return (
                                 <li
                                   key={elementKey2++}
@@ -262,11 +258,11 @@ export default function TestHistory({
                       <h1 className="text-xs">
                         {moment().diff(data.updatedAt, "minutes") < 60
                           ? moment().diff(data.updatedAt, "minutes") +
-                            " นาทีที่แล้ว"
+                          " นาทีที่แล้ว"
                           : moment().diff(data.updatedAt, "hours") < 24
-                          ? moment().diff(data.updatedAt, "hours") +
+                            ? moment().diff(data.updatedAt, "hours") +
                             " ชั่วโมงที่แล้ว"
-                          : moment().diff(data.updatedAt, "days") +
+                            : moment().diff(data.updatedAt, "days") +
                             " วันที่แล้ว"}
                       </h1>
                     </div>

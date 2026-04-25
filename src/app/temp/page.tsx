@@ -68,10 +68,8 @@ export default function MainTempTest() {
     c1: number;
     m2: number;
     c2: number;
-    m3: number;
-    c3: number;
-    m4: number;
-    c4: number;
+    k: number;
+    x0: number;
   }>({
     state: "on",
     tempMin: 0.0,
@@ -84,10 +82,8 @@ export default function MainTempTest() {
     c1: 0.0,
     m2: 0.0,
     c2: 0.0,
-    m3: 0.0,
-    c3: 0.0,
-    m4: 0.0,
-    c4: 0.0,
+    k: 0.0,
+    x0: 0.0,
   });
 
   const [qcMains, setQcMains] = useState<{
@@ -118,10 +114,8 @@ export default function MainTempTest() {
               c1: number;
               m2: number;
               c2: number;
-              m3: number;
-              c3: number;
-              m4: number;
-              c4: number;
+              k: number;
+              x0: number;
             };
           };
           status: string | null; //ค่าสถานะ
@@ -270,8 +264,7 @@ export default function MainTempTest() {
     if (dataToProcess) {
       const format_script = (dataToProcess || []).find(
         (data: any) =>
-          String(data?.qcMain?.qcType?.name || "").toLowerCase() ===
-          "thermostat"
+          String(data?.qcMain?.qcType?.name || "").toLowerCase() === "thermostat"
       );
 
       setSendData((prev) => ({
@@ -282,15 +275,13 @@ export default function MainTempTest() {
         startMoment:
           format_script?.qcMain?.qcScript?.script?.StartMoment ?? 0.0,
         endMoment: format_script?.qcMain?.qcScript?.script?.EndMoment ?? 0.0,
-        emissivity: format_script?.qcMain?.qcScript?.script?.emissivity ?? 0.0,
+        emissivity: format_script?.qcMain?.qcScript?.script?.emissivity ?? 0.1,
         m1: format_script?.qcMain?.qcScript?.script?.m1 ?? 0.0,
         c1: format_script?.qcMain?.qcScript?.script?.c1 ?? 0.0,
         m2: format_script?.qcMain?.qcScript?.script?.m2 ?? 0.0,
         c2: format_script?.qcMain?.qcScript?.script?.c2 ?? 0.0,
-        m3: format_script?.qcMain?.qcScript?.script?.m3 ?? 0.0,
-        c3: format_script?.qcMain?.qcScript?.script?.c3 ?? 0.0,
-        m4: format_script?.qcMain?.qcScript?.script?.m4 ?? 0.0,
-        c4: format_script?.qcMain?.qcScript?.script?.c4 ?? 0.0,
+        k: format_script?.qcMain?.qcScript?.script?.k ?? 0.0,
+        x0: format_script?.qcMain?.qcScript?.script?.x0 ?? 0.0,
       }));
     }
   };
@@ -405,7 +396,7 @@ export default function MainTempTest() {
       }
 
       const qcMainTemp = qcMainsRef.current?.data.find(
-        (d: any) => d?.qcMain?.qcType?.name === "thermostat"
+        (d: any) => String(d?.qcMain?.qcType?.name || "").toLowerCase() === "thermostat"
       )?.qcMain?.ID;
 
       const res = await window.electronAPI.fetchAPI({
@@ -511,7 +502,7 @@ export default function MainTempTest() {
                   </Popup>
                 )}
               </li>
-              <li className="w-full text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:basis-60">
+              <li className="w-fit text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:min-w-[240px]">
                 <div className="flex flex-col">
                   <div className="flex pb-3">
                     <p className="">โปรเจกต์การทดสอบ</p>
@@ -520,17 +511,42 @@ export default function MainTempTest() {
                     </span>
                   </div>
                   {!isSelectedCard ? (
-                    <Select
-                      className="rounded-sm border"
-                      closeMenuOnSelect={true}
-                      options={qcProjectList?.data?.map((data) => ({
-                        value: data.ID,
-                        label: data.projectName,
-                      }))}
-                      onChange={(e) => {
-                        setQcProject(e ? e.value : "");
-                      }}
-                    />
+                    <div className="relative w-fit min-w-[240px] max-w-[600px]">
+                      {/* Hidden spacer to force width based on longest option */}
+                      <div className="invisible h-0 px-10 whitespace-nowrap overflow-hidden pointer-events-none border border-transparent">
+                        {qcProjectList?.data?.reduce((max: string, item: any) =>
+                          ((item.projectName?.length || 0) > max.length ? item.projectName : max), "Select Project..."
+                        )}
+                      </div>
+                      <Select
+                        className="rounded-sm"
+                        styles={{
+                          container: (base) => ({
+                            ...base,
+                            width: "100%",
+                          }),
+                          control: (base) => ({
+                            ...base,
+                            width: "100%",
+                            fontSize: "inherit",
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            width: "max-content",
+                            minWidth: "100%",
+                            maxWidth: "600px",
+                          }),
+                        }}
+                        closeMenuOnSelect={true}
+                        options={qcProjectList?.data?.map((data) => ({
+                          value: data.ID,
+                          label: data.projectName,
+                        }))}
+                        onChange={(e) => {
+                          setQcProject(e ? e.value : "");
+                        }}
+                      />
+                    </div>
                   ) : (
                     <h1 className="text-red-600 text-lg xl:text-xl h-10 flex place-items-end">
                       มีการทดสอบที่ถูกเลือกแล้ว

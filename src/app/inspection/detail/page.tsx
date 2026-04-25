@@ -12,6 +12,34 @@ export default function QcDetail() {
   const param = localStorageWeb.getItem("param");
   const [record, setRecord] = useState([]);
 
+  const detailTemp: Record<string, Record<string, string>> = {
+    ironError: {
+      "010": "sensor2มีปัญหาในการอ่านค่า",
+      "011": "sensor3มีปัญหาในการอ่านค่า",
+      "012": "sensor4มีปัญหาในการอ่านค่า",
+      "013": "sensor5มีปัญหาในการอ่านค่า",
+      "000": "โปรดตรวจเช็คว่าเครื่องเปิดหรือว่าเสียบปลั๊กหรือยัง",
+    },
+    detailFailed: {
+      "888": "ผ่าน",
+      "020": "อุณหภูมิเกินกว่าค่าที่กำหนด",
+      "021": "อุณหภูมิต่ำกว่าค่าที่กำหนด",
+      "030": "เทอโมสตัดตัดก่อนกำหนด",
+      "031": "เทอโมสตัดตัดหลังกำหนด",
+      "040": "กระแสไฟฟ้าเกิน",
+      "666": "กำลังดำเนินการ",
+      "777": "หยุดโดยผู้ใช้งาน",
+    },
+  };
+
+  const translateCode = (code: string | undefined): string => {
+    if (!code) return "-";
+    const trimmed = code.trim();
+    return detailTemp.detailFailed[trimmed] ??
+      detailTemp.ironError[trimmed] ??
+      trimmed;
+  };
+
   useEffect(() => {
     refreshData();
   }, [auth]);
@@ -208,7 +236,7 @@ export default function QcDetail() {
                             {data?.status?.thermostat === "Failed" && (
                               <span className="whitespace-normal text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
                                 {" ( "}
-                                {data.status.thermostat_failed}
+                                {translateCode(data.status.thermostat_failed)}
                                 {" )"}
                               </span>
                             )}

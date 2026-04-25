@@ -36,15 +36,13 @@ type QcScriptTemperature = {
   CurrentMax: number;
   StartMoment: number;
   EndMoment: number;
-  emissivity: number;
   m1: number;
   c1: number;
   m2: number;
   c2: number;
-  m3: number;
-  c3: number;
-  m4: number;
-  c4: number;
+  k: number;
+  x0: number;
+  emissivity: number;
 };
 
 export default function CreateTestSetting() {
@@ -89,15 +87,13 @@ export default function CreateTestSetting() {
       CurrentMax: 0,
       StartMoment: 0,
       EndMoment: 0,
-      emissivity: 0,
       m1: 0,
       c1: 0,
       m2: 0,
       c2: 0,
-      m3: 0,
-      c3: 0,
-      m4: 0,
-      c4: 0,
+      k: 0,
+      x0: 0,
+      emissivity: 0.1,
     },
   };
 
@@ -107,8 +103,15 @@ export default function CreateTestSetting() {
 
   const [calibratePopup, setCalibratePopup] = useState(false);
   const openCalibratePopup = () => setCalibratePopup(true);
-  const closeCalibratePopup = async () => {
+  const closeCalibratePopup = () => {
     setCalibratePopup(false);
+  };
+
+  const handleCalibrateSave = (data: Partial<QcScriptTemperature>) => {
+    setQcScript((prev) => ({
+      ...(prev as QcScriptTemperature),
+      ...data,
+    } as QcScriptTemperature));
   };
 
   const settingSensor = async () => {
@@ -135,10 +138,8 @@ export default function CreateTestSetting() {
         c1: pairs[0]?.y ?? 0.0,
         m2: pairs[1]?.x ?? 0.0,
         c2: pairs[1]?.y ?? 0.0,
-        m3: pairs[2]?.x ?? 0.0,
-        c3: pairs[2]?.y ?? 0.0,
-        m4: pairs[3]?.x ?? 0.0,
-        c4: pairs[3]?.y ?? 0.0,
+        k: pairs[2]?.x ?? 0.0,
+        x0: pairs[2]?.y ?? 0.0,
       };
     }
     return null;
@@ -153,8 +154,9 @@ export default function CreateTestSetting() {
       }, 2000);
       const checkSettingSensor = await settingSensor();
 
+      const isThermo = qcType.name.toLowerCase() === "thermostat";
       const script =
-        qcType.name === "thermostat"
+        isThermo
           ? { ...(qcScript as QcScriptTemperature), ...(checkSettingSensor || {}) }
           : (qcScript as QcScriptSeaward);
       if (!name || !qcType.value) {
@@ -218,6 +220,7 @@ export default function CreateTestSetting() {
     if (!data) {
       throw new Error("Failed to fetch data");
     }
+    console.log("fetchQcTypeList : ", data);
     return data;
   };
 
@@ -225,8 +228,9 @@ export default function CreateTestSetting() {
     qcType?.name === "seaward" && qcScript
       ? (qcScript as QcScriptSeaward)
       : null;
+  const isTemperature = qcType?.name?.toLowerCase() === "thermostat";
   const TemperatureScript =
-    qcType?.name === "thermostat" && qcScript
+    isTemperature && qcScript
       ? (qcScript as QcScriptTemperature)
       : null;
 
@@ -234,13 +238,7 @@ export default function CreateTestSetting() {
     fetchData();
   }, []);
 
-  const unitLabel: Record<string, string> = {
-    TemperatureMin: "TemperatureMin (°C)",
-    TemperatureMax: "TemperatureMax (°C)",
-    CurrentMax: "CurrentMax (แอมแปร์)",
-    StartMoment: "StartMoment (วินาที)",
-    EndMoment: "EndMoment (วินาที)",
-  };
+
 
   return (
     <div className="flex h-screen">
@@ -292,15 +290,18 @@ export default function CreateTestSetting() {
                   <select
                     value={qcType?.value || ""}
                     onChange={(e) => {
+                      const selectedName = e.target.options[e.target.selectedIndex].text;
+                      const selectedValue = e.target.value;
                       setQcType({
-                        value: e.target.value,
-                        name: e.target.options[e.target.selectedIndex].text,
+                        value: selectedValue,
+                        name: selectedName,
                       });
-                      setQcScript(
-                        defaultScripts[
-                        e.target.options[e.target.selectedIndex].text
-                        ] || null
-                      );
+
+                      const scriptKey = selectedName.toLowerCase() === "thermostat"
+                        ? "thermostat"
+                        : selectedName;
+
+                      setQcScript(defaultScripts[scriptKey] || null);
                     }}
                     className="w-[80%] px-8 h-10 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl border rounded-sm"
                   >
@@ -637,21 +638,17 @@ export default function CreateTestSetting() {
               </div>
             )}
             {TemperatureScript && (
-              <div className="py-4 grid grid-cols-2 rounded-xl border">
-                <div className="col-span-2 flex pl-4">
+              <div className="grid grid-cols-2 rounded-xl border">
+                <div className="col-span-2 flex pl-4 py-2">
                   <button
                     onClick={openCalibratePopup}
                     className="h-[40px] md:h-[50px] w-auto mt-1 px-3 text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md bg-gray-200 hover:bg-gray-300"
                   >
                     ตั้งค่าSensor
                   </button>
-                  <span className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun'] text-red-600">
-                    &nbsp;*
-                  </span>
-
                   {calibratePopup && (
                     <Popup onClose={closeCalibratePopup}>
-                      <CalibrateFile />
+                      <CalibrateFile onSave={handleCalibrateSave} />
                     </Popup>
                   )}
                 </div>
@@ -663,21 +660,17 @@ export default function CreateTestSetting() {
                   "EndMoment",
                 ].map((key, index) => (
                   <div key={index}>
-                    <div className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
+                    <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
                       <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-                        {unitLabel[key] ?? key}
+                        {key}
                         <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                           &nbsp;*
                         </span>
                       </h4>
                       <input
-                        className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
+                        className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
                         type="number"
-                        value={
-                          (qcScript as QcScriptTemperature)[
-                          key as keyof QcScriptTemperature
-                          ]
-                        }
+                        value={(qcScript as QcScriptTemperature)[key as keyof QcScriptTemperature]}
                         onChange={(e) =>
                           setQcScript({
                             ...(qcScript as QcScriptTemperature),
@@ -686,7 +679,30 @@ export default function CreateTestSetting() {
                         }
                         required
                       />
-                    </div>
+                    </label>
+                  </div>
+                ))}
+                {[
+                  "emissivity",
+                  "m1",
+                  "c1",
+                  "m2",
+                  "c2",
+                  "k",
+                  "x0",
+                ].map((key, index) => (
+                  <div key={index}>
+                    <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
+                      <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+                        {key}
+                      </h4>
+                      <input
+                        className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md bg-gray-100"
+                        type="number"
+                        value={(qcScript as QcScriptTemperature)[key as keyof QcScriptTemperature] ?? 0}
+                        disabled
+                      />
+                    </label>
                   </div>
                 ))}
               </div>
@@ -697,6 +713,6 @@ export default function CreateTestSetting() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
