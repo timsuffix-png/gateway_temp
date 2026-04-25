@@ -30,7 +30,8 @@
     "react-select": "^5.10.1",
     "recharts": "^3.1.1",
     "serialport": "^13.0.0",
-    "sweetalert2": "^11.22.2"
+    "sweetalert2": "^11.22.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.9.0",

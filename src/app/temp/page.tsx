@@ -502,7 +502,7 @@ export default function MainTempTest() {
                   </Popup>
                 )}
               </li>
-              <li className="w-full text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:basis-60">
+              <li className="w-fit text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:min-w-[240px]">
                 <div className="flex flex-col">
                   <div className="flex pb-3">
                     <p className="">โปรเจกต์การทดสอบ</p>
@@ -511,17 +511,42 @@ export default function MainTempTest() {
                     </span>
                   </div>
                   {!isSelectedCard ? (
-                    <Select
-                      className="rounded-sm border"
-                      closeMenuOnSelect={true}
-                      options={qcProjectList?.data?.map((data) => ({
-                        value: data.ID,
-                        label: data.projectName,
-                      }))}
-                      onChange={(e) => {
-                        setQcProject(e ? e.value : "");
-                      }}
-                    />
+                    <div className="relative w-fit min-w-[240px] max-w-[600px]">
+                      {/* Hidden spacer to force width based on longest option */}
+                      <div className="invisible h-0 px-10 whitespace-nowrap overflow-hidden pointer-events-none border border-transparent">
+                        {qcProjectList?.data?.reduce((max: string, item: any) =>
+                          ((item.projectName?.length || 0) > max.length ? item.projectName : max), "Select Project..."
+                        )}
+                      </div>
+                      <Select
+                        className="rounded-sm"
+                        styles={{
+                          container: (base) => ({
+                            ...base,
+                            width: "100%",
+                          }),
+                          control: (base) => ({
+                            ...base,
+                            width: "100%",
+                            fontSize: "inherit",
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            width: "max-content",
+                            minWidth: "100%",
+                            maxWidth: "600px",
+                          }),
+                        }}
+                        closeMenuOnSelect={true}
+                        options={qcProjectList?.data?.map((data) => ({
+                          value: data.ID,
+                          label: data.projectName,
+                        }))}
+                        onChange={(e) => {
+                          setQcProject(e ? e.value : "");
+                        }}
+                      />
+                    </div>
                   ) : (
                     <h1 className="text-red-600 text-lg xl:text-xl h-10 flex place-items-end">
                       มีการทดสอบที่ถูกเลือกแล้ว

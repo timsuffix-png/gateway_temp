@@ -18,6 +18,7 @@ import CreateTestSetting from "@/app/inspection/testSetting/create/page";
 import QcProject from "@/app/inspection/projectTest/page";
 import CreateQcproject from "@/app/inspection/projectTest/create/page";
 import EditTestSetting from "@/app/inspection/testSetting/edit/page";
+import CalibrationTestPage from "@/app/calibration-test/page";
 
 export default function Routing() {
   const auth = useAuth();
@@ -67,6 +68,9 @@ export default function Routing() {
 
       case "thermostat":
         return <MainTemp />;
+
+      case "calibration-test":
+        return <CalibrationTestPage />;
 
       default:
         return <Login />; // ค่าเริ่มต้นหาก currentUrl ไม่ตรงกับกรณีใดๆ

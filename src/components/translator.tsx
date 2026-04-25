@@ -425,4 +425,25 @@ export const Translator: any = {
       </svg>
     ),
   },
+  calibration: {
+    name: "Calibration Test",
+    icon: (
+      <svg
+        width="30"
+        height="30"
+        viewBox="0 0 30 30"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M15 2.5C8.1 2.5 2.5 8.1 2.5 15C2.5 21.9 8.1 27.5 15 27.5C21.9 27.5 27.5 21.9 27.5 15C27.5 8.1 21.9 2.5 15 2.5ZM15 25C9.48 25 5 20.52 5 15C5 9.48 9.48 5 15 5C20.52 5 25 9.48 25 15C25 20.52 20.52 25 15 25Z"
+          fill="#EE6C4D"
+        />
+        <path
+          d="M15.9375 7.5H14.0625V16.25H21.5625V14.375H15.9375V7.5Z"
+          fill="#EE6C4D"
+        />
+      </svg>
+    ),
+  },
 };
