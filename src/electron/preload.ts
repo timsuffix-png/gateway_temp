@@ -53,6 +53,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
       x0: number;  // เพิ่มค่า x0 สำหรับจุดตัดสมการ
     };
   }) => ipcRenderer.invoke("writeData", args),
+  openExternal: (url: string) => ipcRenderer.invoke("openExternal", url),
 });
 console.log("✅ Preload script loaded");
 

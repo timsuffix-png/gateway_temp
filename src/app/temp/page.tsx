@@ -63,7 +63,6 @@ export default function MainTempTest() {
     currentLim: number;
     startMoment: number;
     endMoment: number;
-    emissivity: number;
     m1: number;
     c1: number;
     m2: number;
@@ -77,7 +76,6 @@ export default function MainTempTest() {
     currentLim: 0.0,
     startMoment: 0.0,
     endMoment: 0.0,
-    emissivity: 0.0,
     m1: 0.0,
     c1: 0.0,
     m2: 0.0,
@@ -275,7 +273,6 @@ export default function MainTempTest() {
         startMoment:
           format_script?.qcMain?.qcScript?.script?.StartMoment ?? 0.0,
         endMoment: format_script?.qcMain?.qcScript?.script?.EndMoment ?? 0.0,
-        emissivity: format_script?.qcMain?.qcScript?.script?.emissivity ?? 0.1,
         m1: format_script?.qcMain?.qcScript?.script?.m1 ?? 0.0,
         c1: format_script?.qcMain?.qcScript?.script?.c1 ?? 0.0,
         m2: format_script?.qcMain?.qcScript?.script?.m2 ?? 0.0,

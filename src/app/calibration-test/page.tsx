@@ -289,7 +289,7 @@ export default function CalibrationTestPage() {
       // @ts-ignore
       await window.electronAPI.writeData({
         port: currentCOMPort,
-        command: "on", // ส่งคำสั่ง on
+        command: "calibrate", // ส่งคำสั่ง on
       });
       setStatus("on");
       setDetail("กำลังเริ่มการทดสอบ...");

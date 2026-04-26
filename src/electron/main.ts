@@ -462,7 +462,6 @@ app.on("ready", () => {
         command.currentLim,
         command.startMoment,
         command.endMoment,
-        command.emissivity,
         command.m1,
         command.c1,
         command.m2,
@@ -500,6 +499,10 @@ app.on("ready", () => {
         console.log("Port is closing...................");
       });
     });
+  });
+  ipcMain.handle("openExternal", async (event, url: string) => {
+    const { shell } = require("electron");
+    await shell.openExternal(url);
   });
   createWindow();
 });

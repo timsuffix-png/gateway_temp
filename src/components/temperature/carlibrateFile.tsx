@@ -10,7 +10,6 @@ import Swal from "sweetalert2";
 import ButtonBlue from "../buttonBlue";
 
 type CalibrationData = {
-  emissivity?: number;
   m1?: number;
   c1?: number;
   m2?: number;
@@ -22,10 +21,10 @@ type CalibrationData = {
 export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationData) => void }) {
   const [currentWidth, setCurrentWidth] = useState(0); //ขนาดความกว้างของหน้าจอ
   const [existingFileName, setExistingFileName] = useState<string | null>(null);
-  const [mode, setMode] = useState<"emissivity" | "file">("emissivity");
-  const [emissivity, setEmissivity] = useState<string>("");
+  const [mode, setMode] = useState<"file">("file");
   const [files, setFiles] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [colabIcon, setColabIcon] = useState<string | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -36,6 +35,15 @@ export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationD
       setCurrentWidth(window.innerWidth);
     }
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const loadIcon = async () => {
+      // @ts-ignore
+      const icon = await window.electronAPI.loadImg("colab-icon.png");
+      setColabIcon(icon);
+    };
+    loadIcon();
   }, []);
 
   useEffect(() => {
@@ -70,10 +78,6 @@ export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationD
     loadFiles();
   }, [existingFileName]);
 
-  useEffect(() => {
-    const saved = localStorageWeb.getItem("emissivity");
-    if (saved) setEmissivity(saved);
-  }, []);
 
   const handleSaveSelectedFile = async () => {
     if (!selectedFile) {
@@ -86,11 +90,9 @@ export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationD
       setExistingFileName(selectedFile);
 
       // อ่านค่าจากไฟล์และส่งกลับผ่าน onSave
-      const emissivityVal = Number(localStorageWeb.getItem("emissivity") ?? 0);
       const pairs: Array<{ x: number; y: number }> = Array.isArray(res.text) ? res.text : [];
       if (onSave) {
         onSave({
-          emissivity: emissivityVal,
           m1: pairs[0]?.x ?? 0,
           c1: pairs[0]?.y ?? 0,
           m2: pairs[1]?.x ?? 0,
@@ -144,122 +146,81 @@ export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationD
     Swal.fire({ icon: "success", title: "ลบไฟล์สำเร็จ" });
   };
 
-  const handleSaveEmissivity = async () => {
-    const val = Number(emissivity);
-    if (Number.isNaN(val) || val < 0 || val > 1) {
-      Swal.fire({ icon: "error", title: "ค่าต้องอยู่ระหว่าง 0 ถึง 1" });
-      return;
-    }
-    localStorageWeb.setItem("emissivity", String(val));
-    if (onSave) {
-      onSave({ emissivity: val });
-    }
-    Swal.fire({ icon: "success", title: "บันทึกค่า Emissivity สำเร็จ" });
-  };
 
   return (
     <div className="text-start bg-white p-5 sm:p-10 2xl:p-20 border-black border-2 rounded-2xl flex flex-col">
-      <div className="flex flex-col w-full">
+      <div className=" flex flex-col w-full">
         <h1 className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-black mb-4">
           ตั้งค่าเซนเซอร์อุณหภูมิ
         </h1>
-        <div className="flex gap-4 mb-6" style={{ width: currentWidth / 2 }}>
-          <button
-            className={`px-4 py-2 rounded-md border text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ${mode === "emissivity" ? "bg-gray-200" : "bg-white"}`}
-            onClick={() => setMode("emissivity")}
-          >
-            ใช้ค่า Emissivity
-          </button>
-          <button
-            className={`px-4 py-2 rounded-md border text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ${mode === "file" ? "bg-gray-200" : "bg-white"}`}
-            onClick={() => setMode("file")}
-          >
-            คาลิเบรตจากไฟล์
-          </button>
+        <div className="flex flex-col gap-3" style={{ width: currentWidth / 2 }}>
+          <label className="text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
+            ไฟล์ Calibrate Sensor
+          </label>
+          <div className="flex items-center gap-4">
+            <div className="w-full h-[40px] md:h-[50px] bg-white rounded-md text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl px-3 font-normal ">
+              <Select
+                className="rounded-sm border"
+                options={files.map((name) => ({ value: name, label: name }))}
+                value={
+                  selectedFile
+                    ? { value: selectedFile, label: selectedFile }
+                    : null
+                }
+                onChange={(opt: any) => setSelectedFile(opt?.value || null)}
+              />
+            </div>
+
+            <button
+              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
+              onClick={async () => {
+                const res =
+                  await window.electronAPI.uploadCalibrateFileDialog();
+                if (res?.status) {
+                  const list = await window.electronAPI.listDataFiles();
+                  if (list?.status) setFiles(list.files);
+                  setSelectedFile(res.name);
+                  setExistingFileName(res.name);
+                  Swal.fire({ icon: "success", title: "อัปโหลดสำเร็จ" });
+                } else {
+                  if (res?.error !== "canceled")
+                    Swal.fire({
+                      icon: "error",
+                      title: res?.error || "อัปโหลดไม่สำเร็จ",
+                    });
+                }
+              }}
+            >
+              อัปโหลดไฟล์
+            </button>
+
+            <button className="px-3 py-2 cursor-pointer" onClick={handleDeleteSelectedFile}>
+              {Translator.delete.icon}
+            </button>
+          </div>
+          <div className="flex justify-between gap-4 mt-6 w-full">
+            <button
+              className="w-fit h-fit py-2 px-4 gap-2 self-end text-sm md:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl bg-white rounded-md border border-gray-300 flex items-center justify-center 
+              hover:bg-gray-100 cursor-pointer overflow-hidden "
+              onClick={() => {
+                // @ts-ignore
+                window.electronAPI.openExternal("https://colab.research.google.com/drive/1eeb_N_HxXdVFkfWwnmewH4cBsj1Pg2-w?usp=sharing");
+              }}
+              title="Open Colab Notebook"
+            >
+              {colabIcon ? (
+                <>
+                  <img className="w-8 h-8 object-contain" src={colabIcon} alt="Colab Icon" />
+                  <p>คาลิเบตสูตรใหม่</p>
+                </>
+              ) : (
+                "C"
+              )}
+            </button>
+            <SubmitButton text={"บันทึก"} onClick={handleSaveSelectedFile} />
+          </div>
         </div>
 
-        {mode === "emissivity" ? (
-          <div
-            className="flex flex-col gap-3"
-            style={{ width: currentWidth / 2 }}
-          >
-            <label className="text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-              กำหนดค่า Emissivity (ε)
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              min={0}
-              max={1}
-              value={emissivity}
-              placeholder="0.00 - 1.00"
-              className="h-[40px] md:h-[50px] w-full border border-black px-3 text-xl xl:text-2xl rounded-md"
-              onChange={(e) => setEmissivity(e.target.value)}
-              onBlur={(e) => {
-                const num = Number(e.target.value);
-                if (Number.isNaN(num)) return;
-                const clamped = Math.max(0, Math.min(1, num));
-                setEmissivity(String(clamped));
-              }}
-            />
-            <div className="mt-6 flex place-content-end">
-              <SubmitButton text={"บันทึก"} onClick={handleSaveEmissivity} />
-            </div>
-          </div>
-        ) : (
-          <div
-            className="flex flex-col gap-3"
-            style={{ width: currentWidth / 2 }}
-          >
-            <label className="text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-              ไฟล์ Calibrate Sensor
-            </label>
-            <div className="flex items-center gap-4">
-              <div className="w-full h-[40px] md:h-[50px] bg-white rounded-md text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl px-3 font-normal ">
-                <Select
-                  className="rounded-sm border"
-                  options={files.map((name) => ({ value: name, label: name }))}
-                  value={
-                    selectedFile
-                      ? { value: selectedFile, label: selectedFile }
-                      : null
-                  }
-                  onChange={(opt: any) => setSelectedFile(opt?.value || null)}
-                />
-              </div>
-
-              <button
-                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
-                onClick={async () => {
-                  const res =
-                    await window.electronAPI.uploadCalibrateFileDialog();
-                  if (res?.status) {
-                    const list = await window.electronAPI.listDataFiles();
-                    if (list?.status) setFiles(list.files);
-                    setSelectedFile(res.name);
-                    setExistingFileName(res.name);
-                    Swal.fire({ icon: "success", title: "อัปโหลดสำเร็จ" });
-                  } else {
-                    if (res?.error !== "canceled")
-                      Swal.fire({
-                        icon: "error",
-                        title: res?.error || "อัปโหลดไม่สำเร็จ",
-                      });
-                  }
-                }}
-              >
-                อัปโหลดไฟล์
-              </button>
-
-              <button className="px-3 py-2 cursor-pointer" onClick={handleDeleteSelectedFile}>
-                {Translator.delete.icon}
-              </button>
-            </div>
-            <div className="mt-6 flex place-content-end">
-              <SubmitButton text={"บันทึก"} onClick={handleSaveSelectedFile} />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

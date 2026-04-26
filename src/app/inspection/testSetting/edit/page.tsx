@@ -43,7 +43,7 @@ type QcScriptTemperature = {
   c2: number;
   k: number;
   x0: number;
-  emissivity: number;
+  x0: number;
 };
 export default function EditTestSetting() {
   const auth = useAuth();
@@ -79,8 +79,7 @@ export default function EditTestSetting() {
 
   async function calibrateScript() {
     const activeFile = localStorageWeb.getItem("fileCalibrate");
-    const emissivity = localStorageWeb.getItem("emissivity");
-    if (!activeFile || emissivity === null || emissivity === undefined) return qcScript;
+    if (!activeFile) return qcScript;
     const res = await window.electronAPI.readCalibrateFile(activeFile);
     if (!res?.status) {
       Swal.fire({
@@ -97,7 +96,6 @@ export default function EditTestSetting() {
 
     return {
       ...(qcScript as QcScriptTemperature),
-      emissivity: Number(emissivity),
       m1: pairs[0]?.x ?? 0.0,
       c1: pairs[0]?.y ?? 0.0,
       m2: pairs[1]?.x ?? 0.0,
@@ -580,7 +578,6 @@ export default function EditTestSetting() {
                         </div>
                       ))}
                       {[
-                        "emissivity",
                         "m1",
                         "c1",
                         "m2",
