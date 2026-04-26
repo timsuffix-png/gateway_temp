@@ -425,8 +425,8 @@ export const Translator: any = {
       </svg>
     ),
   },
-  calibration: {
-    name: "Calibration Test",
+  "calibration-test": {
+    name: "Calibration",
     icon: (
       <svg
         width="30"

@@ -481,7 +481,7 @@ export default function MainTempTest() {
             md:flex-row md:gap-10 md:items-center"
             >
               <li
-                className="flex flex-col justify-center items-center text-center whitespace-nowrap
+                className="flex flex-col justify-start items-start text-center whitespace-nowrap
              md:basis-40"
               >
                 <h4 className="flex-nowrap pb-3 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
@@ -490,18 +490,23 @@ export default function MainTempTest() {
                     &nbsp;*
                   </span>
                 </h4>
-                <div className="text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl flex place-content-start w-full lg:mt-3">
+                <div className="flex flex-row w-40 justify-start gap-2 items-center text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  lg:mt-3">
                   {currentCOMPort ? <h1>{"COM" + currentCOMPort}</h1> : null}
-                  <button className="ml-5" onClick={openPopup}>
-                    {currentCOMPort ? "เปลี่ยน" : "เลือก"}
+                  <button className="bg-cyan-500 text-white px-5 py-1 rounded-lg cursor-pointer hover:bg-cyan-600" onClick={openPopup}>
+
+                    <p className="">{currentCOMPort ? "เปลี่ยน" : "เลือก"}</p>
+
                   </button>
                 </div>
+
                 {popup && (
                   <Popup onClose={closePopup}>
                     <SerialCommunicationPort />
                   </Popup>
                 )}
               </li>
+
+
               <li className="w-fit text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl md:min-w-[240px]">
                 <div className="flex flex-col">
                   <div className="flex pb-3">

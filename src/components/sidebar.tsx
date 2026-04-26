@@ -46,7 +46,7 @@ export default function SideBar() {
   var menus: any = {
     qc: Translator.qc,
     thermostat: Translator.thermostat,
-    "calibration-test": Translator.calibration,
+    "calibration-test": Translator["calibration-test"],
   };
 
   if (!auth.user) return <Index />;
