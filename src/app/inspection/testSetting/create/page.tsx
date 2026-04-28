@@ -687,11 +687,12 @@ export default function CreateTestSetting() {
                       <input
                         className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
                         type="number"
+                        min={0}
                         value={TemperatureScript[key as keyof QcScriptTemperature] ?? 0}
                         onChange={(e) =>
                           setQcScript({
                             ...(qcScript as QcScriptTemperature),
-                            [key]: Number(e.target.value),
+                            [key]: Math.max(0, Number(e.target.value)),
                           } as QcScriptTemperature)
                         }
                         required
