@@ -14,11 +14,23 @@ type CalibrationData = {
   c1?: number;
   m2?: number;
   c2?: number;
-  k?: number;
-  x0?: number;
+  k1?: number;
+  x01?: number;
+  m3?: number;
+  c3?: number;
+  m4?: number;
+  c4?: number;
+  k2?: number;
+  x02?: number;
 };
 
-export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationData) => void }) {
+export default function CalibrateFile({
+  onSave,
+  onClose,
+}: {
+  onSave?: (data: CalibrationData) => void;
+  onClose?: () => void;
+}) {
   const [currentWidth, setCurrentWidth] = useState(0); //ขนาดความกว้างของหน้าจอ
   const [existingFileName, setExistingFileName] = useState<string | null>(null);
   const [mode, setMode] = useState<"file">("file");
@@ -79,29 +91,36 @@ export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationD
   }, [existingFileName]);
 
 
-  const handleSaveSelectedFile = async () => {
-    if (!selectedFile) {
+  const handleSaveSelectedFile = async (fileName?: string) => {
+    const fileToRead = fileName || selectedFile;
+    if (!fileToRead) {
       Swal.fire({ icon: "warning", title: "กรุณาเลือกไฟล์" });
       return;
     }
-    const res = await window.electronAPI.readCalibrateFile(selectedFile);
+    const res = await window.electronAPI.readCalibrateFile(fileToRead);
     if (res?.status) {
-      localStorageWeb.setItem("fileCalibrate", selectedFile);
-      setExistingFileName(selectedFile);
+      localStorageWeb.setItem("fileCalibrate", fileToRead);
+      setExistingFileName(fileToRead);
 
       // อ่านค่าจากไฟล์และส่งกลับผ่าน onSave
-      const pairs: Array<{ x: number; y: number }> = Array.isArray(res.text) ? res.text : [];
-      if (onSave) {
+      const pairs = res.text;
+      if (onSave && pairs) {
         onSave({
           m1: pairs[0]?.x ?? 0,
           c1: pairs[0]?.y ?? 0,
           m2: pairs[1]?.x ?? 0,
           c2: pairs[1]?.y ?? 0,
-          k: pairs[2]?.x ?? 0,
-          x0: pairs[2]?.y ?? 0,
+          k1: pairs[2]?.x ?? 0,
+          x01: pairs[2]?.y ?? 0,
+          m3: pairs[3]?.x ?? 0,
+          c3: pairs[3]?.y ?? 0,
+          m4: pairs[4]?.x ?? 0,
+          c4: pairs[4]?.y ?? 0,
+          k2: pairs[5]?.x ?? 0,
+          x02: pairs[5]?.y ?? 0,
         });
       }
-      Swal.fire({ icon: "success", title: "เลือกไฟล์สำเร็จ" });
+      Swal.fire({ icon: "success", title: "เลือกไฟล์สำเร็จ", timer: 1500, showConfirmButton: false });
     } else {
       Swal.fire({ icon: "error", title: res?.error || "ไม่สามารถอ่านไฟล์ได้" });
     }
@@ -181,7 +200,8 @@ export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationD
                   if (list?.status) setFiles(list.files);
                   setSelectedFile(res.name);
                   setExistingFileName(res.name);
-                  Swal.fire({ icon: "success", title: "อัปโหลดสำเร็จ" });
+                  // บันทึกและปิดอัตโนมัติ
+                  await handleSaveSelectedFile(res.name);
                 } else {
                   if (res?.error !== "canceled")
                     Swal.fire({
@@ -194,7 +214,7 @@ export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationD
               อัปโหลดไฟล์
             </button>
 
-            <button className="px-3 py-2 cursor-pointer" onClick={handleDeleteSelectedFile}>
+            <button className="px-3 py-2 cursor-pointer" onClick={() => handleDeleteSelectedFile()}>
               {Translator.delete.icon}
             </button>
           </div>
@@ -217,7 +237,10 @@ export default function CalibrateFile({ onSave }: { onSave?: (data: CalibrationD
                 "C"
               )}
             </button>
-            <SubmitButton text={"บันทึก"} onClick={handleSaveSelectedFile} />
+            <SubmitButton text={"บันทึก"} onClick={async () => {
+              await handleSaveSelectedFile();
+              if (onClose) onClose();
+            }} />
           </div>
         </div>
 

@@ -466,8 +466,14 @@ app.on("ready", () => {
         command.c1,
         command.m2,
         command.c2,
-        command.k,
-        command.x0
+        command.k1,
+        command.x01,
+        command.m3,
+        command.c3,
+        command.m4,
+        command.c4,
+        command.k2,
+        command.x02
       ].join(",");
 
       if (command.state === "stop") {

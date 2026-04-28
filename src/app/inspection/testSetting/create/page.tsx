@@ -40,9 +40,14 @@ type QcScriptTemperature = {
   c1: number;
   m2: number;
   c2: number;
-  k: number;
-  x0: number;
-  x0: number;
+  k1: number;
+  x01: number;
+  m3: number;
+  c3: number;
+  m4: number;
+  c4: number;
+  k2: number;
+  x02: number;
 };
 
 export default function CreateTestSetting() {
@@ -91,8 +96,14 @@ export default function CreateTestSetting() {
       c1: 0,
       m2: 0,
       c2: 0,
-      k: 0,
-      x0: 0,
+      k1: 0,
+      x01: 0,
+      m3: 0,
+      c3: 0,
+      m4: 0,
+      c4: 0,
+      k2: 0,
+      x02: 0,
     },
   };
 
@@ -107,10 +118,13 @@ export default function CreateTestSetting() {
   };
 
   const handleCalibrateSave = (data: Partial<QcScriptTemperature>) => {
-    setQcScript((prev) => ({
-      ...(prev as QcScriptTemperature),
-      ...data,
-    } as QcScriptTemperature));
+    setQcScript((prev) => {
+      const base = prev || defaultScripts.thermostat;
+      return {
+        ...base,
+        ...data,
+      } as QcScriptTemperature;
+    });
   };
 
   const settingSensor = async () => {
@@ -135,8 +149,14 @@ export default function CreateTestSetting() {
         c1: pairs[0]?.y ?? 0.0,
         m2: pairs[1]?.x ?? 0.0,
         c2: pairs[1]?.y ?? 0.0,
-        k: pairs[2]?.x ?? 0.0,
-        x0: pairs[2]?.y ?? 0.0,
+        k1: pairs[2]?.x ?? 0.0,
+        x01: pairs[2]?.y ?? 0.0,
+        m3: pairs[3]?.x ?? 0.0,
+        c3: pairs[3]?.y ?? 0.0,
+        m4: pairs[4]?.x ?? 0.0,
+        c4: pairs[4]?.y ?? 0.0,
+        k2: pairs[5]?.x ?? 0.0,
+        x02: pairs[5]?.y ?? 0.0,
       };
     }
     return null;
@@ -645,12 +665,12 @@ export default function CreateTestSetting() {
                   </button>
                   {calibratePopup && (
                     <Popup onClose={closeCalibratePopup}>
-                      <CalibrateFile onSave={handleCalibrateSave} />
+                      <CalibrateFile onSave={handleCalibrateSave} onClose={closeCalibratePopup} />
                     </Popup>
                   )}
                 </div>
                 {[
-                  "TemperatureMin",
+                   "TemperatureMin",
                   "TemperatureMax",
                   "CurrentMax",
                   "StartMoment",
@@ -667,7 +687,7 @@ export default function CreateTestSetting() {
                       <input
                         className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md"
                         type="number"
-                        value={(qcScript as QcScriptTemperature)[key as keyof QcScriptTemperature]}
+                        value={TemperatureScript[key as keyof QcScriptTemperature] ?? 0}
                         onChange={(e) =>
                           setQcScript({
                             ...(qcScript as QcScriptTemperature),
@@ -680,12 +700,18 @@ export default function CreateTestSetting() {
                   </div>
                 ))}
                 {[
-                  "m1",
+                   "m1",
                   "c1",
                   "m2",
                   "c2",
-                  "k",
-                  "x0",
+                  "k1",
+                  "x01",
+                  "m3",
+                  "c3",
+                  "m4",
+                  "c4",
+                  "k2",
+                  "x02",
                 ].map((key, index) => (
                   <div key={index}>
                     <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
@@ -695,7 +721,7 @@ export default function CreateTestSetting() {
                       <input
                         className="h-[40px] md:h-[50px] w-full border mt-1 px-3 text-base text-xl  2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md bg-gray-100"
                         type="number"
-                        value={(qcScript as QcScriptTemperature)[key as keyof QcScriptTemperature] ?? 0}
+                        value={TemperatureScript[key as keyof QcScriptTemperature] ?? 0}
                         disabled
                       />
                     </label>

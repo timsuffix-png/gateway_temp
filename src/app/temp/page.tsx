@@ -67,8 +67,14 @@ export default function MainTempTest() {
     c1: number;
     m2: number;
     c2: number;
-    k: number;
-    x0: number;
+    k1: number;
+    x01: number;
+    m3: number;
+    c3: number;
+    m4: number;
+    c4: number;
+    k2: number;
+    x02: number;
   }>({
     state: "on",
     tempMin: 0.0,
@@ -80,8 +86,14 @@ export default function MainTempTest() {
     c1: 0.0,
     m2: 0.0,
     c2: 0.0,
-    k: 0.0,
-    x0: 0.0,
+    k1: 0.0,
+    x01: 0.0,
+    m3: 0.0,
+    c3: 0.0,
+    m4: 0.0,
+    c4: 0.0,
+    k2: 0.0,
+    x02: 0.0,
   });
 
   const [qcMains, setQcMains] = useState<{
@@ -107,13 +119,18 @@ export default function MainTempTest() {
               CurrentMax: number;
               StartMoment: number;
               EndMoment: number;
-              emissivity: number;
               m1: number;
               c1: number;
               m2: number;
               c2: number;
-              k: number;
-              x0: number;
+              k1: number;
+              x01: number;
+              m3: number;
+              c3: number;
+              m4: number;
+              c4: number;
+              k2: number;
+              x02: number;
             };
           };
           status: string | null; //ค่าสถานะ
@@ -277,8 +294,14 @@ export default function MainTempTest() {
         c1: format_script?.qcMain?.qcScript?.script?.c1 ?? 0.0,
         m2: format_script?.qcMain?.qcScript?.script?.m2 ?? 0.0,
         c2: format_script?.qcMain?.qcScript?.script?.c2 ?? 0.0,
-        k: format_script?.qcMain?.qcScript?.script?.k ?? 0.0,
-        x0: format_script?.qcMain?.qcScript?.script?.x0 ?? 0.0,
+        k1: format_script?.qcMain?.qcScript?.script?.k1 ?? 0.0,
+        x01: format_script?.qcMain?.qcScript?.script?.x01 ?? 0.0,
+        m3: format_script?.qcMain?.qcScript?.script?.m3 ?? 0.0,
+        c3: format_script?.qcMain?.qcScript?.script?.c3 ?? 0.0,
+        m4: format_script?.qcMain?.qcScript?.script?.m4 ?? 0.0,
+        c4: format_script?.qcMain?.qcScript?.script?.c4 ?? 0.0,
+        k2: format_script?.qcMain?.qcScript?.script?.k2 ?? 0.0,
+        x02: format_script?.qcMain?.qcScript?.script?.x02 ?? 0.0,
       }));
     }
   };
