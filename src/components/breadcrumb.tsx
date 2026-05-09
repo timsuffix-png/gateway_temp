@@ -8,8 +8,7 @@ export default function Breadcrumb() {
 
   return (
     <div className="bg-white w-full h-14 whitespace-nowrap overflow-x-auto border-b border-black">
-      <div className="w-full h-full 2xl:flex place-items-center hidden">
-        <div className="ml-10"></div>
+      <div className="w-full h-full flex place-items-center pl-64 2xl:pl-0">
         
         <h3 className="ml-2 text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
           หน้าหลัก

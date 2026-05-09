@@ -588,7 +588,7 @@ export default function MainTempTest() {
                 </div>
                 <input
                   required
-                  className="w-full px-2 py-1 rounded-sm border"
+                  className="w-full px-2 py-1 rounded-sm border border-gray-300"
                   placeholder="รหัสสินค้า"
                   onClick={(e: any) => {
                     e.target.value = "";
