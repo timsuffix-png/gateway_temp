@@ -474,10 +474,10 @@ app.on("ready", () => {
         return;
       }
 
-      // Send full comma-separated command string
-      port.write(command + "\n", (err) => {
+      // Send command as-is (React already appends \n at the end)
+      port.write(command, (err) => {
         if (err) return reject(err);
-        console.log("Sent command:", command);
+        console.log("Sent command:", command.trim());
         resolve("Command sent successfully");
       });
     });
