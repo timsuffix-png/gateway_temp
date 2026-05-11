@@ -454,37 +454,30 @@ app.on("ready", () => {
     return new Promise((resolve, reject) => {
       if (!port || !port.isOpen) return reject("Port not open");
 
-      const command = args.command;
-      const cleanCmd = [
-        command.state,
-        command.tempMin,
-        command.tempLim,
-        command.currentLim,
-        command.startMoment,
-        command.endMoment,
-        command.m1,
-        command.c1,
-        command.m2,
-        command.c2,
-        command.k1,
-        command.x01,
-        command.m3,
-        command.c3,
-        command.m4,
-        command.c4,
-        command.k2,
-        command.x02
-      ].join(",");
+      // command is now a pre-formatted comma-separated string
+      const command: string = String(args.command ?? "");
 
-      if (command.state === "stop") {
+      // Handle stop command
+      if (command === "stop" || command.startsWith("stop,")) {
         port.write("stop\n");
         console.log("Sent stop command");
         return resolve("Stopped");
       }
 
-      port.write(cleanCmd + "\n", (err) => {
+      // Handle calibrate command (calibration-test page)
+      if (command === "calibrate") {
+        port.write("calibrate\n", (err) => {
+          if (err) return reject(err);
+          console.log("Sent command: calibrate");
+          resolve("Command sent successfully");
+        });
+        return;
+      }
+
+      // Send full comma-separated command string
+      port.write(command + "\n", (err) => {
         if (err) return reject(err);
-        console.log("Sent command:", cleanCmd);
+        console.log("Sent command:", command);
         resolve("Command sent successfully");
       });
     });
