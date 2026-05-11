@@ -388,26 +388,24 @@ export default function CalibrationTestPage() {
   return (
     <div className="flex h-screen">
       <SideBar />
-      <div className="flex flex-col w-full h-full overflow-y-auto">
-        <div className="flex-shrink-0">
-          <Breadcrumb />
-        </div>
+      <div className="flex flex-col w-full h-full  overflow-y-auto">
+        <Breadcrumb />
 
         {/* Progress Bar (Full Width, Top) */}
-        <div className="w-full bg-gray-50 border-b border-gray-100 p-0 h-14 flex flex-col justify-center flex-shrink-0">
-          <div className="w-full h-2 bg-gray-200">
+        <div className="w-full bg-gray-50 p-0 h-14 flex flex-col justify-center flex-shrink-0 ">
+          <div className="w-full h-2 bg-gray-200 pl-64 2xl:pl-0 ">
             <div
               className="bg-[#001F3F] h-full transition-all duration-700 ease-in-out shadow-[0_0_10px_rgba(0,31,63,0.3)]"
               style={{ width: `${(data.length / MAX_SAMPLES) * 100}%` }}
             />
           </div>
-          <div className="px-6 flex justify-between items-center">
-            <div className="flex items-center gap-4">
+          <div className="px-6 flex justify-between items-center pl-6 2xl:pl-6">
+            <div className="w-full flex items-center gap-4  ">
               <p className="text-[20px] text-center align-middle font-bold text-gray-500 uppercase tracking-widest">
                 สถานะการเก็บข้อมูล: {data.length} / {MAX_SAMPLES} ตัวอย่าง
               </p>
               {/* Mode Toggle Switch */}
-              <div className="flex items-center bg-gray-200 rounded-full p-1 ml-4 scale-75 origin-left">
+              {/* <div className="flex items-center bg-gray-200 rounded-full p-1 ml-4 scale-75 origin-left">
                 <button
                   onClick={() => setMode("real")}
                   className={`px-4 py-1 rounded-full text-xs font-bold transition-all ${mode === "real" ? "bg-[#001F3F] text-white shadow-md" : "text-gray-500 hover:text-gray-700"}`}
@@ -420,7 +418,7 @@ export default function CalibrationTestPage() {
                 >
                   MOCKUP
                 </button>
-              </div>
+              </div> */}
             </div>
             {data.length === MAX_SAMPLES && (
               <p className="text-[10px] font-bold text-green-600 animate-pulse">✓ พร้อมสำหรับการส่งออกข้อมูล</p>
@@ -428,188 +426,188 @@ export default function CalibrationTestPage() {
           </div>
         </div>
 
-        <div className=" flex justify-between items-center px-10 w-full h-auto flex-shrink-0 whitespace-nowrap place-items-center">
-          {/* Select Bar (Port Selection & Export Button) */}
-          <div className="flex flex-col items-start whitespace-nowrap ">
-            <h4 className="flex-nowrap pb-3 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
-              Thermostat port
-              <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                &nbsp;*
-              </span>
-            </h4>
-            <div className="flex flex-row w-40 justify-start gap-2 items-center text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  lg:mt-3">
-              {currentCOMPort ? <h1>{"COM" + currentCOMPort}</h1> : null}
-              <button className="bg-cyan-500 text-white px-5 py-1 rounded-lg cursor-pointer hover:bg-cyan-600" onClick={openPopup}>
+        <div className="flex flex-col bg-white w-full h-full  overflow-y-auto whitespace-nowrap">
+          <div className="w-full flex flex-col ">
+            <ul
+              className="flex flex-col justify-between items-start pt-5 px-10 gap-2 text-lg 
+            md:flex-row md:gap-10 md:items-center pl-6 2xl:pl-10"
+            >
+              <li
+                className="flex flex-col justify-start items-start text-center whitespace-nowrap
+              md:basis-40"
+              >
+                <h4 className="flex-nowrap pb-3 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
+                  Calibration port
+                  <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
+                    &nbsp;*
+                  </span>
+                </h4>
+                <div className="flex flex-row w-40 justify-start gap-2 items-center text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl  lg:mt-3">
+                  {currentCOMPort ? <h1>{"COM" + currentCOMPort}</h1> : null}
+                  <button className="bg-cyan-500 text-white px-5 py-1 rounded-lg cursor-pointer hover:bg-cyan-600" onClick={openPopup}>
+                    <p className="">{currentCOMPort ? "เปลี่ยน" : "เลือก"}</p>
+                  </button>
+                </div>
 
-                <p className="">{currentCOMPort ? "เปลี่ยน" : "เลือก"}</p>
+                {popup && (
+                  <Popup onClose={closePopup}>
+                    <SerialCommunicationPort />
+                  </Popup>
+                )}
+              </li>
 
-              </button>
-            </div>
-
-
+              <li className="flex flex-col justify-end items-end ml-auto">
+                <button
+                  onClick={handleExport}
+                  disabled={data.length < MAX_SAMPLES || loading}
+                  className={`flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-bold text-white shadow-lg transition-all active:scale-95 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl ${data.length < MAX_SAMPLES || loading
+                    ? "bg-green-600/30 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700 shadow-green-100"
+                    }`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  ส่งออกไฟล์ (.xlsx)
+                </button>
+              </li>
+            </ul>
           </div>
 
-          <button
-            onClick={handleExport}
-            disabled={data.length < MAX_SAMPLES || loading}
-            className={`flex items-center justify-center gap-2  px-5 py-3 rounded-lg font-bold text-white shadow-lg transition-all active:scale-95 ${data.length < MAX_SAMPLES || loading
-              ? "bg-green-600/30 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700 shadow-green-100"
-              }`}
-          >
+          <div className="w-full h-10 my-4"> </div>
 
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-            ส่งออกไฟล์ (.xlsx)
+          {/* ----------- Body -------------*/}
+          <div className="w-full h-full flex px-[20%] flex-col justify-between lg:gap-10 lg:px-[10%] lg:my-2">
 
-          </button>
+            {/* ภาพเตารีด (Identical to reference) */}
+            <div className="relative self-center pt-10 pb-10">
+              <img
+                className="w-[240px] h-[400px]"
+                ref={ironImageRef}
+                alt="iron plate"
+              />
 
+              <div>
+                {/* บน */}
+                <div className="absolute left-1/2 -translate-x-1/2 -top-7 text-[#d6bb0fff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-bold whitespace-nowrap">
+                  {lastRead?.ir4 ?? 0} °C
+                </div>
+                <div className="absolute left-1/2 -translate-x-1/2 top-3 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold whitespace-nowrap">
+                  อุณหภูมิรอบข้าง : {ambient4} °C
+                </div>
+                <div className="flex flex-col absolute left-25 top-20 items-center">
+                  <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#fbff00ff] font-bold">บน</label>
+                  <svg className="h-6 w-6" fill="#fbff00ff" viewBox="0 0 512 512"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z" /></svg>
+                </div>
 
-          {popup && (
-            <Popup onClose={closePopup}>
-              <SerialCommunicationPort />
-            </Popup>
-          )}
+                {/* กลาง */}
+                <div className="absolute left-1/2 -translate-x-1/2 bottom-1 text-[#1496ecff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-bold whitespace-nowrap">
+                  {lastRead?.ir2 ?? 0} °C
+                </div>
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold whitespace-nowrap">
+                  อุณหภูมิรอบข้าง : {ambient2} °C
+                </div>
+                <div className="flex flex-col absolute left-23 top-45 items-center">
+                  <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#66f0ffff] font-bold">กลาง</label>
+                  <svg className="h-6 w-6" fill="#66f0ffff" viewBox="0 0 512 512"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z" /></svg>
+                </div>
 
+                {/* ซ้าย */}
+                <div className="absolute right-58 bottom-36 text-[#0fb500ff] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-bold whitespace-nowrap">
+                  {lastRead?.ir3 ?? 0} °C
+                </div>
+                <div className="absolute right-58 bottom-28 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold whitespace-nowrap">
+                  อุณหภูมิรอบข้าง : {ambient3} °C
+                </div>
+                <div className="flex flex-col absolute left-6 bottom-30 items-center">
+                  <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#61ff53ff] font-bold">ซ้าย</label>
+                  <svg className="h-6 w-6" fill="#61ff53ff" viewBox="0 0 512 512"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z" /></svg>
+                </div>
 
-          {/* Top Right Export Button */}
-
-        </div>
-
-        <div className="w-full h-10 my-4"> </div>
-
-        {/* ----------- Body -------------*/}
-        <div className="w-full h-full flex px-[20%] flex-col justify-between lg:gap-10 lg:px-[10%] lg:my-2">
-
-          {/* ภาพเตารีด (Identical to reference) */}
-          <div className="relative self-center pt-10 pb-10">
-            <img
-              className="w-[240px] h-[400px]"
-              ref={ironImageRef}
-              alt="iron plate"
-            />
-
-            <div>
-              {/* บน */}
-              <div className="absolute left-1/2 -translate-x-1/2 -top-7 text-[#d6bb0fff] text-xl xl:text-2xl 2xl:text-3xl font-bold whitespace-nowrap">
-                {lastRead?.ir4 ?? 0} °C
-              </div>
-              <div className="absolute left-1/2 -translate-x-1/2 top-3 text-gray-900 text-base 2xl:text-lg font-semibold whitespace-nowrap">
-                อุณหภูมิรอบข้าง : {ambient4} °C
-              </div>
-              <div className="flex flex-col absolute left-25 top-20 items-center">
-                <label className="text-lg 2xl:text-xl text-[#fbff00ff] font-bold">บน</label>
-                <svg className="h-6 w-6" fill="#fbff00ff" viewBox="0 0 512 512"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z" /></svg>
-              </div>
-
-              {/* กลาง */}
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-1 text-[#1496ecff] text-xl xl:text-2xl 2xl:text-3xl font-bold whitespace-nowrap">
-                {lastRead?.ir2 ?? 0} °C
-              </div>
-              <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 text-gray-900 text-base 2xl:text-lg font-semibold whitespace-nowrap">
-                อุณหภูมิรอบข้าง : {ambient2} °C
-              </div>
-              <div className="flex flex-col absolute left-23 top-45 items-center">
-                <label className="text-lg 2xl:text-xl text-[#66f0ffff] font-bold">กลาง</label>
-                <svg className="h-6 w-6" fill="#66f0ffff" viewBox="0 0 512 512"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z" /></svg>
-              </div>
-
-              {/* ซ้าย */}
-              <div className="absolute right-58 bottom-36 text-[#0fb500ff] text-xl xl:text-2xl 2xl:text-3xl font-bold whitespace-nowrap">
-                {lastRead?.ir3 ?? 0} °C
-              </div>
-              <div className="absolute right-58 bottom-28 text-gray-900 text-base 2xl:text-lg font-semibold whitespace-nowrap">
-                อุณหภูมิรอบข้าง : {ambient3} °C
-              </div>
-              <div className="flex flex-col absolute left-6 bottom-30 items-center">
-                <label className="text-lg 2xl:text-xl text-[#61ff53ff] font-bold">ซ้าย</label>
-                <svg className="h-6 w-6" fill="#61ff53ff" viewBox="0 0 512 512"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z" /></svg>
-              </div>
-
-              {/* ขวา */}
-              <div className="absolute left-58 bottom-36 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl font-bold whitespace-nowrap">
-                {lastRead?.ir1 ?? 0} °C
-              </div>
-              <div className="absolute left-58 bottom-28 text-gray-900 text-base 2xl:text-lg font-semibold whitespace-nowrap">
-                อุณหภูมิรอบข้าง : {ambient1} °C
-              </div>
-              <div className="flex flex-col absolute right-5 bottom-30 items-center">
-                <label className="text-lg 2xl:text-xl text-[#FFB8DF] font-bold">ขวา</label>
-                <svg className="h-6 w-6" fill="#FFB8DF" viewBox="0 0 512 512"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z" /></svg>
+                {/* ขวา */}
+                <div className="absolute left-58 bottom-36 text-[#FF5CB6] text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-bold whitespace-nowrap">
+                  {lastRead?.ir1 ?? 0} °C
+                </div>
+                <div className="absolute left-58 bottom-28 text-gray-900 text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl font-semibold whitespace-nowrap">
+                  อุณหภูมิรอบข้าง : {ambient1} °C
+                </div>
+                <div className="flex flex-col absolute right-5 bottom-30 items-center">
+                  <label className="text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl text-[#FFB8DF] font-bold">ขวา</label>
+                  <svg className="h-6 w-6" fill="#FFB8DF" viewBox="0 0 512 512"><path d="M256 56c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m0-48C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 168c-44.183 0-80 35.817-80 80s35.817 80 80 80 80-35.817 80-80-35.817-80-80-80z" /></svg>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Bottom Controls Section */}
-          <div className="w-full h-full flex flex-col justify-between gap-6 pt-6 sm:gap-8 sm:pt-8 lg:pt-0 lg:flex-row lg:gap-0">
+            {/* Bottom Controls Section */}
+            <div className="w-full h-full flex flex-col justify-between gap-6 pt-6 sm:gap-8 sm:pt-8 lg:pt-0 lg:flex-row lg:gap-0">
 
-            {/* Left Side: Stats and Info */}
-            <div className="flex flex-col w-full h-full gap-6 justify-between text-base sm:text-lg md:text-xl xl:text-2xl lg:items-start">
-              <div className="flex flex-col pt-10 lg:flex-row lg:pt-0 gap-4 sm:gap-8">
-                <div className="flex items-center gap-4">
-                  <p>กระแสไฟฟ้า :</p>
-                  <input
-                    className="w-20 sm:w-24 md:w-28 h-8 sm:h-9 md:h-10 text-center border rounded-sm"
-                    type="text"
-                    value={current}
-                    readOnly
-                  />
-                  <span>แอมแปร์</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <p>เวลา :</p>
-                  <input
-                    className="w-20 sm:w-24 md:w-28 h-8 sm:h-9 md:h-10 text-center border rounded-sm"
-                    type="text"
-                    value={time}
-                    readOnly
-                  />
-                  <span>วินาที</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-6 items-start">
-                <div className="flex h-auto w-auto items-center justify-center gap-4">
-                  <p>ผลลัพธ์ : </p>
-                  <div className={`w-auto flex px-6 py-2 justify-center items-center whitespace-nowrap rounded-lg text-white font-bold transition-colors ${status === "on" ? "bg-yellow-600" : status === "Passed" ? "bg-green-600" : status === "Failed" ? "bg-red-400" : "bg-gray-400"
-                    }`}>
-                    {status === "on" ? "IN PROCESS" : status === "Passed" ? "PASS" : status === "Failed" ? "FAIL" : "OFF"}
+              {/* Left Side: Stats and Info */}
+              <div className="flex flex-col w-full h-full gap-6 justify-between text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl lg:items-start">
+                <div className="flex flex-col pt-10 lg:flex-row lg:pt-0 gap-4 sm:gap-8">
+                  <div className="flex items-center gap-4">
+                    <p>กระแสไฟฟ้า :</p>
+                    <input
+                      className="w-20 sm:w-24 md:w-28 h-8 sm:h-9 md:h-10 text-center border rounded-sm"
+                      type="text"
+                      value={current}
+                      readOnly
+                    />
+                    <span>แอมแปร์</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <p>เวลา :</p>
+                    <input
+                      className="w-20 sm:w-24 md:w-28 h-8 sm:h-9 md:h-10 text-center border rounded-sm"
+                      type="text"
+                      value={time}
+                      readOnly
+                    />
+                    <span>วินาที</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 whitespace-normal">
-                  <p className="font-bold">หมายเหตุ :</p>
-                  <p className="text-gray-600">{detail || "-"}</p>
+
+                <div className="flex flex-col gap-10 items-start">
+                  <div className="flex h-auto w-auto items-center justify-center gap-4">
+                    <p>ผลลัพธ์ : </p>
+                    <div className={`w-auto flex px-6 py-2 justify-center items-center whitespace-nowrap rounded-lg text-white font-bold transition-colors ${status === "on" ? "bg-yellow-600" : status === "Passed" ? "bg-green-600" : status === "Failed" ? "bg-red-400" : "bg-gray-400"
+                      }`}>
+                      {status === "on" ? "IN PROCESS" : status === "Passed" ? "PASS" : status === "Failed" ? "FAIL" : "OFF"}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 whitespace-normal">
+                    <p>หมายเหตุ :</p>
+                    <p className="text-gray-600">{detail || "-"}</p>
+                  </div>
                 </div>
+              </div>
+
+              {/* Right Side: Action Buttons */}
+              <div className="flex flex-col h-auto w-full items-center gap-6 py-6 sm:gap-8 lg:items-end">
+                <button
+                  onClick={handleTest}
+                  disabled={data.length >= MAX_SAMPLES || loading}
+                  className={`w-full sm:w-[70%] lg:w-[70%] xl:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl rounded-lg font-semibold text-white transition duration-200 ${data.length >= MAX_SAMPLES || loading
+                    ? "bg-[#001F3F]/60 cursor-not-allowed"
+                    : "bg-[#003366] hover:bg-[#001F3F] hover:cursor-pointer shadow-lg"
+                    }`}
+                >
+                  {loading ? "กำลังทดสอบ..." : "ทดสอบ"}
+                </button>
+
+                <button
+                  onClick={handleReset}
+                  disabled={data.length === 0}
+                  className={`w-full sm:w-[70%] lg:w-[70%] xl:w-[50%] h-12 sm:h-14 lg:h-16 text-base sm:text-lg md:text-xl xl:text-2xl 2xl:text-3xl rounded-lg font-semibold text-white transition duration-300 shadow-md ${data.length === 0
+                    ? "bg-red-500/50 cursor-not-allowed"
+                    : "bg-red-500 hover:bg-red-600 hover:cursor-pointer"
+                    }`}
+                >
+                  รีเซ็ตข้อมูล
+                </button>
               </div>
             </div>
 
-            {/* Right Side: Action Buttons */}
-            <div className="flex flex-col h-auto w-full items-center gap-4 py-6 sm:gap-6 lg:items-end lg:w-[40%]">
-              <button
-                onClick={handleTest}
-                disabled={data.length >= MAX_SAMPLES || loading}
-                className={`w-full h-12 sm:h-14 lg:h-16 text-lg xl:text-xl rounded-lg font-semibold text-white transition duration-200 ${data.length >= MAX_SAMPLES || loading
-                  ? "bg-[#001F3F]/60 cursor-not-allowed"
-                  : "bg-[#003366] hover:bg-[#001F3F] hover:cursor-pointer shadow-lg"
-                  }`}
-              >
-                {loading ? "กำลังทดสอบ..." : "ทดสอบ"}
-              </button>
-
-              <button
-                onClick={handleReset}
-                disabled={data.length === 0}
-                className={`w-full h-12 sm:h-14 lg:h-16 text-lg xl:text-xl rounded-lg font-semibold text-white transition duration-300 shadow-md ${data.length === 0
-                  ? "bg-red-500/50 cursor-not-allowed"
-                  : "bg-red-500 hover:bg-red-600 hover:cursor-pointer"
-                  }`}
-              >
-                รีเซ็ตข้อมูล
-              </button>
+            <div className="flex flex-col-reverse place-content-center mt-auto">
+              <Footer />
             </div>
-          </div>
-
-          <div className="flex flex-col-reverse place-content-center mt-auto">
-            <Footer />
           </div>
         </div>
       </div>
