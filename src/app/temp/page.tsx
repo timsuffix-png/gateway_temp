@@ -63,14 +63,10 @@ export default function MainTempTest() {
     currentLim: number;
     startMoment: number;
     endMoment: number;
-    // Sensor 1
+    // Sensor 1 (also used for Sensor 3)
     m1: number; c1: number; m2: number; c2: number; k1: number; x01: number;
-    // Sensor 2
+    // Sensor 2 (also used for Sensor 4)
     m3: number; c3: number; m4: number; c4: number; k2: number; x02: number;
-    // Sensor 3
-    s3_m1: number; s3_c1: number; s3_m2: number; s3_c2: number; s3_k: number; s3_x0: number;
-    // Sensor 4
-    s4_m1: number; s4_c1: number; s4_m2: number; s4_c2: number; s4_k: number; s4_x0: number;
   }>({
     state: "on",
     tempMin: 0.0,
@@ -78,14 +74,10 @@ export default function MainTempTest() {
     currentLim: 0.0,
     startMoment: 0.0,
     endMoment: 0.0,
-    // Sensor 1
+    // Sensor 1 (also used for Sensor 3)
     m1: 0.0, c1: 0.0, m2: 0.0, c2: 0.0, k1: 0.0, x01: 0.0,
-    // Sensor 2
+    // Sensor 2 (also used for Sensor 4)
     m3: 0.0, c3: 0.0, m4: 0.0, c4: 0.0, k2: 0.0, x02: 0.0,
-    // Sensor 3
-    s3_m1: 0.0, s3_c1: 0.0, s3_m2: 0.0, s3_c2: 0.0, s3_k: 0.0, s3_x0: 0.0,
-    // Sensor 4
-    s4_m1: 0.0, s4_c1: 0.0, s4_m2: 0.0, s4_c2: 0.0, s4_k: 0.0, s4_x0: 0.0,
   });
 
   const [qcMains, setQcMains] = useState<{
@@ -281,34 +273,20 @@ export default function MainTempTest() {
         currentLim: format_script?.qcMain?.qcScript?.script?.CurrentMax ?? 0.0,
         startMoment: format_script?.qcMain?.qcScript?.script?.StartMoment ?? 0.0,
         endMoment: format_script?.qcMain?.qcScript?.script?.EndMoment ?? 0.0,
-        // Sensor 1
+        // Sensor 1 (also mirrored to Sensor 3)
         m1:  format_script?.qcMain?.qcScript?.script?.m1  ?? 0.0,
         c1:  format_script?.qcMain?.qcScript?.script?.c1  ?? 0.0,
         m2:  format_script?.qcMain?.qcScript?.script?.m2  ?? 0.0,
         c2:  format_script?.qcMain?.qcScript?.script?.c2  ?? 0.0,
         k1:  format_script?.qcMain?.qcScript?.script?.k1  ?? 0.0,
         x01: format_script?.qcMain?.qcScript?.script?.x01 ?? 0.0,
-        // Sensor 2
+        // Sensor 2 (also mirrored to Sensor 4)
         m3:  format_script?.qcMain?.qcScript?.script?.m3  ?? 0.0,
         c3:  format_script?.qcMain?.qcScript?.script?.c3  ?? 0.0,
         m4:  format_script?.qcMain?.qcScript?.script?.m4  ?? 0.0,
         c4:  format_script?.qcMain?.qcScript?.script?.c4  ?? 0.0,
         k2:  format_script?.qcMain?.qcScript?.script?.k2  ?? 0.0,
         x02: format_script?.qcMain?.qcScript?.script?.x02 ?? 0.0,
-        // Sensor 3 (from DB script fields s3_m1…s3_x0, fallback 0)
-        s3_m1: format_script?.qcMain?.qcScript?.script?.s3_m1 ?? 0.0,
-        s3_c1: format_script?.qcMain?.qcScript?.script?.s3_c1 ?? 0.0,
-        s3_m2: format_script?.qcMain?.qcScript?.script?.s3_m2 ?? 0.0,
-        s3_c2: format_script?.qcMain?.qcScript?.script?.s3_c2 ?? 0.0,
-        s3_k:  format_script?.qcMain?.qcScript?.script?.s3_k  ?? 0.0,
-        s3_x0: format_script?.qcMain?.qcScript?.script?.s3_x0 ?? 0.0,
-        // Sensor 4 (from DB script fields s4_m1…s4_x0, fallback 0)
-        s4_m1: format_script?.qcMain?.qcScript?.script?.s4_m1 ?? 0.0,
-        s4_c1: format_script?.qcMain?.qcScript?.script?.s4_c1 ?? 0.0,
-        s4_m2: format_script?.qcMain?.qcScript?.script?.s4_m2 ?? 0.0,
-        s4_c2: format_script?.qcMain?.qcScript?.script?.s4_c2 ?? 0.0,
-        s4_k:  format_script?.qcMain?.qcScript?.script?.s4_k  ?? 0.0,
-        s4_x0: format_script?.qcMain?.qcScript?.script?.s4_x0 ?? 0.0,
       }));
     }
   };
@@ -374,8 +352,10 @@ export default function MainTempTest() {
 
       // Build command string (Arduino derives sensorCount = calibrationParams / 6):
       // state,tempMin,tempLim,currentLim,startMoment,endMoment,
-      // [sensor1: m1,c1,m2,c2,k,x0] [sensor2: m1,c1,m2,c2,k,x0]
-      // [sensor3: m1,c1,m2,c2,k,x0] [sensor4: m1,c1,m2,c2,k,x0]
+      // [sensor1: m1,c1,m2,c2,k1,x01]  ← index 6-11
+      // [sensor2: m3,c3,m4,c4,k2,x02]  ← index 12-17
+      // [sensor3: m1,c1,m2,c2,k1,x01]  ← index 18-23 (mirror sensor1)
+      // [sensor4: m3,c3,m4,c4,k2,x02]  ← index 24-29 (mirror sensor2)
       // Total calibration params = 4 × 6 = 24  →  sensorCount = 4
       const commandStr = [
         state,
@@ -388,10 +368,10 @@ export default function MainTempTest() {
         sendData.m1,  sendData.c1,  sendData.m2,  sendData.c2,  sendData.k1,  sendData.x01,
         // Sensor 2
         sendData.m3,  sendData.c3,  sendData.m4,  sendData.c4,  sendData.k2,  sendData.x02,
-        // Sensor 3
-        sendData.s3_m1, sendData.s3_c1, sendData.s3_m2, sendData.s3_c2, sendData.s3_k, sendData.s3_x0,
-        // Sensor 4
-        sendData.s4_m1, sendData.s4_c1, sendData.s4_m2, sendData.s4_c2, sendData.s4_k, sendData.s4_x0,
+        // Sensor 3 → mirror Sensor 1
+        sendData.m1,  sendData.c1,  sendData.m2,  sendData.c2,  sendData.k1,  sendData.x01,
+        // Sensor 4 → mirror Sensor 2
+        sendData.m3,  sendData.c3,  sendData.m4,  sendData.c4,  sendData.k2,  sendData.x02,
       ].join(",");
 
       console.log("[clickTest] commandStr:", commandStr);
