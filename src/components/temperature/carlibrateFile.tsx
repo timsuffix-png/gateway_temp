@@ -10,18 +10,14 @@ import Swal from "sweetalert2";
 import ButtonBlue from "../buttonBlue";
 
 type CalibrationData = {
-  m1?: number;
-  c1?: number;
-  m2?: number;
-  c2?: number;
-  k1?: number;
-  x01?: number;
-  m3?: number;
-  c3?: number;
-  m4?: number;
-  c4?: number;
-  k2?: number;
-  x02?: number;
+  // Sensor 1
+  m1?: number;  c1?: number;  m2?: number;  c2?: number;  k1?: number;  x01?: number;
+  // Sensor 2
+  m3?: number;  c3?: number;  m4?: number;  c4?: number;  k2?: number;  x02?: number;
+  // Sensor 3
+  s3_m1?: number; s3_c1?: number; s3_m2?: number; s3_c2?: number; s3_k?: number; s3_x0?: number;
+  // Sensor 4
+  s4_m1?: number; s4_c1?: number; s4_m2?: number; s4_c2?: number; s4_k?: number; s4_x0?: number;
 };
 
 export default function CalibrateFile({
@@ -106,18 +102,34 @@ export default function CalibrateFile({
       const pairs = res.text;
       if (onSave && pairs) {
         onSave({
-          m1: pairs[0]?.x ?? 0,
-          c1: pairs[0]?.y ?? 0,
-          m2: pairs[1]?.x ?? 0,
-          c2: pairs[1]?.y ?? 0,
-          k1: pairs[2]?.x ?? 0,
+          // Sensor 1
+          m1:  pairs[0]?.x ?? 0,
+          c1:  pairs[0]?.y ?? 0,
+          m2:  pairs[1]?.x ?? 0,
+          c2:  pairs[1]?.y ?? 0,
+          k1:  pairs[2]?.x ?? 0,
           x01: pairs[2]?.y ?? 0,
-          m3: pairs[3]?.x ?? 0,
-          c3: pairs[3]?.y ?? 0,
-          m4: pairs[4]?.x ?? 0,
-          c4: pairs[4]?.y ?? 0,
-          k2: pairs[5]?.x ?? 0,
+          // Sensor 2
+          m3:  pairs[3]?.x ?? 0,
+          c3:  pairs[3]?.y ?? 0,
+          m4:  pairs[4]?.x ?? 0,
+          c4:  pairs[4]?.y ?? 0,
+          k2:  pairs[5]?.x ?? 0,
           x02: pairs[5]?.y ?? 0,
+          // Sensor 3 (rows 6-8, optional)
+          s3_m1: pairs[6]?.x ?? 0,
+          s3_c1: pairs[6]?.y ?? 0,
+          s3_m2: pairs[7]?.x ?? 0,
+          s3_c2: pairs[7]?.y ?? 0,
+          s3_k:  pairs[8]?.x ?? 0,
+          s3_x0: pairs[8]?.y ?? 0,
+          // Sensor 4 (rows 9-11, optional)
+          s4_m1: pairs[9]?.x  ?? 0,
+          s4_c1: pairs[9]?.y  ?? 0,
+          s4_m2: pairs[10]?.x ?? 0,
+          s4_c2: pairs[10]?.y ?? 0,
+          s4_k:  pairs[11]?.x ?? 0,
+          s4_x0: pairs[11]?.y ?? 0,
         });
       }
       Swal.fire({ icon: "success", title: "เลือกไฟล์สำเร็จ", timer: 1500, showConfirmButton: false });
