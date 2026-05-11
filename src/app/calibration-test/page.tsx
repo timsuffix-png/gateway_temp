@@ -286,10 +286,12 @@ export default function CalibrationTestPage() {
     try {
       // @ts-ignore
       await window.electronAPI.openPort(String(currentCOMPort));
+      // Wait for port to be ready (Arduinos often reset on connection)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       // @ts-ignore
       await window.electronAPI.writeData({
         port: currentCOMPort,
-        command: "calibrate", // ส่งคำสั่ง on
+        command: "calibrate",
       });
       setStatus("on");
       setDetail("กำลังเริ่มการทดสอบ...");

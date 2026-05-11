@@ -364,9 +364,35 @@ export default function MainTempTest() {
 
       await window.electronAPI.openPort(String(currentCOMPort));
       await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Build command string:
+      // state,tempMin,tempLim,currentLim,startMoment,endMoment,
+      // ir1_m1,ir1_c1,ir1_m2,ir1_c2,ir1_k1,ir1_x01,
+      // ir2_m1,ir2_c1,ir2_m2,ir2_c2,ir2_k2,ir2_x02
+      const commandStr = [
+        state,
+        sendData.tempMin,
+        sendData.tempLim,
+        sendData.currentLim,
+        sendData.startMoment,
+        sendData.endMoment,
+        sendData.m1,
+        sendData.c1,
+        sendData.m2,
+        sendData.c2,
+        sendData.k1,
+        sendData.x01,
+        sendData.m3,
+        sendData.c3,
+        sendData.m4,
+        sendData.c4,
+        sendData.k2,
+        sendData.x02,
+      ].join(",");
+
       await window.electronAPI.writeData({
         port: currentCOMPort,
-        command: { ...sendData, state: state },
+        command: commandStr,
       });
     } catch (error) {
       const errStr = String(error ?? "").trim(); // รับรองเป็น string
