@@ -414,7 +414,7 @@ app.on("ready", () => {
       const portPath = portName.startsWith("COM") ? portName : `COM${portName}`;
       port = new SerialPort({
         path: portPath,
-        baudRate: 9600,
+        baudRate: 115200,
         autoOpen: false,
       });
 
