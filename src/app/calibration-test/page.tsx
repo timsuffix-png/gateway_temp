@@ -90,11 +90,13 @@ export default function CalibrationTestPage() {
     }
 
     // @ts-ignore
-    window.electronAPI.onSerialData(handleSerialData);
+    const listener = window.electronAPI.onSerialData(handleSerialData);
 
     return () => {
       // @ts-ignore
       if (window.mockInterval) clearInterval(window.mockInterval);
+      // @ts-ignore
+      window.electronAPI.removeSerialDataListener(listener);
     };
   }, []);
 
@@ -183,11 +185,14 @@ export default function CalibrationTestPage() {
   const finishCycle = (readings: Omit<SensorData, 'time'>) => {
     setData((prev) => {
       if (prev.length < MAX_SAMPLES) {
+        // Play success sound/beep on finish
+        playBeep();
         return [...prev, { ...readings, time: prev.length }];
       }
       return prev;
     });
     setLoading(false);
+    setStatus("Passed"); // Update status to Passed explicitly
     // @ts-ignore
     if (window.mockInterval) {
       // @ts-ignore

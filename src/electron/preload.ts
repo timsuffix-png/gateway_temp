@@ -25,11 +25,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("fetchAPI", fetch),
 
   onSerialData: (callback: (data: string) => void) => {
-    ipcRenderer.on("serial-data", (_event, data) => callback(data));
+    const listener = (_event: IpcRendererEvent, data: string) => callback(data);
+    ipcRenderer.on("serial-data", listener);
+    return listener;
   },
   //ใช้ลบการฟังข้อมูล
-  removeSerialDataListener: (callback: (data: string) => void) => {
-    ipcRenderer.removeListener("serial-data", (_event, data) => callback(data));
+  removeSerialDataListener: (listener: any) => {
+    if (listener) {
+      ipcRenderer.removeListener("serial-data", listener);
+    }
   },
 
   openPort: (portName: string) => ipcRenderer.invoke("openPort", portName),
