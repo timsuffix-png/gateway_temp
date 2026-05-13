@@ -273,20 +273,22 @@ export default function MainTempTest() {
         currentLim: format_script?.qcMain?.qcScript?.script?.CurrentMax ?? 0.0,
         startMoment: format_script?.qcMain?.qcScript?.script?.StartMoment ?? 0.0,
         endMoment: format_script?.qcMain?.qcScript?.script?.EndMoment ?? 0.0,
-        // Sensor 1 (also mirrored to Sensor 3)
-        m1:  format_script?.qcMain?.qcScript?.script?.m1  ?? 0.0,
-        c1:  format_script?.qcMain?.qcScript?.script?.c1  ?? 0.0,
-        m2:  format_script?.qcMain?.qcScript?.script?.m2  ?? 0.0,
-        c2:  format_script?.qcMain?.qcScript?.script?.c2  ?? 0.0,
-        k1:  format_script?.qcMain?.qcScript?.script?.k1  ?? 0.0,
-        x01: format_script?.qcMain?.qcScript?.script?.x01 ?? 0.0,
-        // Sensor 2 (also mirrored to Sensor 4)
-        m3:  format_script?.qcMain?.qcScript?.script?.m3  ?? 0.0,
-        c3:  format_script?.qcMain?.qcScript?.script?.c3  ?? 0.0,
-        m4:  format_script?.qcMain?.qcScript?.script?.m4  ?? 0.0,
-        c4:  format_script?.qcMain?.qcScript?.script?.c4  ?? 0.0,
-        k2:  format_script?.qcMain?.qcScript?.script?.k2  ?? 0.0,
+
+        m3: format_script?.qcMain?.qcScript?.script?.m3 ?? 0.0,
+        c3: format_script?.qcMain?.qcScript?.script?.c3 ?? 0.0,
+        m4: format_script?.qcMain?.qcScript?.script?.m4 ?? 0.0,
+        c4: format_script?.qcMain?.qcScript?.script?.c4 ?? 0.0,
+        k2: format_script?.qcMain?.qcScript?.script?.k2 ?? 0.0,
         x02: format_script?.qcMain?.qcScript?.script?.x02 ?? 0.0,
+
+        m1: format_script?.qcMain?.qcScript?.script?.m1 ?? 0.0,
+        c1: format_script?.qcMain?.qcScript?.script?.c1 ?? 0.0,
+        m2: format_script?.qcMain?.qcScript?.script?.m2 ?? 0.0,
+        c2: format_script?.qcMain?.qcScript?.script?.c2 ?? 0.0,
+        k1: format_script?.qcMain?.qcScript?.script?.k1 ?? 0.0,
+        x01: format_script?.qcMain?.qcScript?.script?.x01 ?? 0.0,
+
+
       }));
     }
   };
