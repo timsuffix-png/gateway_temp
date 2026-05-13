@@ -62,6 +62,7 @@ export default function CalibrationTestPage() {
 
   const ironImageRef = useRef<any | null>(null);
   const dataRef = useRef(data);
+  const isFinishingRef = useRef(false);
 
   const MAX_SAMPLES = 5;
 
@@ -183,6 +184,9 @@ export default function CalibrationTestPage() {
   };
 
   const finishCycle = (readings: Omit<SensorData, 'time'>) => {
+    if (isFinishingRef.current) return;
+    isFinishingRef.current = true;
+
     setData((prev) => {
       if (prev.length < MAX_SAMPLES) {
         // Play success sound/beep on finish
@@ -241,6 +245,7 @@ export default function CalibrationTestPage() {
     if (data.length >= MAX_SAMPLES) return;
 
     if (mode === "mockup") {
+      isFinishingRef.current = false;
       setLoading(true);
       setStatus("on");
       setDetail("กำลังเริ่มการทดสอบ (Mockup)...");
@@ -288,6 +293,7 @@ export default function CalibrationTestPage() {
     }
 
     setLoading(true);
+    isFinishingRef.current = false;
     try {
       // @ts-ignore
       await window.electronAPI.openPort(String(currentCOMPort));
@@ -324,6 +330,7 @@ export default function CalibrationTestPage() {
       if (result.isConfirmed) {
         setData([]);
         setHistory([]);
+        isFinishingRef.current = false;
         setLastRead(null);
         setStatus("");
         setDetail("");
