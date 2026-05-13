@@ -273,20 +273,22 @@ export default function MainTempTest() {
         currentLim: format_script?.qcMain?.qcScript?.script?.CurrentMax ?? 0.0,
         startMoment: format_script?.qcMain?.qcScript?.script?.StartMoment ?? 0.0,
         endMoment: format_script?.qcMain?.qcScript?.script?.EndMoment ?? 0.0,
-        // Sensor 1 (also mirrored to Sensor 3)
-        m1:  format_script?.qcMain?.qcScript?.script?.m1  ?? 0.0,
-        c1:  format_script?.qcMain?.qcScript?.script?.c1  ?? 0.0,
-        m2:  format_script?.qcMain?.qcScript?.script?.m2  ?? 0.0,
-        c2:  format_script?.qcMain?.qcScript?.script?.c2  ?? 0.0,
-        k1:  format_script?.qcMain?.qcScript?.script?.k1  ?? 0.0,
-        x01: format_script?.qcMain?.qcScript?.script?.x01 ?? 0.0,
-        // Sensor 2 (also mirrored to Sensor 4)
-        m3:  format_script?.qcMain?.qcScript?.script?.m3  ?? 0.0,
-        c3:  format_script?.qcMain?.qcScript?.script?.c3  ?? 0.0,
-        m4:  format_script?.qcMain?.qcScript?.script?.m4  ?? 0.0,
-        c4:  format_script?.qcMain?.qcScript?.script?.c4  ?? 0.0,
-        k2:  format_script?.qcMain?.qcScript?.script?.k2  ?? 0.0,
+
+        m3: format_script?.qcMain?.qcScript?.script?.m3 ?? 0.0,
+        c3: format_script?.qcMain?.qcScript?.script?.c3 ?? 0.0,
+        m4: format_script?.qcMain?.qcScript?.script?.m4 ?? 0.0,
+        c4: format_script?.qcMain?.qcScript?.script?.c4 ?? 0.0,
+        k2: format_script?.qcMain?.qcScript?.script?.k2 ?? 0.0,
         x02: format_script?.qcMain?.qcScript?.script?.x02 ?? 0.0,
+
+        m1: format_script?.qcMain?.qcScript?.script?.m1 ?? 0.0,
+        c1: format_script?.qcMain?.qcScript?.script?.c1 ?? 0.0,
+        m2: format_script?.qcMain?.qcScript?.script?.m2 ?? 0.0,
+        c2: format_script?.qcMain?.qcScript?.script?.c2 ?? 0.0,
+        k1: format_script?.qcMain?.qcScript?.script?.k1 ?? 0.0,
+        x01: format_script?.qcMain?.qcScript?.script?.x01 ?? 0.0,
+
+
       }));
     }
   };
@@ -351,28 +353,17 @@ export default function MainTempTest() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Build command string (Arduino derives sensorCount = calibrationParams / 6):
-      // state,tempMin,tempLim,currentLim,startMoment,endMoment,
-      // [sensor1: m1,c1,m2,c2,k1,x01]  ← index 6-11
-      // [sensor2: m3,c3,m4,c4,k2,x02]  ← index 12-17
-      // [sensor3: m1,c1,m2,c2,k1,x01]  ← index 18-23 (mirror sensor1)
-      // [sensor4: m3,c3,m4,c4,k2,x02]  ← index 24-29 (mirror sensor2)
-      // Total calibration params = 4 × 6 = 24  →  sensorCount = 4
-      const commandStr = [
-        state,
-        sendData.tempMin,
-        sendData.tempLim,
-        sendData.currentLim,
-        sendData.startMoment,
-        sendData.endMoment,
-        // Sensor 1
-        sendData.m1,  sendData.c1,  sendData.m2,  sendData.c2,  sendData.k1,  sendData.x01,
-        // Sensor 2
-        sendData.m3,  sendData.c3,  sendData.m4,  sendData.c4,  sendData.k2,  sendData.x02,
-        // Sensor 3 → mirror Sensor 1
-        sendData.m1,  sendData.c1,  sendData.m2,  sendData.c2,  sendData.k1,  sendData.x01,
-        // Sensor 4 → mirror Sensor 2
-        sendData.m3,  sendData.c3,  sendData.m4,  sendData.c4,  sendData.k2,  sendData.x02,
-      ].join(",");
+      // Build single-line command, no spaces, terminated with \n
+      // Format: state,tempMin,tempLim,currentLim,startMoment,endMoment,
+      //         S1(m3,c3,m4,c4,k2,x02), S2(m1,c1,m2,c2,k1,x01),
+      //         S3=S1,                   S4=S2
+      //         (Arduino: sensorCount = 24 calibration params / 6 = 4)
+      const commandStr =
+        `${state},${sendData.tempMin},${sendData.tempLim},${sendData.currentLim},${sendData.startMoment},${sendData.endMoment},` +
+        `${sendData.m3},${sendData.c3},${sendData.m4},${sendData.c4},${sendData.k2},${sendData.x02},` +
+        `${sendData.m1},${sendData.c1},${sendData.m2},${sendData.c2},${sendData.k1},${sendData.x01},` +
+        `${sendData.m3},${sendData.c3},${sendData.m4},${sendData.c4},${sendData.k2},${sendData.x02},` +
+        `${sendData.m1},${sendData.c1},${sendData.m2},${sendData.c2},${sendData.k1},${sendData.x01}\n`;
 
       console.log("[clickTest] commandStr:", commandStr);
 

@@ -295,7 +295,7 @@ app.on("ready", () => {
         "config.cnf",
         "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
       );
-      API = "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/";
+      API = "https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/";
     }
     if (args.method === "POST") {
       try {
@@ -304,9 +304,13 @@ app.on("ready", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...args.body }),
         });
-        if (!res.ok) return null;
+        if (!res.ok) {
+          console.error(`Fetch POST failed: ${res.status} ${res.statusText} for URL: ${API + args.URL}`);
+          return null;
+        }
         return await res.json();
-      } catch {
+      } catch (err: any) {
+        console.error(`Fetch POST exception: ${err.message} for URL: ${API + args.URL}`);
         return null;
       }
     } else if (args.method === "GET") {
@@ -315,9 +319,13 @@ app.on("ready", () => {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
-        if (!res.ok) return null;
+        if (!res.ok) {
+          console.error(`Fetch GET failed: ${res.status} ${res.statusText} for URL: ${API + args.URL}`);
+          return null;
+        }
         return await res.json();
-      } catch {
+      } catch (err: any) {
+        console.error(`Fetch GET exception: ${err.message} for URL: ${API + args.URL}`);
         return null;
       }
     } else if (args.method === "PATCH") {
@@ -474,10 +482,10 @@ app.on("ready", () => {
         return;
       }
 
-      // Send full comma-separated command string
-      port.write(command + "\n", (err) => {
+      // Send command as-is (React already appends \n at the end)
+      port.write(command, (err) => {
         if (err) return reject(err);
-        console.log("Sent command:", command);
+        console.log("Sent command:", command.trim());
         resolve("Command sent successfully");
       });
     });
