@@ -35,9 +35,11 @@ export default function QcDetail() {
   const translateCode = (code: string | undefined): string => {
     if (!code) return "-";
     const trimmed = code.trim();
-    return detailTemp.detailFailed[trimmed] ??
+    return (
+      detailTemp.detailFailed[trimmed] ??
       detailTemp.ironError[trimmed] ??
-      trimmed;
+      trimmed
+    );
   };
 
   useEffect(() => {
@@ -62,43 +64,62 @@ export default function QcDetail() {
     return data;
   };
 
+  const defaultFailedReason = {
+    seaward: "-",
+    seaward_failed: [],
+    thermostat: "-",
+    thermostat_failed: undefined,
+    result: {
+      time: undefined,
+      temp0: undefined,
+      temp1: undefined,
+      temp2: undefined,
+      temp3: undefined,
+    },
+    script_temp: "-",
+    seaward_script: "-",
+    seaward_result: { value: undefined, status: undefined },
+  };
+
   const fetchFailedReason = async (qcRecordId: string) => {
     const res = await window.electronAPI.fetchAPI({
       method: "GET",
       URL: `qc/status/type/${qcRecordId}?limit=99999&page=1&type=both`,
     });
 
-    if (!res) throw new Error("Failed to fetchFailedReason data.");
+    if (!res || res.error) {
+      console.warn(`fetchFailedReason: no data for record ${qcRecordId}`, res);
+      return defaultFailedReason;
+    }
 
     const has_seaward_data = res.data?.some(
       (item: any) =>
-        item.qcMain?.qcType?.name?.toLowerCase() === "seaward" &&
-        item.status
+        item.qcMain?.qcType?.name?.toLowerCase() === "seaward" && item.status,
     );
     const has_temp_data = res.data?.some(
       (item: any) =>
         item.qcMain?.qcType?.name?.toLowerCase() === "thermostat" &&
-        item.status
+        item.status,
     );
 
     const failed_seaward_item = res.data?.filter(
       (item: any) =>
         item.qcMain?.qcType?.name?.toLowerCase() === "seaward" &&
-        item.status?.toLowerCase() === "failed"
+        item.status?.toLowerCase() === "failed",
     );
 
     const seaward_item = res.data?.find(
-      (item: any) => item.qcMain?.qcType?.name?.toLowerCase() === "seaward"
+      (item: any) => item.qcMain?.qcType?.name?.toLowerCase() === "seaward",
     );
 
     const thermostat_item = res.data?.find(
-      (item: any) => item.qcMain?.qcType?.name?.toLowerCase() === "thermostat"
+      (item: any) => item.qcMain?.qcType?.name?.toLowerCase() === "thermostat",
     );
 
     const failed_thermostat_item = res.data?.find(
       (item: any) =>
         item.qcMain?.qcType?.name?.toLowerCase() === "thermostat" &&
-        item.status?.toLowerCase() === "failed"
+        item.status?.toLowerCase() === "failed",
     );
 
     const seaward_details =
@@ -108,8 +129,11 @@ export default function QcDetail() {
     const thermostat_details = thermostat_item?.detail?.split(",") ?? [];
     const script_temp = thermostat_item?.qcMain?.qcScript?.script;
 
-    const seaward_script = seaward_item?.qcMain?.qcScript?.script;
-    const seaward_result_details = seaward_item?.detail?.split(",") ?? [];
+    // ใช้ script/detail ของ test ที่ Failed ก่อน ถ้าไม่มีค่อย fallback ไปอันแรกที่เจอ
+    const seaward_display_item =
+      failed_seaward_item?.length > 0 ? failed_seaward_item[0] : seaward_item;
+    const seaward_script = seaward_display_item?.qcMain?.qcScript?.script;
+    const seaward_result_details = seaward_display_item?.detail?.split(",") ?? [];
 
     return {
       seaward:
@@ -143,13 +167,31 @@ export default function QcDetail() {
     };
   };
 
+  const fetchRemaining = async (qcRecordId: string): Promise<any[]> => {
+    try {
+      const res = await window.electronAPI.fetchAPI({
+        method: "GET",
+        URL: `qc/record/remainingQc/${qcRecordId}`,
+      });
+      if (!res || res.error) return [];
+      return res.data ?? [];
+    } catch {
+      return [];
+    }
+  };
+
   const refreshData = async () => {
     const data = await fetchData();
 
     const fetchPromises = data.data.map(async (item: any) => {
       if (item.tag === "qcRecord") {
         try {
-          const failedReasonText = await fetchFailedReason(item.ID);
+          const [failedReasonText, remaining] = await Promise.all([
+            fetchFailedReason(item.ID),
+            item.statusOverView?.toLowerCase() === "in progress"
+              ? fetchRemaining(item.ID)
+              : Promise.resolve([]),
+          ]);
           return {
             ...item,
             status: {
@@ -161,14 +203,34 @@ export default function QcDetail() {
               thermostat_failed: failedReasonText.thermostat_failed,
               result: failedReasonText.result,
               script_temp: failedReasonText.script_temp,
+              remaining,
             },
           };
         } catch (error) {
           console.error(
             `Error fetching failed reason for ID ${item.ID}:`,
-            error
+            error,
           );
-          return { ...item, failedReasonText: "ไม่สามารถดึงข้อมูลสาเหตุได้" };
+          return {
+            ...item,
+            status: {
+              seaward: "-",
+              seaward_failed: [],
+              seaward_script: "-",
+              seaward_result: { value: undefined, status: undefined },
+              thermostat: "-",
+              thermostat_failed: undefined,
+              result: {
+                time: undefined,
+                temp0: undefined,
+                temp1: undefined,
+                temp2: undefined,
+                temp3: undefined,
+              },
+              script_temp: "-",
+              remaining: [],
+            },
+          };
         }
       }
       return item;
@@ -218,19 +280,34 @@ export default function QcDetail() {
                           <div className="flex w-1/2">
                             {/* /ผลลัพธ์การทดสอบ/ */}
                             <div className="ml-2 overflow-hidden text-ellipsis">
-                              {data.statusOverView?.toLowerCase() === "passed" ? (
-                                <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
-                                  ผ่าน
-                                </h3>
-                              ) : data.statusOverView?.toLowerCase() === "failed" ? (
-                                <h3 className="text-[#ff0000] bg-[#ffa6a6] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
-                                  ไม่ผ่าน
-                                </h3>
-                              ) : data.statusOverView?.toLowerCase() === "in progress" ? (
-                                <h3 className="text-[#ff6600] bg-[#ffea8f] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
-                                  รอการตรวจสอบ
-                                </h3>
-                              ) : null}
+                              {(() => {
+                                // ถ้ามี Failed อย่างน้อย 1 test → ไม่ผ่านทันที (ไม่ต้องรอครบ)
+                                const hasFailed =
+                                  data.status?.seaward === "Failed" ||
+                                  data.status?.thermostat === "Failed";
+
+                                if (hasFailed) {
+                                  return (
+                                    <h3 className="text-[#ff0000] bg-[#ffa6a6] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
+                                      ไม่ผ่าน
+                                    </h3>
+                                  );
+                                }
+                                // ผ่านได้ต่อเมื่อ DB บอก Passed (ครบทุก test และผ่านหมด)
+                                if (data.statusOverView?.toLowerCase() === "passed") {
+                                  return (
+                                    <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
+                                      ผ่าน
+                                    </h3>
+                                  );
+                                }
+                                // ยังทดสอบไม่ครบ
+                                return (
+                                  <h3 className="text-[#ff6600] bg-[#ffea8f] px-2 text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl rounded-xl text-center mr-5 overflow-hidden text-ellipsis">
+                                    รอการตรวจสอบ
+                                  </h3>
+                                );
+                              })()}
                             </div>
                           </div>
                           <div className="flex place-content-end w-1/2">
@@ -241,6 +318,32 @@ export default function QcDetail() {
                             </h1>
                           </div>
                         </div>
+
+                        {/* แสดง test ที่ยังรอทดสอบ */}
+                        {data.statusOverView?.toLowerCase() === "in progress" &&
+                          data.status?.remaining?.length > 0 && (
+                            <div className="mx-[15%] mt-4 mb-2 px-4 py-3 bg-[#fff8e1] border border-[#ffcc00] rounded-xl">
+                              <h1 className="text-[#cc7700] font-bold text-sm xl:text-base 2xl:text-lg mb-2">
+                                ⏳ รอการทดสอบ ({data.status.remaining.length} รายการ)
+                              </h1>
+                              <ul className="list-disc list-inside space-y-1">
+                                {data.status.remaining.map((test: any) => (
+                                  <li
+                                    key={test.ID}
+                                    className="text-black text-sm xl:text-base 2xl:text-lg whitespace-normal"
+                                  >
+                                    <span className="font-medium">{test.testName}</span>
+                                    {test.qcType?.name && (
+                                      <span className="ml-2 text-gray-500 text-xs xl:text-sm">
+                                        ({test.qcType.name === "seaward" ? "ซีเวิร์ด" : test.qcType.name === "thermostat" ? "เทอร์โมสตัท" : test.qcType.name})
+                                      </span>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
                         {data?.status?.seaward !== "-" && (
                           <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
                             ซีเวิร์ด : {data?.status?.seaward}
@@ -260,7 +363,8 @@ export default function QcDetail() {
                         <div className="mt-5 w-full text-center">
                           {data?.status?.thermostat !== "-" && (
                             <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
-                              เทอร์โมสตัท ({data.qcProject?.projectName}) : {data?.status?.thermostat}
+                              เทอร์โมสตัท ({data.qcProject?.projectName}) :{" "}
+                              {data?.status?.thermostat}
                               {data?.status?.thermostat === "Failed" && (
                                 <span className="whitespace-normal text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
                                   {" ( "}
@@ -274,19 +378,52 @@ export default function QcDetail() {
                           {data?.status?.thermostat !== "-" && (
                             <div className=" pl-[17%] flex gap-[10%] items-start">
                               <div className=" text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
-                                <h1 className="mb-2 underline font-bold">ค่าที่กำหนด (เทอร์โมสตัท)</h1>
-                                <h1>เวลาเริ่มต้น : {data.status?.script_temp?.StartMoment ?? "-"}</h1>
-                                <h1>เวลาสิ้นสุด : {data.status?.script_temp?.EndMoment ?? "-"}</h1>
-                                <h1>อุณหภูมิต่ำสุด : {data.status?.script_temp?.TemperatureMin ?? "-"}</h1>
-                                <h1>อุณหภูมิสูงสุด : {data.status?.script_temp?.TemperatureMax ?? "-"}</h1>
+                                <h1 className="mb-2 underline font-bold">
+                                  ค่าที่กำหนด (เทอร์โมสตัท)
+                                </h1>
+                                <h1>
+                                  เวลาเริ่มต้น :{" "}
+                                  {data.status?.script_temp?.StartMoment ?? "-"}
+                                </h1>
+                                <h1>
+                                  เวลาสิ้นสุด :{" "}
+                                  {data.status?.script_temp?.EndMoment ?? "-"}
+                                </h1>
+                                <h1>
+                                  อุณหภูมิต่ำสุด :{" "}
+                                  {data.status?.script_temp?.TemperatureMin ??
+                                    "-"}
+                                </h1>
+                                <h1>
+                                  อุณหภูมิสูงสุด :{" "}
+                                  {data.status?.script_temp?.TemperatureMax ??
+                                    "-"}
+                                </h1>
                               </div>
                               <div className=" text-start  whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
-                                <h1 className="mb-2 underline font-bold">ผลลัพธ์</h1>
-                                <h1>เวลา : {data?.status?.result?.time ?? "-"} วินาที</h1>
-                                <h1>อุณหภูมิขวา : {data?.status?.result?.temp0 ?? "-"} องศา</h1>
-                                <h1>อุณหภูมิซ้าย : {data?.status?.result?.temp1 ?? "-"} องศา</h1>
-                                <h1>อุณหภูมิบน : {data?.status?.result?.temp2 ?? "-"} องศา</h1>
-                                <h1>อุณหภูมิกลาง : {data?.status?.result?.temp3 ?? "-"} องศา</h1>
+                                <h1 className="mb-2 underline font-bold">
+                                  ผลลัพธ์
+                                </h1>
+                                <h1>
+                                  เวลา : {data?.status?.result?.time ?? "-"}{" "}
+                                  วินาที
+                                </h1>
+                                <h1>
+                                  อุณหภูมิขวา :{" "}
+                                  {data?.status?.result?.temp0 ?? "-"} องศา
+                                </h1>
+                                <h1>
+                                  อุณหภูมิซ้าย :{" "}
+                                  {data?.status?.result?.temp1 ?? "-"} องศา
+                                </h1>
+                                <h1>
+                                  อุณหภูมิบน :{" "}
+                                  {data?.status?.result?.temp2 ?? "-"} องศา
+                                </h1>
+                                <h1>
+                                  อุณหภูมิกลาง :{" "}
+                                  {data?.status?.result?.temp3 ?? "-"} องศา
+                                </h1>
                               </div>
                             </div>
                           )}
@@ -294,16 +431,39 @@ export default function QcDetail() {
                           {data?.status?.seaward !== "-" && (
                             <div className=" pl-[17%] flex gap-[10%] items-start border-t border-gray-100 mt-5 pt-5">
                               <div className=" text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
-                                <h1 className="mb-2 underline font-bold">ค่าที่กำหนด (ซีเวิร์ด)</h1>
-                                <h1>Output : {data.status?.seaward_script?.script_5 ?? "-"}</h1>
-                                <h1>RampUp : {data.status?.seaward_script?.script_6 ?? "-"}</h1>
-                                <h1>Dwell : {data.status?.seaward_script?.script_7 ?? "-"}</h1>
-                                <h1>High Limit : {data.status?.seaward_script?.script_10 ?? "-"}</h1>
+                                <h1 className="mb-2 underline font-bold">
+                                  ค่าที่กำหนด (ซีเวิร์ด)
+                                </h1>
+                                <h1>
+                                  Output :{" "}
+                                  {data.status?.seaward_script?.script_5 ?? "-"}
+                                </h1>
+                                <h1>
+                                  RampUp :{" "}
+                                  {data.status?.seaward_script?.script_6 ?? "-"}
+                                </h1>
+                                <h1>
+                                  Dwell :{" "}
+                                  {data.status?.seaward_script?.script_7 ?? "-"}
+                                </h1>
+                                <h1>
+                                  High Limit :{" "}
+                                  {data.status?.seaward_script?.script_10 ??
+                                    "-"}
+                                </h1>
                               </div>
                               <div className=" text-start  whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
-                                <h1 className="mb-2 underline font-bold">ผลลัพธ์</h1>
-                                <h1>ค่าที่ได้ : {data?.status?.seaward_result?.value ?? "-"}</h1>
-                                <h1>สถานะ : {data?.status?.seaward_result?.status ?? "-"}</h1>
+                                <h1 className="mb-2 underline font-bold">
+                                  ผลลัพธ์
+                                </h1>
+                                <h1>
+                                  ค่าที่ได้ :{" "}
+                                  {data?.status?.seaward_result?.value ?? "-"}
+                                </h1>
+                                <h1>
+                                  สถานะ :{" "}
+                                  {data?.status?.seaward_result?.status ?? "-"}
+                                </h1>
                               </div>
                             </div>
                           )}
