@@ -160,10 +160,86 @@ export default function QcDetail() {
       },
       script_temp: script_temp ?? "-",
       seaward_script: seaward_script ?? "-",
-      seaward_result: {
-        value: seaward_result_details[0]?.trim(),
-        status: seaward_result_details[1]?.trim(),
-      },
+      seaward_result: (() => {
+        let seaward_value = "-";
+        let seaward_status = seaward_display_item?.status || "-";
+        let time = undefined;
+        let machine_code = undefined;
+        let measurement_1 = undefined;
+        let measurement_2 = undefined;
+        let has_raw = false;
+        const testName = seaward_display_item?.qcMain?.testName || "";
+
+        const first_element_raw = seaward_result_details[0]?.trim();
+        const is_raw_data = first_element_raw && /^\d+(\.\d+)?[sS]$/.test(first_element_raw);
+
+        if (is_raw_data) {
+          has_raw = true;
+          time = first_element_raw;
+          machine_code = seaward_result_details[1]?.trim();
+          measurement_1 = seaward_result_details[2]?.trim();
+          
+          const last_element = seaward_result_details[seaward_result_details.length - 1]?.trim();
+          const second_to_last = seaward_result_details[seaward_result_details.length - 2]?.trim();
+
+          if (last_element === "Passed" || last_element === "Failed") {
+            seaward_status = last_element;
+            seaward_value = seaward_result_details.slice(1, -1).join(", ").trim();
+            if (seaward_result_details.length > 3) {
+              measurement_2 = seaward_result_details.slice(3, -1).join(", ").trim();
+            }
+          } else if (second_to_last === "Failed") {
+            seaward_status = "Failed";
+            seaward_value = last_element;
+            if (seaward_result_details.length > 3) {
+              measurement_2 = seaward_result_details.slice(3, -2).join(", ").trim();
+            }
+          } else {
+            seaward_status = seaward_display_item?.status || "Failed";
+            if (seaward_status === "Failed" && seaward_display_item?.result) {
+              seaward_value = seaward_display_item.result;
+            } else {
+              seaward_value = seaward_display_item?.detail?.trim() || "-";
+            }
+            if (seaward_result_details.length > 3) {
+              measurement_2 = seaward_result_details.slice(3).join(", ").trim();
+            }
+          }
+        } else {
+          if (seaward_result_details.length > 1) {
+            const last_element = seaward_result_details[seaward_result_details.length - 1]?.trim();
+            const first_element = seaward_result_details[0]?.trim();
+            if (last_element === "Passed" || last_element === "Failed") {
+              seaward_value = seaward_result_details.slice(0, -1).join(", ").trim();
+              seaward_status = last_element;
+            } else if (first_element === "Passed" || first_element === "Failed") {
+              seaward_value = seaward_result_details.slice(1).join(", ").trim();
+              seaward_status = first_element;
+            } else {
+              seaward_value = seaward_display_item?.detail?.trim() || "-";
+              seaward_status = seaward_display_item?.status || "Failed";
+            }
+          } else {
+            if (seaward_display_item?.status === "Failed" && seaward_display_item?.result) {
+              seaward_value = seaward_display_item.result;
+            } else {
+              seaward_value = seaward_display_item?.detail?.trim() || "-";
+            }
+            seaward_status = seaward_display_item?.status || "-";
+          }
+        }
+
+        return {
+          value: seaward_value,
+          status: seaward_status,
+          time,
+          machine_code,
+          measurement_1,
+          measurement_2,
+          has_raw,
+          testName,
+        };
+      })(),
     };
   };
 
@@ -457,13 +533,92 @@ export default function QcDetail() {
                                   ผลลัพธ์
                                 </h1>
                                 <h1>
-                                  ค่าที่ได้ :{" "}
-                                  {data?.status?.seaward_result?.value ?? "-"}
-                                </h1>
-                                <h1>
                                   สถานะ :{" "}
-                                  {data?.status?.seaward_result?.status ?? "-"}
+                                  <span>
+                                    {data?.status?.seaward_result?.status ?? "-"}
+                                  </span>
                                 </h1>
+                                {data?.status?.seaward_result?.status === "Failed" && 
+                                 data?.status?.seaward_result?.value && 
+                                 data?.status?.seaward_result?.value !== "-" && 
+                                 !data?.status?.seaward_result?.value.includes(",") && (
+                                  <h1>
+                                    เหตุผลที่ตก : {data.status.seaward_result.value}
+                                  </h1>
+                                )}
+                                {!data?.status?.seaward_result?.has_raw && 
+                                 data?.status?.seaward_result?.status !== "Failed" && (
+                                  <h1>
+                                    ค่าที่ได้ :{" "}
+                                    {data?.status?.seaward_result?.value ?? "-"}
+                                  </h1>
+                                )}
+                                {data?.status?.seaward_result?.has_raw && (() => {
+                                  const testName = (data?.status?.seaward_result?.testName || "").toUpperCase();
+                                  
+                                  let timeLabel = "เวลาทดสอบ";
+                                  let val1Label = "โค้ด / แรงดันทดสอบ";
+                                  let val2Label = "ค่าที่วัดได้ 1";
+                                  let val3Label = "ค่าที่วัดได้ 2";
+                                  
+                                  let val1Unit = "";
+                                  let val2Unit = "";
+                                  let val3Unit = "";
+
+                                  if (testName.includes("EBOND")) {
+                                    timeLabel = "เวลาทดสอบ";
+                                    val1Label = "กระแสทดสอบ";
+                                    val2Label = "ความต้านทานสายดิน";
+                                    val1Unit = " A";
+                                    val2Unit = " mΩ";
+                                  } else if (testName.includes("DCIR") || testName.includes("INSULATION")) {
+                                    timeLabel = "เวลาทดสอบ";
+                                    val1Label = "แรงดันทดสอบ";
+                                    val2Label = "ความต้านทานฉนวน";
+                                    val1Unit = " V";
+                                    val2Unit = " MΩ";
+                                  } else if (testName.includes("HIPOT")) {
+                                    timeLabel = "เวลาทดสอบ";
+                                    val1Label = "แรงดันทดสอบ";
+                                    val2Label = "กระแสรั่วไหล";
+                                    val1Unit = " V";
+                                    val2Unit = " mA";
+                                  } else if (testName.includes("LEAKAGE") || testName.includes("POWER")) {
+                                    timeLabel = "เวลาทดสอบ";
+                                    val1Label = "แรงดันทดสอบ";
+                                    val2Label = "กระแสรั่วไหล";
+                                    val1Unit = " V";
+                                    val2Unit = " mA";
+                                  }
+
+                                  let val1Display = data.status.seaward_result.machine_code;
+                                  if (testName.includes("EBOND") && val1Display && !isNaN(Number(val1Display))) {
+                                    const numVal = Number(val1Display);
+                                    if (numVal > 100) {
+                                      val1Display = (numVal / 1000).toFixed(2);
+                                    }
+                                  }
+
+                                  return (
+                                    <div className="mt-4 pt-3 border-t border-dashed border-gray-300 text-gray-700">
+                                      <h2 className="font-bold text-xs xl:text-sm text-gray-500 mb-1">
+                                        📊 ผลการตรวจวัดจริง (Seaward Measurements)
+                                      </h2>
+                                      {data?.status?.seaward_result?.time && (
+                                        <h1>{timeLabel} : {data.status.seaward_result.time}</h1>
+                                      )}
+                                      {val1Display && (
+                                        <h1>{val1Label} : {val1Display}{val1Unit}</h1>
+                                      )}
+                                      {data?.status?.seaward_result?.measurement_1 && (
+                                        <h1>{val2Label} : {data.status.seaward_result.measurement_1}{val2Unit}</h1>
+                                      )}
+                                      {data?.status?.seaward_result?.measurement_2 && (
+                                        <h1>{val3Label} : {data.status.seaward_result.measurement_2}{val3Unit}</h1>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
                               </div>
                             </div>
                           )}
