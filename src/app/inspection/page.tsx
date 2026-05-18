@@ -35,16 +35,18 @@ export default function Inspection() {
         };
         qcProject: {
           projectName: string;
-          qcItemProject: [
-            {
-              qcMain: {
-                qcType: {
-                  name: string;
-                };
-              };
-            },
-          ];
         };
+        qcRecordStatus: [
+          {
+            createdAt: string;
+            status: string;
+            qcMain: {
+              qcType: {
+                name: string;
+              };
+            };
+          },
+        ];
         testBy: {
           name: string;
           surname: string;
@@ -235,12 +237,30 @@ export default function Inspection() {
                       </div>
                     </div>
                     <div className="text-black">
-                      {qcRecords?.data?.map((data) => {
-                        const type =
-                          data.qcProject.qcItemProject[0].qcMain.qcType.name;
-                        return (
+                      {qcRecords?.data?.flatMap((data) => {
+                        const sorted = [...(data.qcRecordStatus ?? [])].sort(
+                          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                        );
+                        const typeGroups: Record<string, typeof sorted> = {};
+                        for (const s of sorted) {
+                          const t = s.qcMain?.qcType?.name ?? "unknown";
+                          if (!typeGroups[t]) typeGroups[t] = [];
+                          typeGroups[t].push(s);
+                        }
+                        if (Object.keys(typeGroups).length === 0) {
+                          typeGroups["unknown"] = [];
+                        }
+                        return Object.entries(typeGroups).map(([typeName, typeStatuses]) => {
+                          const typeDisplay =
+                            typeName === "thermostat" ? "เทอร์โมสตัท"
+                            : typeName === "seaward" ? "ซีเวิร์ด"
+                            : typeName;
+                          const allPassed = typeStatuses.length > 0 && typeStatuses.every((s: any) => s.status === "Passed");
+                          const anyFailed = typeStatuses.some((s: any) => s.status === "Failed");
+                          const rowStatus = allPassed ? "Passed" : anyFailed ? "Failed" : "In progress";
+                          return (
                           <div
-                            key={data.ID}
+                            key={`${data.ID}-${typeName}`}
                             className="flex flex-row w-full h-12 hover:bg-gray-200"
                           >
                             <div className="w-7/12 sm:w-4/12 md:w-3/12 lg:w-2/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
@@ -253,11 +273,7 @@ export default function Inspection() {
                             </div>
                             <div className="w-3/12 sm:w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl   flex items-center justify-center">
                               <div className="text-ellipsis overflow-hidden">
-                                {type === "thermostat"
-                                  ? "เทอร์โมสตัท"
-                                  : type === "seaward"
-                                    ? "ซีเวิร์ด"
-                                    : type}
+                                {typeDisplay}
                               </div>
                             </div>
                             <div className="w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] flex items-center justify-center">
@@ -282,19 +298,19 @@ export default function Inspection() {
                               </h5>
                             </div>
                             <div className="w-1/12 sm:w-1/12 lg:w-1/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] flex items-center justify-center">
-                              {data.statusOverView === "Passed" ? (
+                              {rowStatus === "Passed" ? (
                                 <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
                                   ผ่าน
                                 </h3>
-                              ) : data.statusOverView === "Failed" ? (
+                              ) : rowStatus === "Failed" ? (
                                 <h3 className="text-[#ff0000] bg-[#ffa6a6] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
                                   ไม่ผ่าน
                                 </h3>
-                              ) : data.statusOverView === "In progress" ? (
+                              ) : (
                                 <h3 className="text-[#ff6600] bg-[#ffea8f] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
                                   รอการตรวจสอบ
                                 </h3>
-                              ) : null}
+                              )}
                             </div>
                             <div className="hidden md:block w-2/12 lg:w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   place-content-center place-items-center">
                               <div className="text-ellipsis overflow-hidden">
@@ -331,6 +347,7 @@ export default function Inspection() {
                             </div>
                           </div>
                         );
+                        });
                       })}
                     </div>
                   </div>
