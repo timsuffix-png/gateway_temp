@@ -250,7 +250,7 @@ export default function Inspection() {
                         if (Object.keys(typeGroups).length === 0) {
                           typeGroups["unknown"] = [];
                         }
-                        return Object.entries(typeGroups).map(([typeName, typeStatuses]) => {
+                        return Object.entries(typeGroups).reverse().map(([typeName, typeStatuses]) => {
                           const typeDisplay =
                             typeName === "thermostat" ? "เทอร์โมสตัท"
                             : typeName === "seaward" ? "ซีเวิร์ด"
