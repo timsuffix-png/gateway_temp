@@ -67,6 +67,7 @@ export default function QcDetail() {
   const defaultFailedReason = {
     seaward: "-",
     seaward_failed: [],
+    seaward_items: [] as any[],
     thermostat: "-",
     thermostat_failed: undefined,
     result: {
@@ -79,6 +80,71 @@ export default function QcDetail() {
     script_temp: "-",
     seaward_script: "-",
     seaward_result: { value: undefined, status: undefined },
+  };
+
+  const parseSeawardResultItem = (item: any) => {
+    const detail_parts = item.detail?.split(",") ?? [];
+    const testName = (item.qcMain?.testName || "").trim();
+    const script = item.qcMain?.qcScript?.script;
+
+    let seaward_value = "-";
+    let seaward_status = item.status || "-";
+    let time: string | undefined;
+    let machine_code: string | undefined;
+    let measurement_1: string | undefined;
+    let measurement_2: string | undefined;
+    let has_raw = false;
+
+    const first_element_raw = detail_parts[0]?.trim();
+    const is_raw_data = first_element_raw && /^\d+(\.\d+)?[sS]$/.test(first_element_raw);
+
+    if (is_raw_data) {
+      has_raw = true;
+      time = first_element_raw;
+      machine_code = detail_parts[1]?.trim();
+      measurement_1 = detail_parts[2]?.trim();
+      const last_element = detail_parts[detail_parts.length - 1]?.trim();
+      const second_to_last = detail_parts[detail_parts.length - 2]?.trim();
+
+      if (last_element === "Passed" || last_element === "Failed") {
+        seaward_status = last_element;
+        seaward_value = detail_parts.slice(1, -1).join(", ").trim();
+        if (detail_parts.length > 3) measurement_2 = detail_parts.slice(3, -1).join(", ").trim();
+      } else if (second_to_last === "Failed") {
+        seaward_status = "Failed";
+        seaward_value = last_element || "-";
+        if (detail_parts.length > 3) measurement_2 = detail_parts.slice(3, -2).join(", ").trim();
+      } else {
+        seaward_status = item.status || "Failed";
+        seaward_value = item.detail?.trim() || "-";
+        if (detail_parts.length > 3) measurement_2 = detail_parts.slice(3).join(", ").trim();
+      }
+    } else {
+      if (detail_parts.length > 1) {
+        const last_element = detail_parts[detail_parts.length - 1]?.trim();
+        const first_element = detail_parts[0]?.trim();
+        if (last_element === "Passed" || last_element === "Failed") {
+          seaward_value = detail_parts.slice(0, -1).join(", ").trim();
+          seaward_status = last_element;
+        } else if (first_element === "Passed" || first_element === "Failed") {
+          seaward_value = detail_parts.slice(1).join(", ").trim();
+          seaward_status = first_element;
+        } else {
+          seaward_value = item.detail?.trim() || "-";
+          seaward_status = item.status || "Failed";
+        }
+      } else {
+        seaward_value = item.detail?.trim() || "-";
+        seaward_status = item.status || "-";
+      }
+    }
+
+    return {
+      testName,
+      status: seaward_status,
+      script,
+      result: { value: seaward_value, status: seaward_status, time, machine_code, measurement_1, measurement_2, has_raw, testName },
+    };
   };
 
   const fetchFailedReason = async (qcRecordId: string) => {
@@ -135,6 +201,10 @@ export default function QcDetail() {
     const seaward_script = seaward_display_item?.qcMain?.qcScript?.script;
     const seaward_result_details = seaward_display_item?.detail?.split(",") ?? [];
 
+    const seaward_items = (res.data ?? [])
+      .filter((item: any) => item.qcMain?.qcType?.name?.toLowerCase() === "seaward")
+      .map((item: any) => parseSeawardResultItem(item));
+
     return {
       seaward:
         failed_seaward_item?.length > 0
@@ -143,6 +213,7 @@ export default function QcDetail() {
             ? "Passed"
             : "-",
       seaward_failed: seaward_details,
+      seaward_items,
       thermostat: failed_thermostat_item
         ? "Failed"
         : has_temp_data
@@ -273,6 +344,7 @@ export default function QcDetail() {
             status: {
               seaward: failedReasonText.seaward,
               seaward_failed: failedReasonText.seaward_failed,
+              seaward_items: failedReasonText.seaward_items,
               seaward_script: failedReasonText.seaward_script,
               seaward_result: failedReasonText.seaward_result,
               thermostat: failedReasonText.thermostat,
@@ -292,6 +364,7 @@ export default function QcDetail() {
             status: {
               seaward: "-",
               seaward_failed: [],
+              seaward_items: [],
               seaward_script: "-",
               seaward_result: { value: undefined, status: undefined },
               thermostat: "-",
@@ -504,124 +577,73 @@ export default function QcDetail() {
                             </div>
                           )}
 
-                          {data?.status?.seaward !== "-" && (
-                            <div className=" pl-[17%] flex gap-[10%] items-start border-t border-gray-100 mt-5 pt-5">
-                              <div className=" text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
-                                <h1 className="mb-2 underline font-bold">
-                                  ค่าที่กำหนด (ซีเวิร์ด)
-                                </h1>
-                                <h1>
-                                  Output :{" "}
-                                  {data.status?.seaward_script?.script_5 ?? "-"}
-                                </h1>
-                                <h1>
-                                  RampUp :{" "}
-                                  {data.status?.seaward_script?.script_6 ?? "-"}
-                                </h1>
-                                <h1>
-                                  Dwell :{" "}
-                                  {data.status?.seaward_script?.script_7 ?? "-"}
-                                </h1>
-                                <h1>
-                                  High Limit :{" "}
-                                  {data.status?.seaward_script?.script_10 ??
-                                    "-"}
-                                </h1>
-                              </div>
-                              <div className=" text-start  whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
-                                <h1 className="mb-2 underline font-bold">
-                                  ผลลัพธ์
-                                </h1>
-                                <h1>
-                                  สถานะ :{" "}
-                                  <span>
-                                    {data?.status?.seaward_result?.status ?? "-"}
-                                  </span>
-                                </h1>
-                                {data?.status?.seaward_result?.status === "Failed" && 
-                                 data?.status?.seaward_result?.value && 
-                                 data?.status?.seaward_result?.value !== "-" && 
-                                 !data?.status?.seaward_result?.value.includes(",") && (
-                                  <h1>
-                                    เหตุผลที่ตก : {data.status.seaward_result.value}
+                          {data?.status?.seaward_items?.map((sw: any, idx: number) => {
+                            const tn = sw.testName.toUpperCase();
+                            let val1Label = "โค้ด / แรงดันทดสอบ";
+                            let val2Label = "ค่าที่วัดได้";
+                            let val1Unit = "";
+                            let val2Unit = "";
+
+                            if (tn.includes("EBOND")) {
+                              val1Label = "กระแสทดสอบ"; val2Label = "ความต้านทานสายดิน";
+                              val1Unit = " A"; val2Unit = " mΩ";
+                            } else if (tn.includes("DCIR") || tn.includes("INSULATION")) {
+                              val1Label = "แรงดันทดสอบ"; val2Label = "ความต้านทานฉนวน";
+                              val1Unit = " V"; val2Unit = " MΩ";
+                            } else if (tn.includes("HIPOT")) {
+                              val1Label = "แรงดันทดสอบ"; val2Label = "กระแสรั่วไหล";
+                              val1Unit = " V"; val2Unit = " mA";
+                            } else if (tn.includes("LEAKAGE") || tn.includes("POWER")) {
+                              val1Label = "แรงดันทดสอบ"; val2Label = "กระแสรั่วไหล";
+                              val1Unit = " V"; val2Unit = " mA";
+                            }
+
+                            let val1Display = sw.result.machine_code;
+                            if (tn.includes("EBOND") && val1Display && !isNaN(Number(val1Display))) {
+                              const numVal = Number(val1Display);
+                              if (numVal > 100) val1Display = (numVal / 1000).toFixed(2);
+                            }
+
+                            return (
+                              <div key={idx} className="pl-[17%] flex gap-[10%] items-start border-t border-gray-100 mt-5 pt-5">
+                                <div className="text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
+                                  <h1 className="mb-2 underline font-bold">
+                                    ค่าที่กำหนด ({sw.testName})
                                   </h1>
-                                )}
-                                {!data?.status?.seaward_result?.has_raw && 
-                                 data?.status?.seaward_result?.status !== "Failed" && (
+                                  <h1>Output : {sw.script?.script_5 ?? "-"}</h1>
+                                  <h1>RampUp : {sw.script?.script_6 ?? "-"}</h1>
+                                  <h1>Dwell : {sw.script?.script_7 ?? "-"}</h1>
+                                  <h1>High Limit : {sw.script?.script_10 ?? "-"}</h1>
+                                </div>
+                                <div className="text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
+                                  <h1 className="mb-2 underline font-bold">ผลลัพธ์</h1>
                                   <h1>
-                                    ค่าที่ได้ :{" "}
-                                    {data?.status?.seaward_result?.value ?? "-"}
+                                    สถานะ :{" "}
+                                    <span className={sw.result.status === "Passed" ? "text-green-600 font-bold" : sw.result.status === "Failed" ? "text-red-600 font-bold" : ""}>
+                                      {sw.result.status ?? "-"}
+                                    </span>
                                   </h1>
-                                )}
-                                {data?.status?.seaward_result?.has_raw && (() => {
-                                  const testName = (data?.status?.seaward_result?.testName || "").toUpperCase();
-                                  
-                                  let timeLabel = "เวลาทดสอบ";
-                                  let val1Label = "โค้ด / แรงดันทดสอบ";
-                                  let val2Label = "ค่าที่วัดได้ 1";
-                                  let val3Label = "ค่าที่วัดได้ 2";
-                                  
-                                  let val1Unit = "";
-                                  let val2Unit = "";
-                                  let val3Unit = "";
-
-                                  if (testName.includes("EBOND")) {
-                                    timeLabel = "เวลาทดสอบ";
-                                    val1Label = "กระแสทดสอบ";
-                                    val2Label = "ความต้านทานสายดิน";
-                                    val1Unit = " A";
-                                    val2Unit = " mΩ";
-                                  } else if (testName.includes("DCIR") || testName.includes("INSULATION")) {
-                                    timeLabel = "เวลาทดสอบ";
-                                    val1Label = "แรงดันทดสอบ";
-                                    val2Label = "ความต้านทานฉนวน";
-                                    val1Unit = " V";
-                                    val2Unit = " MΩ";
-                                  } else if (testName.includes("HIPOT")) {
-                                    timeLabel = "เวลาทดสอบ";
-                                    val1Label = "แรงดันทดสอบ";
-                                    val2Label = "กระแสรั่วไหล";
-                                    val1Unit = " V";
-                                    val2Unit = " mA";
-                                  } else if (testName.includes("LEAKAGE") || testName.includes("POWER")) {
-                                    timeLabel = "เวลาทดสอบ";
-                                    val1Label = "แรงดันทดสอบ";
-                                    val2Label = "กระแสรั่วไหล";
-                                    val1Unit = " V";
-                                    val2Unit = " mA";
-                                  }
-
-                                  let val1Display = data.status.seaward_result.machine_code;
-                                  if (testName.includes("EBOND") && val1Display && !isNaN(Number(val1Display))) {
-                                    const numVal = Number(val1Display);
-                                    if (numVal > 100) {
-                                      val1Display = (numVal / 1000).toFixed(2);
-                                    }
-                                  }
-
-                                  return (
+                                  {sw.result.status === "Failed" && sw.result.value && sw.result.value !== "-" && !sw.result.value.includes(",") && (
+                                    <h1>เหตุผลที่ตก : {sw.result.value}</h1>
+                                  )}
+                                  {sw.result.has_raw && (
                                     <div className="mt-4 pt-3 border-t border-dashed border-gray-300 text-gray-700">
                                       <h2 className="font-bold text-xs xl:text-sm text-gray-500 mb-1">
                                         📊 ผลการตรวจวัดจริง (Seaward Measurements)
                                       </h2>
-                                      {data?.status?.seaward_result?.time && (
-                                        <h1>{timeLabel} : {data.status.seaward_result.time}</h1>
-                                      )}
-                                      {val1Display && (
-                                        <h1>{val1Label} : {val1Display}{val1Unit}</h1>
-                                      )}
-                                      {data?.status?.seaward_result?.measurement_1 && (
-                                        <h1>{val2Label} : {data.status.seaward_result.measurement_1}{val2Unit}</h1>
-                                      )}
-                                      {data?.status?.seaward_result?.measurement_2 && (
-                                        <h1>{val3Label} : {data.status.seaward_result.measurement_2}{val3Unit}</h1>
-                                      )}
+                                      {sw.result.time && <h1>เวลาทดสอบ : {sw.result.time}</h1>}
+                                      {val1Display && <h1>{val1Label} : {val1Display}{val1Unit}</h1>}
+                                      {sw.result.measurement_1 && <h1>{val2Label} : {sw.result.measurement_1}{val2Unit}</h1>}
+                                      {sw.result.measurement_2 && <h1>ค่าเพิ่มเติม : {sw.result.measurement_2}</h1>}
                                     </div>
-                                  );
-                                })()}
+                                  )}
+                                  {!sw.result.has_raw && sw.result.status !== "Failed" && (
+                                    <h1>ค่าที่ได้ : {sw.result.value ?? "-"}</h1>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            );
+                          })}
                         </div>
 
                         <h1 className="text-black font-normal  text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
