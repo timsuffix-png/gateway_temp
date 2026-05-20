@@ -237,7 +237,7 @@ export default function Inspection() {
                     <div className="text-black">
                       {qcRecords?.data?.map((data) => {
                         const type =
-                          data.qcProject.qcItemProject[0].qcMain.qcType.name;
+                          data.qcProject?.qcItemProject?.[0]?.qcMain?.qcType?.name || "-";
                         return (
                           <div
                             key={data.ID}
