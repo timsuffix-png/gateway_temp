@@ -35,16 +35,18 @@ export default function Inspection() {
         };
         qcProject: {
           projectName: string;
-          qcItemProject: [
-            {
-              qcMain: {
-                qcType: {
-                  name: string;
-                };
-              };
-            },
-          ];
         };
+        qcRecordStatus: [
+          {
+            createdAt: string;
+            status: string;
+            qcMain: {
+              qcType: {
+                name: string;
+              };
+            };
+          },
+        ];
         testBy: {
           name: string;
           surname: string;
@@ -235,102 +237,117 @@ export default function Inspection() {
                       </div>
                     </div>
                     <div className="text-black">
-                      {qcRecords?.data?.map((data) => {
-                        const type =
-                          data.qcProject?.qcItemProject?.[0]?.qcMain?.qcType?.name || "-";
-                        return (
-                          <div
-                            key={data.ID}
-                            className="flex flex-row w-full h-12 hover:bg-gray-200"
-                          >
-                            <div className="w-7/12 sm:w-4/12 md:w-3/12 lg:w-2/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
-                              <div className="hidden xl:block">
-                                {Translator.item.icon}
-                              </div>
-                              <h5 className="xl:ml-1 text-ellipsis overflow-hidden">
-                                {data.construct.ID}
-                              </h5>
-                            </div>
-                            <div className="w-3/12 sm:w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl   flex items-center justify-center">
-                              <div className="text-ellipsis overflow-hidden">
-                                {type === "thermostat"
-                                  ? "เทอร์โมสตัท"
-                                  : type === "seaward"
-                                    ? "ซีเวิร์ด"
-                                    : type}
-                              </div>
-                            </div>
-                            <div className="w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] flex items-center justify-center">
-                              <div className="text-ellipsis overflow-hidden">
-                                {data.qcProject.projectName}
-                              </div>
-                            </div>
-                            <div className="hidden lg:flex w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] items-center justify-center">
-                              <div className="text-ellipsis overflow-hidden">
-                                {
-                                  data.construct.productionSub.productionLot
-                                    .name
-                                }
-                              </div>
-                            </div>
-                            <div className="hidden sm:flex sm:w-2/12 lg:w-1/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] items-center justify-center">
-                              <div className="hidden xl:block">
-                                {Translator.user.icon}
-                              </div>
-                              <h5 className="xl:ml-1 text-ellipsis overflow-hidden">
-                                {data.testBy.name + " " + data.testBy.surname}
-                              </h5>
-                            </div>
-                            <div className="w-1/12 sm:w-1/12 lg:w-1/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] flex items-center justify-center">
-                              {data.statusOverView === "Passed" ? (
-                                <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
-                                  ผ่าน
-                                </h3>
-                              ) : data.statusOverView === "Failed" ? (
-                                <h3 className="text-[#ff0000] bg-[#ffa6a6] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
-                                  ไม่ผ่าน
-                                </h3>
-                              ) : data.statusOverView === "In progress" ? (
-                                <h3 className="text-[#ff6600] bg-[#ffea8f] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
-                                  รอการตรวจสอบ
-                                </h3>
-                              ) : null}
-                            </div>
-                            <div className="hidden md:block w-2/12 lg:w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   place-content-center place-items-center">
-                              <div className="text-ellipsis overflow-hidden">
-                                {data.createdAt.split("T")[0]}
-                              </div>
-                            </div>
-                            <div className="w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-content-center place-items-center">
-                              <button
-                                onClick={() => {
-                                  localStorageWeb.setItem(
-                                    "currentUrl",
-                                    "qc/detail"
-                                  );
-                                  localStorageWeb.setItem(
-                                    "param",
-                                    data.construct.ID
-                                  );
-                                  window.location.reload();
-                                }}
-                              >
-                                <svg
-                                  width="30"
-                                  height="30"
-                                  viewBox="0 0 30 30"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M15 1.875C18.4812 1.875 21.8198 3.25791 24.2814 5.7195C26.743 8.18109 28.1259 11.5197 28.1259 15.0009C28.1259 18.4822 26.743 21.8208 24.2814 24.2824C21.8198 26.744 18.4812 28.1269 15 28.1269C11.5188 28.1269 8.18014 26.744 5.71855 24.2824C3.25696 21.8208 1.87405 18.4822 1.87405 15.0009C1.87405 11.5197 3.25696 8.18109 5.71855 5.7195C8.18014 3.25791 11.5188 1.875 15 1.875ZM16.9687 9.93375C17.9437 9.93375 18.735 9.25687 18.735 8.25375C18.735 7.25062 17.9419 6.57375 16.9687 6.57375C15.9937 6.57375 15.2062 7.25062 15.2062 8.25375C15.2062 9.25687 15.9937 9.93375 16.9687 9.93375ZM17.3119 20.4844C17.3119 20.2838 17.3812 19.7625 17.3419 19.4662L15.8006 21.24C15.4819 21.5756 15.0825 21.8081 14.895 21.7462C14.8099 21.7149 14.7388 21.6543 14.6945 21.5753C14.6501 21.4962 14.6355 21.4039 14.6531 21.315L17.2219 13.2C17.4319 12.1706 16.8544 11.2313 15.63 11.1113C14.3381 11.1113 12.4369 12.4219 11.28 14.085C11.28 14.2838 11.2425 14.7787 11.2819 15.075L12.8212 13.2994C13.14 12.9675 13.5112 12.7331 13.6987 12.7969C13.7911 12.83 13.8668 12.8981 13.9096 12.9864C13.9524 13.0748 13.9588 13.1763 13.9275 13.2694L11.3812 21.345C11.0869 22.29 11.6437 23.2163 12.9937 23.4263C14.9812 23.4263 16.155 22.1475 17.3137 20.4844H17.3119Z"
-                                    fill="#EE6C4D"
-                                  />
-                                </svg>
-                              </button>
-                            </div>
-                          </div>
+                      {qcRecords?.data?.flatMap((data) => {
+                        const sorted = [...(data.qcRecordStatus ?? [])].sort(
+                          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
                         );
+                        const typeGroups: Record<string, typeof sorted> = {};
+                        for (const s of sorted) {
+                          const t = s.qcMain?.qcType?.name ?? "unknown";
+                          if (!typeGroups[t]) typeGroups[t] = [];
+                          typeGroups[t].push(s);
+                        }
+                        if (Object.keys(typeGroups).length === 0) {
+                          typeGroups["unknown"] = [];
+                        }
+                        return Object.entries(typeGroups).reverse().map(([typeName, typeStatuses]) => {
+                          const typeDisplay =
+                            typeName === "thermostat" ? "เทอร์โมสตัท"
+                              : typeName === "seaward" ? "ซีเวิร์ด"
+                                : typeName;
+                          const allPassed = typeStatuses.length > 0 && typeStatuses.every((s: any) => s.status === "Passed");
+                          const anyFailed = typeStatuses.some((s: any) => s.status === "Failed");
+                          const rowStatus = allPassed ? "Passed" : anyFailed ? "Failed" : "In progress";
+                          return (
+                            <div
+                              key={`${data.ID}-${typeName}`}
+                              className="flex flex-row w-full h-12 hover:bg-gray-200"
+                            >
+                              <div className="w-7/12 sm:w-4/12 md:w-3/12 lg:w-2/12 text-center text-base lg:text-lg font-['Sarabun'] flex items-center justify-center">
+                                <div className="hidden xl:block">
+                                  {Translator.item.icon}
+                                </div>
+                                <h5 className="xl:ml-1 text-ellipsis overflow-hidden">
+                                  {data.construct.ID}
+                                </h5>
+                              </div>
+                              <div className="w-3/12 sm:w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl   flex items-center justify-center">
+                                <div className="text-ellipsis overflow-hidden">
+                                  {typeDisplay}
+                                </div>
+                              </div>
+                              <div className="w-2/12 lg:w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] flex items-center justify-center">
+                                <div className="text-ellipsis overflow-hidden">
+                                  {data.qcProject.projectName}
+                                </div>
+                              </div>
+                              <div className="hidden lg:flex w-2/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] items-center justify-center">
+                                <div className="text-ellipsis overflow-hidden">
+                                  {
+                                    data.construct.productionSub.productionLot
+                                      .name
+                                  }
+                                </div>
+                              </div>
+                              <div className="hidden sm:flex sm:w-2/12 lg:w-1/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] items-center justify-center">
+                                <div className="hidden xl:block">
+                                  {Translator.user.icon}
+                                </div>
+                                <h5 className="xl:ml-1 text-ellipsis overflow-hidden">
+                                  {data.testBy.name + " " + data.testBy.surname}
+                                </h5>
+                              </div>
+                              <div className="w-1/12 sm:w-1/12 lg:w-1/12 text-center text-base lg:text-lg  3xl:text-2xl  4xl:text-3xl font-['Sarabun'] flex items-center justify-center">
+                                {rowStatus === "Passed" ? (
+                                  <h3 className="text-[#13A452] bg-[#adff9d] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
+                                    ผ่าน
+                                  </h3>
+                                ) : rowStatus === "Failed" ? (
+                                  <h3 className="text-[#ff0000] bg-[#ffa6a6] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
+                                    ไม่ผ่าน
+                                  </h3>
+                                ) : (
+                                  <h3 className="text-[#ff6600] bg-[#ffea8f] px-2 text-sm rounded-xl text-ellipsis overflow-hidden">
+                                    รอการตรวจสอบ
+                                  </h3>
+                                )}
+                              </div>
+                              <div className="hidden md:block w-2/12 lg:w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   place-content-center place-items-center">
+                                <div className="text-ellipsis overflow-hidden">
+                                  {data.createdAt.split("T")[0]}
+                                </div>
+                              </div>
+                              <div className="w-1/12 text-center text-base text-lg 2xl:text-xl 3xl:text-2xl  4xl:text-3xl   flex place-content-center place-items-center">
+                                <button
+                                  onClick={() => {
+                                    localStorageWeb.setItem(
+                                      "currentUrl",
+                                      "qc/detail"
+                                    );
+                                    localStorageWeb.setItem(
+                                      "param",
+                                      data.construct.ID
+                                    );
+                                    window.location.reload();
+                                  }}
+                                >
+                                  <svg
+                                    width="30"
+                                    height="30"
+                                    viewBox="0 0 30 30"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M15 1.875C18.4812 1.875 21.8198 3.25791 24.2814 5.7195C26.743 8.18109 28.1259 11.5197 28.1259 15.0009C28.1259 18.4822 26.743 21.8208 24.2814 24.2824C21.8198 26.744 18.4812 28.1269 15 28.1269C11.5188 28.1269 8.18014 26.744 5.71855 24.2824C3.25696 21.8208 1.87405 18.4822 1.87405 15.0009C1.87405 11.5197 3.25696 8.18109 5.71855 5.7195C8.18014 3.25791 11.5188 1.875 15 1.875ZM16.9687 9.93375C17.9437 9.93375 18.735 9.25687 18.735 8.25375C18.735 7.25062 17.9419 6.57375 16.9687 6.57375C15.9937 6.57375 15.2062 7.25062 15.2062 8.25375C15.2062 9.25687 15.9937 9.93375 16.9687 9.93375ZM17.3119 20.4844C17.3119 20.2838 17.3812 19.7625 17.3419 19.4662L15.8006 21.24C15.4819 21.5756 15.0825 21.8081 14.895 21.7462C14.8099 21.7149 14.7388 21.6543 14.6945 21.5753C14.6501 21.4962 14.6355 21.4039 14.6531 21.315L17.2219 13.2C17.4319 12.1706 16.8544 11.2313 15.63 11.1113C14.3381 11.1113 12.4369 12.4219 11.28 14.085C11.28 14.2838 11.2425 14.7787 11.2819 15.075L12.8212 13.2994C13.14 12.9675 13.5112 12.7331 13.6987 12.7969C13.7911 12.83 13.8668 12.8981 13.9096 12.9864C13.9524 13.0748 13.9588 13.1763 13.9275 13.2694L11.3812 21.345C11.0869 22.29 11.6437 23.2163 12.9937 23.4263C14.9812 23.4263 16.155 22.1475 17.3137 20.4844H17.3119Z"
+                                      fill="#EE6C4D"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        });
                       })}
                     </div>
                   </div>

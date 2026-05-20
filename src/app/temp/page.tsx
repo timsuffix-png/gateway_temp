@@ -252,12 +252,19 @@ export default function MainTempTest() {
     }
     //ถ้าไม่มีการเลือกcard
     else if (projectID && projectID.length > 0 && !isCardSelected) {
-      rawData = await window.electronAPI.fetchAPI({
-        method: "GET",
-        URL: `qc/itemProject/${projectID}`,
-      });
-      setQcMains(rawData);
-      dataToProcess = rawData?.data;
+      const hasData = currentQcMains?.data?.some(
+        (d: any) => d.qcProject?.ID === projectID
+      );
+      if (!hasData) {
+        rawData = await window.electronAPI.fetchAPI({
+          method: "GET",
+          URL: `qc/itemProject/${projectID}`,
+        });
+        setQcMains(rawData);
+        dataToProcess = rawData?.data;
+      } else {
+        dataToProcess = currentQcMains?.data;
+      }
     }
 
     if (dataToProcess) {
@@ -409,11 +416,14 @@ export default function MainTempTest() {
             testBy: auth.user.data.ID,
           },
         });
-        if (!record)
-          return Swal.fire({
+        if (!record) {
+          Swal.fire({
             icon: "error",
-            title: record.message || "เกิดข้อผิดพลาด",
+            title: "เกิดข้อผิดพลาด",
+            text: "ไม่สามารถสร้างบันทึกการทดสอบได้",
           });
+          return;
+        }
       } else {
         record = qcMainsRef.current;
       }
@@ -433,6 +443,13 @@ export default function MainTempTest() {
           detail: lastResult.join(",").trim(),
         },
       });
+      if (!res) {
+        Swal.fire({
+          icon: "error",
+          title: "เกิดข้อผิดพลาด",
+          text: "ไม่สามารถบันทึกผลการทดสอบได้",
+        });
+      }
     } catch (error) {
       console.error("Error recording data:", error);
     }
