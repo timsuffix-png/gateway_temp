@@ -155,10 +155,10 @@ export default function MainTempTest() {
 
   const detailTemp: Record<string, Record<string, string>> = {
     ironError: {
-      "010": "sensor2มีปัญหาในการอ่านค่า",
-      "011": "sensor3มีปัญหาในการอ่านค่า",
-      "012": "sensor4มีปัญหาในการอ่านค่า",
-      "013": "sensor5มีปัญหาในการอ่านค่า",
+      "010": "เซนเซอร์ ขวา มีปัญหาในการอ่านค่า",
+      "011": "เซนเซอร์ ซ้าย มีปัญหาในการอ่านค่า",
+      "012": "เซนเซอร์ กลาง มีปัญหาในการอ่านค่า",
+      "013": "เซนเซอร์ บน มีปัญหาในการอ่านค่า",
       "000": "โปรดตรวจเช็คว่าเครื่องเปิดหรือว่าเสียบปลั๊กหรือยัง",
     },
     detailFailed: {
@@ -211,8 +211,8 @@ export default function MainTempTest() {
 
       setTime(parseInt(parts[9]));
       setCurrent(parseFloat(parts[10]));
-      setStatus(status);
-      setDetail(detailTemp.detailFailed[detail] || "-");
+      setStatus(detail === "777" ? "stop" : status);
+      setDetail(detailTemp.detailFailed[detail] || detailTemp.ironError[detail] || "-");
 
       if (
         status === "Passed" ||
