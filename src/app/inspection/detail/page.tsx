@@ -632,10 +632,10 @@ export default function QcDetail() {
                                   <h1 className="mb-2 underline font-bold">
                                     ค่าที่กำหนด ({sw.testName})
                                   </h1>
-                                  <h1>Output : {sw.script?.script_5 ?? "-"}</h1>
-                                  <h1>RampUp : {sw.script?.script_6 ?? "-"}</h1>
-                                  <h1>Dwell : {sw.script?.script_7 ?? "-"}</h1>
-                                  <h1>High Limit : {sw.script?.script_10 ?? "-"}</h1>
+                                  <h1>{scriptOutputLabel} : {sw.script?.script_5 ?? "-"}{scriptOutputUnit}</h1>
+                                  <h1>เวลาเพิ่มแรงดัน : {sw.script?.script_6 ?? "-"} s</h1>
+                                  <h1>เวลาทดสอบ : {sw.script?.script_7 ?? "-"} s</h1>
+                                  <h1>{scriptHighLimitLabel} : {sw.script?.script_10 ?? "-"}{scriptHighLimitUnit}</h1>
                                 </div>
                                 <div className="text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
                                   <h1 className="mb-2 underline font-bold">ผลลัพธ์</h1>
