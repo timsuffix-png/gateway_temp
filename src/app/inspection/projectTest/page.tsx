@@ -118,7 +118,7 @@ export default function QcProject() {
                       <svg
                         onClick={() => {
                           Swal.fire({
-                            title: `ลบข้อมูล "${project.projectName}" จริงหรือไม่`,
+                            title: `ลบข้อมูล \n"${project.projectName}"\n จริงหรือไม่`,
                             text: "หลังจากลบไปแล้วข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย",
                             icon: "warning",
                             showCancelButton: true,
@@ -135,7 +135,7 @@ export default function QcProject() {
                               await refreshData();
                               Swal.fire({
                                 title: "ลบข้อมูลสำเร็จ",
-                                text: `ข้อมูลเกี่ยวกับ "${project.projectName}" ถูกลบสำเร็จ`,
+                                text: `ข้อมูลเกี่ยวกับ \n"${project.projectName}" \nถูกลบสำเร็จ`,
                                 icon: "success",
                               });
                             }

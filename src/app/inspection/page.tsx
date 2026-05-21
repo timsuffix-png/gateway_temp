@@ -199,8 +199,16 @@ export default function Inspection() {
                 <input
                   className="h-[40px] md:h-[50px] w-[90%] xl:w-[700px] border border-black mt-1 lg:ml-10 px-3 text-xl xl:text-2xl font-normal  rounded-md text-black"
                   type="number"
+                  min="0"
+                  onKeyDown={(e) => {
+                    if (e.key === "-") e.preventDefault();
+                  }}
                   placeholder="ค้นหาจากรหัสสินค้า หรือวัตถุดิบ"
-                  onChange={(e) => setLike(e.target.value)}
+                  onChange={(e) => {
+                    if (Number(e.target.value) >= 0) {
+                      setLike(e.target.value);
+                    }
+                  }}
                 />
               </div>
             </div>

@@ -74,10 +74,10 @@ export default function TestSetting() {
             <div
               tabIndex={0}
               onClick={() => {
-                
+
                 localStorageWeb.setItem("currentUrl", "qc");
                 window.location.reload();
-                 
+
               }}
               className="ml-5 sm:ml-20 cursor-pointer"
             >
@@ -88,10 +88,10 @@ export default function TestSetting() {
             </p>
             <button
               onClick={() => {
-              
+
                 localStorageWeb.setItem("currentUrl", "qc/testSetting/create");
                 window.location.reload();
-                 
+
               }}
               className="ml-auto mr-5 sm:mr-20 px-10 py-3 text-white  text-lg   rounded-xl bg-[#001F3F]
             xl:text-xl 
@@ -168,7 +168,7 @@ export default function TestSetting() {
                             <button
                               onClick={() => {
                                 Swal.fire({
-                                  title: `ลบข้อมูล "${data.testName}" จริงหรือไม่`,
+                                  title: `ลบข้อมูล \n"${data.testName}" \nจริงหรือไม่`,
                                   text: "หลังจากลบไปแล้วข้อมูลที่เกี่ยวข้องทั้งหมดจะถูกลบไปด้วย",
                                   icon: "warning",
                                   showCancelButton: true,
@@ -201,7 +201,7 @@ export default function TestSetting() {
                   </div>
                 </div>
 
-               
+
               </div>
             </div>
           </div>

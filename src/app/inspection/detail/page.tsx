@@ -249,7 +249,7 @@ export default function QcDetail() {
           time = first_element_raw;
           machine_code = seaward_result_details[1]?.trim();
           measurement_1 = seaward_result_details[2]?.trim();
-          
+
           const last_element = seaward_result_details[seaward_result_details.length - 1]?.trim();
           const second_to_last = seaward_result_details[seaward_result_details.length - 2]?.trim();
 
@@ -624,7 +624,7 @@ export default function QcDetail() {
                                     </span>
                                   </h1>
                                   {sw.result.status === "Failed" && sw.result.value && sw.result.value !== "-" && !sw.result.value.includes(",") && (
-                                    <h1>เหตุผลที่ตก : {sw.result.value}</h1>
+                                    <h1>หมายเหตุ : {sw.result.value}</h1>
                                   )}
                                   {sw.result.has_raw && (
                                     <div className="mt-4 pt-3 border-t border-dashed border-gray-300 text-gray-700">
