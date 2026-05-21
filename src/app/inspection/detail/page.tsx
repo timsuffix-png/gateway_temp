@@ -82,6 +82,15 @@ export default function QcDetail() {
     seaward_result: { value: undefined, status: undefined },
   };
 
+  const seawardReasonTH: Record<string, string> = {
+    "result is above upper limit": "ค่าเกินขีดจำกัดสูงสุด",
+    "result is below lower limit": "ค่าต่ำกว่าขีดจำกัดต่ำสุด",
+    "open circuit": "วงจรเปิด",
+    "short circuit": "วงจรลัด",
+    "test timeout": "หมดเวลาทดสอบ",
+    "hardware fault": "ฮาร์ดแวร์ขัดข้อง",
+  };
+
   const parseSeawardResultItem = (item: any) => {
     const detail_parts = item.detail?.split(",") ?? [];
     const testName = (item.qcMain?.testName || "").trim();
@@ -584,18 +593,31 @@ export default function QcDetail() {
                             let val1Unit = "";
                             let val2Unit = "";
 
+                            let scriptOutputLabel = "Output";
+                            let scriptOutputUnit = "";
+                            let scriptHighLimitLabel = "High Limit";
+                            let scriptHighLimitUnit = "";
+
                             if (tn.includes("EBOND")) {
                               val1Label = "กระแสทดสอบ"; val2Label = "ความต้านทานสายดิน";
                               val1Unit = " A"; val2Unit = " mΩ";
+                              scriptOutputLabel = "กระแสทดสอบ"; scriptOutputUnit = " mA";
+                              scriptHighLimitLabel = "ความต้านทานสูงสุด"; scriptHighLimitUnit = " mΩ";
                             } else if (tn.includes("DCIR") || tn.includes("INSULATION")) {
                               val1Label = "แรงดันทดสอบ"; val2Label = "ความต้านทานฉนวน";
                               val1Unit = " V"; val2Unit = " MΩ";
+                              scriptOutputLabel = "แรงดันทดสอบ"; scriptOutputUnit = " V";
+                              scriptHighLimitLabel = "ความต้านทานฉนวนสูงสุด"; scriptHighLimitUnit = " MΩ";
                             } else if (tn.includes("HIPOT")) {
                               val1Label = "แรงดันทดสอบ"; val2Label = "กระแสรั่วไหล";
                               val1Unit = " V"; val2Unit = " mA";
+                              scriptOutputLabel = "แรงดันทดสอบ"; scriptOutputUnit = " V";
+                              scriptHighLimitLabel = "กระแสรั่วไหลสูงสุด"; scriptHighLimitUnit = " mA";
                             } else if (tn.includes("LEAKAGE") || tn.includes("POWER")) {
                               val1Label = "แรงดันทดสอบ"; val2Label = "กระแสรั่วไหล";
                               val1Unit = " V"; val2Unit = " mA";
+                              scriptOutputLabel = "แรงดันทดสอบ"; scriptOutputUnit = " V";
+                              scriptHighLimitLabel = "กระแสรั่วไหลสูงสุด"; scriptHighLimitUnit = " mA";
                             }
 
                             let val1Display = sw.result.machine_code;
@@ -624,18 +646,15 @@ export default function QcDetail() {
                                     </span>
                                   </h1>
                                   {sw.result.status === "Failed" && sw.result.value && sw.result.value !== "-" && !sw.result.value.includes(",") && (
-                                    <h1>หมายเหตุ : {sw.result.value}</h1>
+                                    <h1>หมายเหตุ : {seawardReasonTH[sw.result.value.trim()] ?? sw.result.value}</h1>
                                   )}
                                   {sw.result.has_raw && (
-                                    <div className="mt-4 pt-3 border-t border-dashed border-gray-300 text-gray-700">
-                                      <h2 className="font-bold text-xs xl:text-sm text-gray-500 mb-1">
-                                        📊 ผลการตรวจวัดจริง (Seaward Measurements)
-                                      </h2>
+                                    <>
                                       {sw.result.time && <h1>เวลาทดสอบ : {sw.result.time}</h1>}
                                       {val1Display && <h1>{val1Label} : {val1Display}{val1Unit}</h1>}
                                       {sw.result.measurement_1 && <h1>{val2Label} : {sw.result.measurement_1}{val2Unit}</h1>}
                                       {sw.result.measurement_2 && <h1>ค่าเพิ่มเติม : {sw.result.measurement_2}</h1>}
-                                    </div>
+                                    </>
                                   )}
                                   {!sw.result.has_raw && sw.result.status !== "Failed" && (
                                     <h1>ค่าที่ได้ : {sw.result.value ?? "-"}</h1>
