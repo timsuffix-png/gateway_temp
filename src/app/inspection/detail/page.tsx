@@ -32,6 +32,12 @@ export default function QcDetail() {
     },
   };
 
+  const translateStatus = (status: string | undefined): string => {
+    if (status === "Passed") return "ผ่าน";
+    if (status === "Failed") return "ไม่ผ่าน";
+    return status ?? "-";
+  };
+
   const translateCode = (code: string | undefined): string => {
     if (!code) return "-";
     const trimmed = code.trim();
@@ -504,7 +510,7 @@ export default function QcDetail() {
 
                         {data?.status?.seaward !== "-" && (
                           <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
-                            ซีเวิร์ด : {data?.status?.seaward}
+                            ซีเวิร์ด : {translateStatus(data?.status?.seaward)}
                             {data?.status?.seaward === "Failed" && (
                               <label className="whitespace-normal text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5 ">
                                 {" "}
@@ -522,7 +528,7 @@ export default function QcDetail() {
                           {data?.status?.thermostat !== "-" && (
                             <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
                               เทอร์โมสตัท ({data.qcProject?.projectName}) :{" "}
-                              {data?.status?.thermostat}
+                              {translateStatus(data?.status?.thermostat)}
                               {data?.status?.thermostat === "Failed" && (
                                 <span className="whitespace-normal text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
                                   {" ( "}
@@ -642,7 +648,7 @@ export default function QcDetail() {
                                   <h1>
                                     สถานะ :{" "}
                                     <span className={sw.result.status === "Passed" ? "text-green-600 font-bold" : sw.result.status === "Failed" ? "text-red-600 font-bold" : ""}>
-                                      {sw.result.status ?? "-"}
+                                      {translateStatus(sw.result.status)}
                                     </span>
                                   </h1>
                                   {sw.result.status === "Failed" && sw.result.value && sw.result.value !== "-" && !sw.result.value.includes(",") && (
