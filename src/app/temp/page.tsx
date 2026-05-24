@@ -154,12 +154,14 @@ export default function MainTempTest() {
   } | null>();
 
   const detailTemp: Record<string, Record<string, string>> = {
-    ironError: {
+    ironInterrupt: {
       "010": "เซนเซอร์ ขวา มีปัญหาในการอ่านค่า",
       "011": "เซนเซอร์ ซ้าย มีปัญหาในการอ่านค่า",
       "012": "เซนเซอร์ กลาง มีปัญหาในการอ่านค่า",
       "013": "เซนเซอร์ บน มีปัญหาในการอ่านค่า",
       "000": "โปรดตรวจเช็คว่าเครื่องเปิดหรือว่าเสียบปลั๊กหรือยัง",
+      "666": "กำลังดำเนินการ",
+      "777": "หยุดโดยผู้ใช้งาน",
     },
     detailFailed: {
       "888": "ผ่าน",
@@ -168,8 +170,7 @@ export default function MainTempTest() {
       "030": "เทอโมสตัดตัดก่อนกำหนด",
       "031": "เทอโมสตัดตัดหลังกำหนด",
       "040": "กระแสไฟฟ้าเกิน",
-      "666": "กำลังดำเนินการ",
-      "777": "หยุดโดยผู้ใช้งาน",
+
     },
   };
 
@@ -212,11 +213,12 @@ export default function MainTempTest() {
       setTime(parseInt(parts[9]));
       setCurrent(parseFloat(parts[10]));
       setStatus(detail === "777" ? "stop" : status);
-      setDetail(detailTemp.detailFailed[detail] || detailTemp.ironError[detail] || "-");
+      setDetail(detailTemp.detailFailed[detail] || detailTemp.ironInterrupt[detail] || "-");
 
+      // เซฟเฉพาะ Passed หรือ Failed เพราะเหตุผลใน detailFailed เท่านั้น
       if (
         status === "Passed" ||
-        (status === "Failed" && !(detail in detailTemp.ironError))
+        (status === "Failed" && detail in detailTemp.detailFailed)
       ) {
         if (!recordedRef.current) {
           recordedRef.current = true;
@@ -392,14 +394,15 @@ export default function MainTempTest() {
   };
 
   const recordData = async (lastResult: string[]) => {
-    // const splitData = allResult.map((line) => line.split(","));
-    // //       [
-    // //   ["15", "1", "3", "in process"],
-    // //   ["45", "2", "3", "in process"],
-    // //   ["45", "3", "4", "in process"]
-    // // ]
-    // let splitResultArray = splitData[splitData.length - 1]; // ผลลัพธ์: [" 8.4S", " 249", " 500.000000","Passed",""Cus termostate is cut in time.]
     try {
+      // แทนค่า -999 (sensor error) ใน index 0-7 ด้วย string ว่าง ก่อน save
+      // เพื่อป้องกันค่า error code ไปบิดเบือนกราฟใน dashboard
+      const sanitized = [...lastResult];
+      for (let i = 0; i <= 7; i++) {
+        const num = parseFloat(sanitized[i]);
+        if (num === -999 || isNaN(num)) sanitized[i] = "";
+      }
+
       let record: any;
 
       if (!isSelectedCardRef.current) {
@@ -440,7 +443,7 @@ export default function MainTempTest() {
           qcMainID: qcMainTemp,
           result: lastResult[11].trim(),
           status: lastResult[11].trim(),
-          detail: lastResult.join(",").trim(),
+          detail: sanitized.join(",").trim(),
         },
       });
       if (!res) {
