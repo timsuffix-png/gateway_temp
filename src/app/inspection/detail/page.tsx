@@ -96,6 +96,8 @@ export default function QcDetail() {
     "short circuit": "วงจรลัด",
     "test timeout": "หมดเวลาทดสอบ",
     "hardware fault": "ฮาร์ดแวร์ขัดข้อง",
+    "over-current detected": "กระแสเกินกำหนด",
+    "abort key was pressed": "หยุดโดยผู้ใช้งาน",
   };
 
   const parseSeawardResultItem = (item: any) => {
