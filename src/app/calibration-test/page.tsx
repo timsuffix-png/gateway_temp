@@ -376,7 +376,7 @@ export default function CalibrationTestPage() {
 
       // Create Workbook and append the sheet
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "CalibrationData");
+      XLSX.utils.book_append_sheet(workbook, worksheet, "ข้อมูลคาลิเบรชัน");
 
       // Generate Filename with timestamp
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -452,7 +452,7 @@ export default function CalibrationTestPage() {
               md:basis-40"
               >
                 <h4 className="flex-nowrap pb-3 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
-                  Calibration port
+                  พอร์ต Calibration
                   <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                     &nbsp;*
                   </span>
@@ -584,7 +584,7 @@ export default function CalibrationTestPage() {
                     <p>ผลลัพธ์ : </p>
                     <div className={`w-auto flex px-6 py-2 justify-center items-center whitespace-nowrap rounded-lg text-white font-bold transition-colors ${status === "on" ? "bg-yellow-600" : status === "Passed" ? "bg-green-600" : status === "Failed" ? "bg-red-400" : "bg-gray-400"
                       }`}>
-                      {status === "on" ? "IN PROCESS" : status === "Passed" ? "PASS" : status === "Failed" ? "FAIL" : "OFF"}
+                      {status === "on" ? "กำลังดำเนินการ" : status === "Passed" ? "ผ่าน" : status === "Failed" ? "ไม่ผ่าน" : "ปิด"}
                     </div>
                   </div>
                   <div className="flex items-center gap-4 whitespace-normal">

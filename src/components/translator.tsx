@@ -382,7 +382,7 @@ export const Translator: any = {
   create: { name: "สร้าง" },
   history: { name: "ประวัติ" },
   seaward: {
-    name: "Seaward",
+    name: "ซีเวิร์ด",
     icon: (
       <svg
         width="30"
@@ -403,7 +403,7 @@ export const Translator: any = {
     ),
   },
   thermostat: {
-    name: "Thermostat",
+    name: "เทอร์โมสตัท",
     icon: (
       <svg
         fill="#EE6C4D"
@@ -427,7 +427,7 @@ export const Translator: any = {
     ),
   },
   "calibration-test": {
-    name: "Calibration",
+    name: "คาลิเบรชัน",
     icon: (
       <svg
         width="30"

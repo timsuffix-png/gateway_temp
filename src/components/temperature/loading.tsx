@@ -21,7 +21,7 @@ export default function LoadingPage() {
   return (
     <div className="flex min-h-screen justify-center items-center">
       {imgSrc && <img src={imgSrc} alt="loading" width={100} height={100} />}
-      <p className="mt-3 text-gray-600">loading...</p>
+      <p className="mt-3 text-gray-600">กำลังโหลด...</p>
     </div>
   );
 }
