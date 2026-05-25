@@ -567,7 +567,7 @@ export default function QcDetail() {
                                     "-"}
                                 </h1>
                               </div>
-                              <div className=" text-start  whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
+                              <div className="flex-1 text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
                                 <h1 className="mb-2 underline font-bold">
                                   ผลลัพธ์
                                 </h1>
@@ -636,8 +636,8 @@ export default function QcDetail() {
                             }
 
                             return (
-                              <div key={idx} className="pl-[17%] flex gap-[10%] items-start border-t border-gray-100 mt-5 pt-5">
-                                <div className="text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
+                              <div key={idx} className="px-[8%] flex gap-6 items-start border-t border-gray-100 mt-5 pt-5">
+                                <div className="flex-1 text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
                                   <h1 className="mb-2 underline font-bold">
                                     ค่าที่กำหนด ({sw.testName})
                                   </h1>
@@ -646,7 +646,7 @@ export default function QcDetail() {
                                   <h1>เวลาทดสอบ : {sw.script?.script_7 ?? "-"} วินาที</h1>
                                   <h1>{scriptHighLimitLabel} : {sw.script?.script_10 ?? "-"}{scriptHighLimitUnit}</h1>
                                 </div>
-                                <div className="text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
+                                <div className="flex-1 text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
                                   <h1 className="mb-2 underline font-bold">ผลลัพธ์</h1>
                                   <h1>
                                     สถานะ :{" "}
