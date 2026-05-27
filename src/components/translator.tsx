@@ -427,7 +427,7 @@ export const Translator: any = {
     ),
   },
   "calibration-test": {
-    name: "คาลิเบรชัน",
+    name: "คาลิเบรท",
     icon: (
       <svg
         width="30"
