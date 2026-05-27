@@ -70,11 +70,22 @@ app.on("ready", () => {
       const lines = text.trim().split("\n");
       const calibrateValue: any = [];
 
-      lines.forEach((line, i) => {
-        const raw = line.split(",").map(Number);
-        const x = raw[1];
-        const y = raw[2];
-        calibrateValue[i] = { x, y };
+      lines.forEach((line) => {
+        // ข้ามบรรทัดว่างและบรรทัด legend (เช่น "0, m1 , c1")
+        const trimmed = line.trim();
+        if (!trimmed) return;
+
+        const parts = trimmed.split(",");
+        const rowIndex = Number(parts[0]);   // index จากไฟล์ (0-5)
+        const x = Number(parts[1]);          // ค่าแรก (m1/m2/k1/m3/m4/k2)
+        const y = Number(parts[2]);          // ค่าที่สอง (c1/c2/x01/c3/c4/x02)
+
+        // ข้าม legend หรือ header ที่ไม่ใช่ตัวเลข
+        if (isNaN(rowIndex) || isNaN(x) || isNaN(y)) return;
+
+        // ใช้ rowIndex จากไฟล์โดยตรง ไม่ใช่ตำแหน่งบรรทัด
+        // ป้องกัน index เบี้ยวถ้าไฟล์มี header/blank lines ก่อนหน้า
+        calibrateValue[rowIndex] = { x, y };
       });
       return {
         status: true,
