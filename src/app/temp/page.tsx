@@ -153,13 +153,15 @@ export default function MainTempTest() {
     allPage: number;
   } | null>();
 
+
+
   const detailTemp: Record<string, Record<string, string>> = {
     ironInterrupt: {
       "010": "เซนเซอร์ ขวา มีปัญหาในการอ่านค่า",
       "011": "เซนเซอร์ ซ้าย มีปัญหาในการอ่านค่า",
       "012": "เซนเซอร์ กลาง มีปัญหาในการอ่านค่า",
       "013": "เซนเซอร์ บน มีปัญหาในการอ่านค่า",
-      "000": "โปรดตรวจเช็คว่าเครื่องเปิดหรือว่าเสียบปลั๊กหรือยัง",
+      "000": "กรุณาตรวจสอบเตารีดของท่าน",
       "666": "กำลังดำเนินการ",
       "777": "หยุดโดยผู้ใช้งาน",
     },
@@ -180,6 +182,8 @@ export default function MainTempTest() {
   const qcProjectRef = useRef(qcProject);
   const serialNumberRef = useRef(serialNumber);
   const statusRef = useRef(status);
+  // ref สำหรับ input รหัสสินค้า เพื่อ set value หลัง lookup encrypted QR
+  const serialInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (ironImageRef.current) {
@@ -458,6 +462,41 @@ export default function MainTempTest() {
     }
   };
 
+  // ======================================================
+  // lookup รหัสสินค้าจาก encrypted QR code ที่ scanner อ่านมา
+  // scanner อ่าน QR → ได้ encryptIDValue (ขึ้นต้นด้วย U2FsdGVkX1)
+  // → เรียก construct/encrypt API → return Construct.ID (serial 20 หลัก)
+  // ======================================================
+  const lookupEncryptedSerial = async (encryptedValue: string) => {
+    try {
+      const res = await window.electronAPI.fetchAPI({
+        method: "POST",
+        URL: "construct/encrypt",
+        body: { encryptSerialNumber: encryptedValue },
+      });
+
+      if (res?.data?.ID) {
+        // แปลง encrypted → serial number จริง แล้ว update state + input
+        const realSerial: string = res.data.ID;
+        setSerialNumber(realSerial);
+        if (serialInputRef.current) {
+          serialInputRef.current.value = realSerial;
+        }
+      } else {
+        // QR code ไม่พบในระบบ
+        Swal.fire({
+          icon: "error",
+          title: "QR Code ไม่ถูกต้อง",
+          text: "ไม่พบข้อมูลสินค้าในระบบ กรุณาตรวจสอบอีกครั้ง",
+        });
+        setSerialNumber("");
+        if (serialInputRef.current) serialInputRef.current.value = "";
+      }
+    } catch (err) {
+      console.error("lookupEncryptedSerial error:", err);
+    }
+  };
+
   const refreshData = async () => {
     const data = await fetchQcProjectList();
     setQcProjectList(data);
@@ -610,6 +649,7 @@ export default function MainTempTest() {
                   </span>
                 </div>
                 <input
+                  ref={serialInputRef}
                   required
                   className="w-full px-2 py-1 rounded-sm border border-gray-300"
                   placeholder="รหัสสินค้า"
@@ -618,8 +658,22 @@ export default function MainTempTest() {
                     setSerialNumber("");
                   }}
                   onChange={(e) => {
-                    setSerialNumber(e.target.value);
-                    return;
+                    const val = e.target.value;
+                    // ถ้าไม่ใช่ encrypted QR → set ตามปกติ (พิมพ์เอง)
+                    // ถ้าเป็น encrypted (U2FsdGVkX1...) รอ Enter จาก scanner ก่อน
+                    if (!val.startsWith("U2FsdGVkX1")) {
+                      setSerialNumber(val);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    // scanner ส่ง Enter หลังสแกน → ตรวจว่าเป็น encrypted QR มั้ย
+                    if (e.key === "Enter") {
+                      const val = (e.target as HTMLInputElement).value;
+                      if (val.startsWith("U2FsdGVkX1")) {
+                        e.preventDefault(); // ป้องกัน Enter ทำงานอื่น
+                        lookupEncryptedSerial(val);
+                      }
+                    }
                   }}
                 />
               </li>
