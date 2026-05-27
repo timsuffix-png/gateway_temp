@@ -15,9 +15,9 @@ import TestHistory from "@/components/temperature/testHistory";
 
 const statusMap: Record<string, { css: string; stateName: string }> = {
   stop: { css: "bg-red-600", stateName: "STOP" },
-  on: { css: "bg-yellow-600", stateName: "IN PROCESS" },
-  Passed: { css: "bg-green-600", stateName: "PASS" },
-  Failed: { css: "bg-red-400", stateName: "FAIL" },
+  on: { css: "bg-yellow-600", stateName: "กำลังดำเนินการ" },
+  Passed: { css: "bg-green-600", stateName: "ผ่าน" },
+  Failed: { css: "bg-red-400", stateName: "ไม่ผ่าน" },
 };
 
 export default function MainTempTest() {
@@ -52,7 +52,7 @@ export default function MainTempTest() {
   const [status, setStatus] = useState<string>(""); //สถานะการทดสอบ
   const { css, stateName } = statusMap[status] || {
     css: "bg-gray-400",
-    stateName: "OFF",
+    stateName: "ปิด",
   };
   const [detail, setDetail] = useState("");
   const ironImageRef = useRef<any | null>(null);
@@ -567,7 +567,7 @@ export default function MainTempTest() {
              md:basis-40"
               >
                 <h4 className="flex-nowrap pb-3 text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl font-normal ">
-                  Thermostat port
+                  พอร์ตเทอร์โมสตัท
                   <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                     &nbsp;*
                   </span>

@@ -120,11 +120,11 @@ export default function AmbientChart1() {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="sec"
-          label={{ value: "Seconds", position: "insideBottomRight" }}
+          label={{ value: "วินาที", position: "insideBottomRight" }}
         />
         <YAxis
           label={{
-            value: "Temperature (°C)",
+            value: "อุณหภูมิ (องศาเซลเซียส)",
             angle: -90,
             position: "insideLeft",
           }}
@@ -133,14 +133,14 @@ export default function AmbientChart1() {
         <Legend />
 
         {/* Object Temps (เตารีด) */}
-        <Line type="monotone" dataKey="r0_object" stroke="#FF0000" name="R0 Iron" />
-        <Line type="monotone" dataKey="r1_object" stroke="#00FF00" name="R1 Iron" />
-        <Line type="monotone" dataKey="r2_object" stroke="#0000FF" name="R2 Iron" />
+        <Line type="monotone" dataKey="r0_object" stroke="#FF0000" name="เซนเซอร์ R0 (เตารีด)" />
+        <Line type="monotone" dataKey="r1_object" stroke="#00FF00" name="เซนเซอร์ R1 (เตารีด)" />
+        <Line type="monotone" dataKey="r2_object" stroke="#0000FF" name="เซนเซอร์ R2 (เตารีด)" />
 
         {/* Ambient Temps */}
-        <Line type="monotone" dataKey="r0_ambient" stroke="#FFA07A" name="R0 Ambient" />
-        <Line type="monotone" dataKey="r1_ambient" stroke="#90EE90" name="R1 Ambient" />
-        <Line type="monotone" dataKey="r2_ambient" stroke="#87CEFA" name="R2 Ambient" />
+        <Line type="monotone" dataKey="r0_ambient" stroke="#FFA07A" name="อุณหภูมิรอบข้าง R0" />
+        <Line type="monotone" dataKey="r1_ambient" stroke="#90EE90" name="อุณหภูมิรอบข้าง R1" />
+        <Line type="monotone" dataKey="r2_ambient" stroke="#87CEFA" name="อุณหภูมิรอบข้าง R2" />
 
         {/* Average */}
         <Line
@@ -148,7 +148,7 @@ export default function AmbientChart1() {
           dataKey="temp_avg"
           stroke="#000"
           strokeDasharray="5 5"
-          name="Average"
+          name="ค่าเฉลี่ย"
         />
       </LineChart>
     </div>

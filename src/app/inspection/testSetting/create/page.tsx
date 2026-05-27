@@ -408,14 +408,14 @@ export default function CreateTestSetting() {
                 <div className="flex flex-wrap place-content-between">
                   <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                     <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                      Output
+                      แรงดัน/กระแสทดสอบ
                       <span className="text-red-600">&nbsp;*</span>
                     </h4>
                     <input
                       className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                       type="number"
                       maxLength={50}
-                      placeholder="Output"
+                      placeholder="แรงดัน/กระแสทดสอบ"
                       value={(qcScript as QcScriptSeaward).script_5}
                       onChange={(e) =>
                         setQcScript({
@@ -428,14 +428,14 @@ export default function CreateTestSetting() {
                   </label>
                   <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                     <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                      RampUp
+                      เวลาเพิ่มแรงดัน (วินาที)
                       <span className="text-red-600">&nbsp;*</span>
                     </h4>
                     <input
                       className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                       type="number"
                       maxLength={50}
-                      placeholder="RampUp"
+                      placeholder="เวลาเพิ่มแรงดัน (วินาที)"
                       value={(qcScript as QcScriptSeaward).script_6}
                       onChange={(e) =>
                         setQcScript({
@@ -448,14 +448,14 @@ export default function CreateTestSetting() {
                   </label>
                   <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                     <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                      Dwell
+                      เวลาทดสอบ (วินาที)
                       <span className="text-red-600">&nbsp;*</span>
                     </h4>
                     <input
                       className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                       type="number"
                       maxLength={50}
-                      placeholder="Dwell"
+                      placeholder="เวลาทดสอบ (วินาที)"
                       value={(qcScript as QcScriptSeaward).script_7}
                       onChange={(e) =>
                         setQcScript({
@@ -468,14 +468,14 @@ export default function CreateTestSetting() {
                   </label>
                   <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                     <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                      TimeToZero
+                      เวลาลดเป็นศูนย์ (วินาที)
                       <span className="text-red-600">&nbsp;*</span>
                     </h4>
                     <input
                       className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                       type="number"
                       maxLength={50}
-                      placeholder="TimeToZero"
+                      placeholder="เวลาลดเป็นศูนย์ (วินาที)"
                       value={(qcScript as QcScriptSeaward).script_8}
                       onChange={(e) =>
                         setQcScript({
@@ -488,14 +488,14 @@ export default function CreateTestSetting() {
                   </label>
                   <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                     <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                      LowLimit
+                      ค่าจำกัดต่ำสุด
                       <span className="text-red-600">&nbsp;*</span>
                     </h4>
                     <input
                       className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                       type="number"
                       maxLength={50}
-                      placeholder="LowLimit"
+                      placeholder="ค่าจำกัดต่ำสุด"
                       value={(qcScript as QcScriptSeaward).script_9}
                       onChange={(e) =>
                         setQcScript({
@@ -508,14 +508,14 @@ export default function CreateTestSetting() {
                   </label>
                   <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                     <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                      HighLimit
+                      ค่าจำกัดสูงสุด
                       <span className="text-red-600">&nbsp;*</span>
                     </h4>
                     <input
                       className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                       type="number"
                       maxLength={50}
-                      placeholder="HighLimit"
+                      placeholder="ค่าจำกัดสูงสุด"
                       value={(qcScript as QcScriptSeaward).script_10}
                       onChange={(e) =>
                         setQcScript({
@@ -528,14 +528,14 @@ export default function CreateTestSetting() {
                   </label>
                   <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                     <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                      ArcDetect
+                      ตรวจจับประกายไฟ
                       <span className="text-red-600">&nbsp;*</span>
                     </h4>
                     <input
                       className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                       type="number"
                       maxLength={50}
-                      placeholder="ArcDetect"
+                      placeholder="ตรวจจับประกายไฟ"
                       value={(qcScript as QcScriptSeaward).script_11}
                       onChange={(e) =>
                         setQcScript({
@@ -548,14 +548,14 @@ export default function CreateTestSetting() {
                   </label>
                   <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                     <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                      Channel
+                      ช่อง
                       <span className="text-red-600">&nbsp;*</span>
                     </h4>
                     <input
                       className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                       type="number"
                       maxLength={50}
-                      placeholder="Channel"
+                      placeholder="ช่อง"
                       value={(qcScript as QcScriptSeaward).script_12}
                       onChange={(e) =>
                         setQcScript({
@@ -571,14 +571,14 @@ export default function CreateTestSetting() {
                       <>
                         <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                           <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                            LeakageLowLimit
+                            กระแสรั่วไหลต่ำสุด
                             <span className="text-red-600">&nbsp;*</span>
                           </h4>
                           <input
                             className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                             type="number"
                             maxLength={50}
-                            placeholder="LeakageLowLimit"
+                            placeholder="กระแสรั่วไหลต่ำสุด"
                             value={(qcScript as QcScriptSeaward).script_13}
                             onChange={(e) =>
                               setQcScript({
@@ -591,14 +591,14 @@ export default function CreateTestSetting() {
                         </label>
                         <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                           <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                            PowerHighLimit
+                            กำลังไฟสูงสุด
                             <span className="text-red-600">&nbsp;*</span>
                           </h4>
                           <input
                             className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                             type="number"
                             maxLength={50}
-                            placeholder="PowerHighLimit"
+                            placeholder="กำลังไฟสูงสุด"
                             value={(qcScript as QcScriptSeaward).script_14}
                             onChange={(e) =>
                               setQcScript({
@@ -611,14 +611,14 @@ export default function CreateTestSetting() {
                         </label>
                         <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                           <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                            PowerLowLimit
+                            กำลังไฟต่ำสุด
                             <span className="text-red-600">&nbsp;*</span>
                           </h4>
                           <input
                             className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                             type="number"
                             maxLength={50}
-                            placeholder="PowerLowLimit"
+                            placeholder="กำลังไฟต่ำสุด"
                             value={(qcScript as QcScriptSeaward).script_15}
                             onChange={(e) =>
                               setQcScript({
@@ -631,14 +631,14 @@ export default function CreateTestSetting() {
                         </label>
                         <label className="w-full md:w-[45%] h-auto mx-3 lg:mx-5 my-3 flex flex-col">
                           <h4 className="text-base lg:text-lg xl:text-xl font-normal font-['Sarabun']">
-                            LeakageHighLimit
+                            กระแสรั่วไหลสูงสุด
                             <span className="text-red-600">&nbsp;*</span>
                           </h4>
                           <input
                             className="h-[40px] md:h-[50px] w-full border border-black mt-1 px-3 text-base lg:text-lg xl:text-2xl font-normal font-['Sarabun'] rounded-md"
                             type="number"
                             maxLength={50}
-                            placeholder="LeakageHighLimit"
+                            placeholder="กระแสรั่วไหลสูงสุด"
                             value={(qcScript as QcScriptSeaward).script_16}
                             onChange={(e) =>
                               setQcScript({
@@ -661,7 +661,7 @@ export default function CreateTestSetting() {
                     onClick={openCalibratePopup}
                     className="h-[40px] md:h-[50px] w-auto mt-1 px-3 text-base text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl rounded-md bg-gray-200 hover:bg-gray-300"
                   >
-                    ตั้งค่าSensor
+                    ตั้งค่าเซนเซอร์
                   </button>
                   {calibratePopup && (
                     <Popup onClose={closeCalibratePopup}>
@@ -670,16 +670,16 @@ export default function CreateTestSetting() {
                   )}
                 </div>
                 {[
-                   "TemperatureMin",
-                  "TemperatureMax",
-                  "CurrentMax",
-                  "StartMoment",
-                  "EndMoment",
-                ].map((key, index) => (
+                  { key: "TemperatureMin", label: "อุณหภูมิขั้นต่ำ (องศาเซลเซียส)" },
+                  { key: "TemperatureMax", label: "อุณหภูมิสูงสุด (องศาเซลเซียส)" },
+                  { key: "CurrentMax", label: "กระแสสูงสุด (A)" },
+                  { key: "StartMoment", label: "เวลาเริ่มจับค่า (วินาที)" },
+                  { key: "EndMoment", label: "เวลาสิ้นสุดจับค่า (วินาที)" },
+                ].map(({ key, label }, index) => (
                   <div key={index}>
                     <label className="w-full md:w-[45%] h-auto mx-5 md:mx-3 lg:mx-5 my-3 flex flex-col">
                       <h4 className="text-base text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
-                        {key}
+                        {label}
                         <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
                           &nbsp;*
                         </span>

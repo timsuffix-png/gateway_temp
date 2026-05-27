@@ -512,7 +512,7 @@ export default function QcDetail() {
                           )}
 
                         {data?.status?.seaward !== "-" && (
-                          <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
+                          <h1 className="text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5">
                             ซีเวิร์ด : {translateStatus(data?.status?.seaward)}
                             {data?.status?.seaward === "Failed" && (
                               <label className="whitespace-normal text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl w-full text-center mt-5 ">
@@ -529,7 +529,7 @@ export default function QcDetail() {
 
                         <div className="mt-5 w-full text-center">
                           {data?.status?.thermostat !== "-" && (
-                            <h1 className="text-start pl-[15%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
+                            <h1 className="text-center px-[8%] text-black font-normal text-base text-lg xl:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl">
                               เทอร์โมสตัท ({data.qcProject?.projectName}) :{" "}
                               {translateStatus(data?.status?.thermostat)}
                               {data?.status?.thermostat === "Failed" && (
@@ -543,8 +543,8 @@ export default function QcDetail() {
                           )}
 
                           {data?.status?.thermostat !== "-" && (
-                            <div className=" pl-[17%] flex gap-[10%] items-start">
-                              <div className=" text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
+                            <div className="px-[8%] flex gap-6 items-start">
+                              <div className="flex-1 text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
                                 <h1 className="mb-2 underline font-bold">
                                   ค่าที่กำหนด (เทอร์โมสตัท)
                                 </h1>
@@ -567,7 +567,7 @@ export default function QcDetail() {
                                     "-"}
                                 </h1>
                               </div>
-                              <div className=" text-start  whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
+                              <div className="flex-1 text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-5">
                                 <h1 className="mb-2 underline font-bold">
                                   ผลลัพธ์
                                 </h1>
@@ -577,19 +577,19 @@ export default function QcDetail() {
                                 </h1>
                                 <h1>
                                   อุณหภูมิขวา :{" "}
-                                  {data?.status?.result?.temp0 ?? "-"} องศา
+                                  {data?.status?.result?.temp0 ?? "-"} องศาเซลเซียส
                                 </h1>
                                 <h1>
                                   อุณหภูมิซ้าย :{" "}
-                                  {data?.status?.result?.temp1 ?? "-"} องศา
+                                  {data?.status?.result?.temp1 ?? "-"} องศาเซลเซียส
                                 </h1>
                                 <h1>
                                   อุณหภูมิบน :{" "}
-                                  {data?.status?.result?.temp2 ?? "-"} องศา
+                                  {data?.status?.result?.temp2 ?? "-"} องศาเซลเซียส
                                 </h1>
                                 <h1>
                                   อุณหภูมิกลาง :{" "}
-                                  {data?.status?.result?.temp3 ?? "-"} องศา
+                                  {data?.status?.result?.temp3 ?? "-"} องศาเซลเซียส
                                 </h1>
                               </div>
                             </div>
@@ -602,31 +602,31 @@ export default function QcDetail() {
                             let val1Unit = "";
                             let val2Unit = "";
 
-                            let scriptOutputLabel = "Output";
+                            let scriptOutputLabel = "แรงดัน/กระแสทดสอบ";
                             let scriptOutputUnit = "";
-                            let scriptHighLimitLabel = "High Limit";
+                            let scriptHighLimitLabel = "ค่าจำกัดสูงสุด";
                             let scriptHighLimitUnit = "";
 
                             if (tn.includes("EBOND")) {
                               val1Label = "กระแสทดสอบ"; val2Label = "ความต้านทานสายดิน";
-                              val1Unit = " A"; val2Unit = " mΩ";
-                              scriptOutputLabel = "กระแสทดสอบ"; scriptOutputUnit = " mA";
-                              scriptHighLimitLabel = "ความต้านทานสูงสุด"; scriptHighLimitUnit = " mΩ";
+                              val1Unit = " แอมแปร์"; val2Unit = " มิลลิโอห์ม";
+                              scriptOutputLabel = "กระแสทดสอบ"; scriptOutputUnit = " มิลลิแอมแปร์";
+                              scriptHighLimitLabel = "ความต้านทานสูงสุด"; scriptHighLimitUnit = " มิลลิโอห์ม";
                             } else if (tn.includes("DCIR") || tn.includes("INSULATION")) {
                               val1Label = "แรงดันทดสอบ"; val2Label = "ความต้านทานฉนวน";
-                              val1Unit = " V"; val2Unit = " MΩ";
-                              scriptOutputLabel = "แรงดันทดสอบ"; scriptOutputUnit = " V";
-                              scriptHighLimitLabel = "ความต้านทานฉนวนสูงสุด"; scriptHighLimitUnit = " MΩ";
+                              val1Unit = " โวลต์"; val2Unit = " เมกะโอห์ม";
+                              scriptOutputLabel = "แรงดันทดสอบ"; scriptOutputUnit = " โวลต์";
+                              scriptHighLimitLabel = "ความต้านทานฉนวนสูงสุด"; scriptHighLimitUnit = " เมกะโอห์ม";
                             } else if (tn.includes("HIPOT")) {
                               val1Label = "แรงดันทดสอบ"; val2Label = "กระแสรั่วไหล";
-                              val1Unit = " V"; val2Unit = " mA";
-                              scriptOutputLabel = "แรงดันทดสอบ"; scriptOutputUnit = " V";
-                              scriptHighLimitLabel = "กระแสรั่วไหลสูงสุด"; scriptHighLimitUnit = " mA";
+                              val1Unit = " โวลต์"; val2Unit = " มิลลิแอมแปร์";
+                              scriptOutputLabel = "แรงดันทดสอบ"; scriptOutputUnit = " โวลต์";
+                              scriptHighLimitLabel = "กระแสรั่วไหลสูงสุด"; scriptHighLimitUnit = " มิลลิแอมแปร์";
                             } else if (tn.includes("LEAKAGE") || tn.includes("POWER")) {
                               val1Label = "แรงดันทดสอบ"; val2Label = "กระแสรั่วไหล";
-                              val1Unit = " V"; val2Unit = " mA";
-                              scriptOutputLabel = "แรงดันทดสอบ"; scriptOutputUnit = " V";
-                              scriptHighLimitLabel = "กระแสรั่วไหลสูงสุด"; scriptHighLimitUnit = " mA";
+                              val1Unit = " โวลต์"; val2Unit = " มิลลิแอมแปร์";
+                              scriptOutputLabel = "แรงดันทดสอบ"; scriptOutputUnit = " โวลต์";
+                              scriptHighLimitLabel = "กระแสรั่วไหลสูงสุด"; scriptHighLimitUnit = " มิลลิแอมแปร์";
                             }
 
                             let val1Display = sw.result.machine_code;
@@ -636,17 +636,17 @@ export default function QcDetail() {
                             }
 
                             return (
-                              <div key={idx} className="pl-[17%] flex gap-[10%] items-start border-t border-gray-100 mt-5 pt-5">
-                                <div className="text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
+                              <div key={idx} className="px-[8%] flex gap-6 items-start border-t border-gray-100 mt-5 pt-5">
+                                <div className="flex-1 text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
                                   <h1 className="mb-2 underline font-bold">
                                     ค่าที่กำหนด ({sw.testName})
                                   </h1>
                                   <h1>{scriptOutputLabel} : {sw.script?.script_5 ?? "-"}{scriptOutputUnit}</h1>
-                                  <h1>เวลาเพิ่มแรงดัน : {sw.script?.script_6 ?? "-"} s</h1>
-                                  <h1>เวลาทดสอบ : {sw.script?.script_7 ?? "-"} s</h1>
+                                  <h1>เวลาเพิ่มแรงดัน : {sw.script?.script_6 ?? "-"} วินาที</h1>
+                                  <h1>เวลาทดสอบ : {sw.script?.script_7 ?? "-"} วินาที</h1>
                                   <h1>{scriptHighLimitLabel} : {sw.script?.script_10 ?? "-"}{scriptHighLimitUnit}</h1>
                                 </div>
-                                <div className="text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
+                                <div className="flex-1 text-start whitespace-normal text-black font-normal text-sm xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl mt-2">
                                   <h1 className="mb-2 underline font-bold">ผลลัพธ์</h1>
                                   <h1>
                                     สถานะ :{" "}
@@ -659,7 +659,7 @@ export default function QcDetail() {
                                   )}
                                   {sw.result.has_raw && (
                                     <>
-                                      {sw.result.time && <h1>เวลาทดสอบ : {sw.result.time}</h1>}
+                                      {sw.result.time && <h1>เวลาทดสอบ : {sw.result.time.replace(/[sS]$/, '')} วินาที</h1>}
                                       {val1Display && <h1>{val1Label} : {val1Display}{val1Unit}</h1>}
                                       {sw.result.measurement_1 && <h1>{val2Label} : {sw.result.measurement_1}{val2Unit}</h1>}
                                       {sw.result.measurement_2 && <h1>ค่าเพิ่มเติม : {sw.result.measurement_2}</h1>}

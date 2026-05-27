@@ -219,9 +219,9 @@ export default function TestHistory({
               if (
                 data.tag === "qcRecord" &&
                 remainingTest &&
-                remainingTest[index].filter(
+                (remainingTest[index]?.filter(
                   (v) => v.qcType.name.toLowerCase() === "thermostat"
-                ).length > 0
+                ) ?? []).length > 0
               ) {
                 return (
                   <button
@@ -237,7 +237,7 @@ export default function TestHistory({
                       </h1>
                       <div className="mt-2">
                         {remainingTest &&
-                          remainingTest[index].map((test) => {
+                          remainingTest[index]?.map((test) => {
                             if (test.qcType.name.toLowerCase() === "thermostat")
                               return (
                                 <li
