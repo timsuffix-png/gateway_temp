@@ -11,9 +11,9 @@ import ButtonBlue from "../buttonBlue";
 
 type CalibrationData = {
   // Sensor 1 (also mirrored to Sensor 3)
-  m1?: number;  c1?: number;  m2?: number;  c2?: number;  k1?: number;  x01?: number;
+  m1?: number; c1?: number; m2?: number; c2?: number; k1?: number; x01?: number;
   // Sensor 2 (also mirrored to Sensor 4)
-  m3?: number;  c3?: number;  m4?: number;  c4?: number;  k2?: number;  x02?: number;
+  m3?: number; c3?: number; m4?: number; c4?: number; k2?: number; x02?: number;
 };
 
 export default function CalibrateFile({
@@ -99,18 +99,18 @@ export default function CalibrateFile({
       if (onSave && pairs) {
         onSave({
           // Sensor 1 (mirrored to Sensor 3 in commandStr)
-          m1:  pairs[0]?.x ?? 0,
-          c1:  pairs[0]?.y ?? 0,
-          m2:  pairs[1]?.x ?? 0,
-          c2:  pairs[1]?.y ?? 0,
-          k1:  pairs[2]?.x ?? 0,
+          m1: pairs[0]?.x ?? 0,
+          c1: pairs[0]?.y ?? 0,
+          m2: pairs[1]?.x ?? 0,
+          c2: pairs[1]?.y ?? 0,
+          k1: pairs[2]?.x ?? 0,
           x01: pairs[2]?.y ?? 0,
           // Sensor 2 (mirrored to Sensor 4 in commandStr)
-          m3:  pairs[3]?.x ?? 0,
-          c3:  pairs[3]?.y ?? 0,
-          m4:  pairs[4]?.x ?? 0,
-          c4:  pairs[4]?.y ?? 0,
-          k2:  pairs[5]?.x ?? 0,
+          m3: pairs[3]?.x ?? 0,
+          c3: pairs[3]?.y ?? 0,
+          m4: pairs[4]?.x ?? 0,
+          c4: pairs[4]?.y ?? 0,
+          k2: pairs[5]?.x ?? 0,
           x02: pairs[5]?.y ?? 0,
         });
       }
@@ -218,7 +218,7 @@ export default function CalibrateFile({
               hover:bg-gray-100 cursor-pointer overflow-hidden "
               onClick={() => {
                 // @ts-ignore
-                window.electronAPI.openExternal("https://colab.research.google.com/drive/1eeb_N_HxXdVFkfWwnmewH4cBsj1Pg2-w?usp=sharing");
+                window.electronAPI.openExternal("https://colab.research.google.com/drive/1g0utsyj2iORA-kIcznrrNam_okgxYL3R?usp=sharing&fbclid=IwY2xjawSROcRleHRuA2FlbQIxMABicmlkETFOOGZLdmExZDB6NU9haXppc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHialP2_bLFnwmfH4h0OgKfxGOOPHj1T91-ZJ1uyrUqUx5PcEkt0isMZ2SCFR_aem_c9D4E4TrtsEyxXx08PtPwg");
               }}
               title="Open Colab Notebook"
             >
