@@ -39,45 +39,40 @@ export default function CreateQcproject() {
     setTimeout(() => {
       setDisAbleClick(false);
     }, 2000);
-    if (!qcMain?.length)
+    // ตรวจสอบ fields ที่มี * สีแดง
+    if (!name || !qcMain?.length) {
       return Swal.fire({
+        position: "top-end",
         icon: "error",
         title: "กรอกข้อมูลไม่ครบ",
         text: "กรุณากรอกข้อมูลให้ครบตามช่องที่มี * สีแดง",
       });
+    }
     const temp = qcMain.map((data) => data.value);
-    if (!(!name || !qcMain.length)) {
-      const data = await window.electronAPI.fetchAPI({
-        method: "POST",
-        URL: `qc/itemProject/multi`,
-        body: {
-          projectName: name,
-          detail: detail,
-          qcMainID: temp,
-        },
+    const data = await window.electronAPI.fetchAPI({
+      method: "POST",
+      URL: `qc/itemProject/multi`,
+      body: {
+        projectName: name,
+        detail: detail,
+        qcMainID: temp,
+      },
+    });
+    if (!data) {
+      return Swal.fire({
+        icon: "error",
+        title: "ตรวจสอบข้อมูลใหม่อีกครั้ง",
+        text: "ชื่อผู้ใช้งานและอีเมล์ไม่สามารถซ้ำกับของที่มีอยู่ได้ และข้อมูลที่จำเป็นต้องกรอกกรอกครบเรียบร้อยแล้ว",
       });
-      if (!data) {
-        return Swal.fire({
-          icon: "error",
-          title: "ตรวจสอบข้อมูลใหม่อีกครั้ง",
-          text: "ชื่อผู้ใช้งานและอีเมล์ไม่สามารถซ้ำกับของที่มีอยู่ได้ และข้อมูลที่จำเป็นต้องกรอกกรอกครบเรียบร้อยแล้ว",
-        });
-      } else {
-        return Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "บันทึกข้อมูลเรียบร้อย",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          window.location.reload();
-        });
-      }
     } else {
       return Swal.fire({
-        icon: "error",
-        title: "กรอกข้อมูลไม่ครบ",
-        text: "กรุณากรอกข้อมูลให้ครบตามช่องที่มี * สีแดง",
+        position: "top-end",
+        icon: "success",
+        title: "บันทึกข้อมูลเรียบร้อย",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        window.location.reload();
       });
     }
   };

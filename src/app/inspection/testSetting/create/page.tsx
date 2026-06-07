@@ -169,6 +169,51 @@ export default function CreateTestSetting() {
       setTimeout(() => {
         setDisAbleClick(false);
       }, 2000);
+
+      // ตรวจสอบ fields หลักที่มี * สีแดง
+      if (!name || !qcType.value) {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "กรอกข้อมูลไม่ครบ",
+          text: "กรุณากรอกข้อมูลให้ครบตามช่องที่มี * สีแดง",
+        });
+        return;
+      }
+
+      // ตรวจสอบ script fields สำหรับ seaward
+      if (seawardScript) {
+        const s = qcScript as QcScriptSeaward;
+        const hasPwrlk = s.script_1?.indexOf("PWRLK") !== -1;
+        if (
+          !s.script_5 || !s.script_6 || !s.script_7 || !s.script_8 ||
+          !s.script_9 || !s.script_10 || !s.script_11 || !s.script_12 ||
+          (hasPwrlk && (!s.script_13 || !s.script_14 || !s.script_15 || !s.script_16))
+        ) {
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: "กรอกข้อมูลไม่ครบ",
+            text: "กรุณากรอกข้อมูลให้ครบตามช่องที่มี * สีแดง",
+          });
+          return;
+        }
+      }
+
+      // ตรวจสอบ script fields สำหรับ thermostat
+      if (TemperatureScript) {
+        const t = qcScript as QcScriptTemperature;
+        if (!t.TemperatureMax || !t.CurrentMax || !t.StartMoment || !t.EndMoment) {
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: "กรอกข้อมูลไม่ครบ",
+            text: "กรุณากรอกข้อมูลให้ครบตามช่องที่มี * สีแดง",
+          });
+          return;
+        }
+      }
+
       const checkSettingSensor = await settingSensor();
 
       const isThermo = qcType.name.toLowerCase() === "thermostat";
@@ -176,14 +221,6 @@ export default function CreateTestSetting() {
         isThermo
           ? { ...(qcScript as QcScriptTemperature), ...(checkSettingSensor || {}) }
           : (qcScript as QcScriptSeaward);
-      if (!name || !qcType.value) {
-        Swal.fire({
-          icon: "error",
-          title: "เกิดข้อผิดพลาด",
-          text: "กรุณากรอกข้อมูลให้ครบตามช่องที่มี * สีแดง",
-        });
-        return;
-      }
 
       // @ts-ignore
       const data = await window.electronAPI.fetchAPI({
