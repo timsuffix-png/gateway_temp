@@ -218,7 +218,7 @@ export default function CalibrateFile({
               hover:bg-gray-100 cursor-pointer overflow-hidden "
               onClick={() => {
                 // @ts-ignore
-                window.electronAPI.openExternal("https://colab.research.google.com/drive/1g0utsyj2iORA-kIcznrrNam_okgxYL3R?usp=sharing&fbclid=IwY2xjawSROcRleHRuA2FlbQIxMABicmlkETFOOGZLdmExZDB6NU9haXppc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHialP2_bLFnwmfH4h0OgKfxGOOPHj1T91-ZJ1uyrUqUx5PcEkt0isMZ2SCFR_aem_c9D4E4TrtsEyxXx08PtPwg");
+                window.electronAPI.openExternal("https://colab.research.google.com/drive/1g0utsyj2iORA-kIcznrrNam_okgxYL3R?usp=sharing&fbclid=IwY2xjawSRNMRleHRuA2FlbQIxMABicmlkETExNWg3OHBhY3o2bFQ1RkpTc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHux-FEWqoDI_V2evMnKPdd2qL9wPUzCkxp4tAOhO1zoM6BeEDp99OSLALJAL_aem_MMbI62ZmWlot6k-gUraWCg#scrollTo=TxURO99NSc_m");
               }}
               title="Open Colab Notebook"
             >
