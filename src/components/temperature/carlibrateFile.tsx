@@ -164,7 +164,7 @@ export default function CalibrateFile({
     <div className="text-start bg-white p-5 sm:p-10 2xl:p-20 border-black border-2 rounded-2xl flex flex-col">
       <div className=" flex flex-col w-full">
         <h1 className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-black mb-4">
-          ตั้งค่าเซนเซอร์อุณหภูมิ
+          ตั้งค่าอุณหภูมิเซนเซอร์
         </h1>
         <div className="flex flex-col gap-3" style={{ width: currentWidth / 2 }}>
           <label className="text-black text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">

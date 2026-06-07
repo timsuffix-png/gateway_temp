@@ -391,9 +391,7 @@ export default function CreateTestSetting() {
                 <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
                   รายละเอียด
                 </p>
-                <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                  &nbsp;*
-                </span>
+
               </div>
               <div className="flex gap-10 items-center">
                 <input
@@ -701,7 +699,7 @@ export default function CreateTestSetting() {
                   </div>
                 ))}
                 {[
-                   "m1",
+                  "m1",
                   "c1",
                   "m2",
                   "c2",

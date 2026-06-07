@@ -184,9 +184,7 @@ export default function CreateQcproject() {
                 <p className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl">
                   รายละเอียด
                 </p>
-                <span className="text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl 4xl:text-5xl text-red-600">
-                  &nbsp;*
-                </span>
+
               </div>
               <div className="flex gap-10 items-center">
                 <textarea
