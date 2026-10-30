@@ -198,8 +198,47 @@ export default function MainTempTest() {
 
   //ฟังชั่นรับserial Data
   const handleSerialData = (data: string) => {
-    //0ขวา, 1กลาง, 2ซ้าย , 3บน
-    const parts = data.split(",");
+    const trimmed = data.trim();
+
+    // 1. จัดการข้อมูลสรุปผลการทดสอบแบบ Standalone จาก Arduino (RESULT_RECORD)
+    if (trimmed.startsWith("RESULT_RECORD,")) {
+      const recParts = trimmed.split(",");
+      if (recParts.length >= 9) {
+        const sn = recParts[1]?.trim();
+        const resStatus = recParts[3]?.trim();
+        const resDetail = recParts[4]?.trim();
+
+        if (sn && sn !== "SAMPLE-000000") {
+          setSerialNumber(sn);
+          serialNumberRef.current = sn;
+          if (serialInputRef.current) serialInputRef.current.value = sn;
+        }
+
+        setStatus(resStatus);
+        setDetail(detailTemp.detailFailed[resDetail] || detailTemp.ironInterrupt[resDetail] || resDetail);
+      }
+      return;
+    }
+
+    // 2. จัดการข้อมูลประวัติการทดสอบออฟไลน์ (Offline Records Sync)
+    if (trimmed.startsWith("REC,")) {
+      const recParts = trimmed.split(",");
+      if (recParts.length >= 10) {
+        const idx = recParts[1]?.trim();
+        const sn = recParts[2]?.trim();
+        const resStatus = recParts[4]?.trim();
+        const resDetail = recParts[5]?.trim();
+        const isSynced = recParts[9]?.trim();
+
+        if (isSynced === "0" && sn && sn !== "SAMPLE-000000") {
+          uploadOfflineRecord(idx, sn, resStatus, resDetail, recParts);
+        }
+      }
+      return;
+    }
+
+    // 3. ข้อมูล Telemetry แบบ Real-time ดั้งเดิม (0ขวา, 1กลาง, 2ซ้าย, 3บน)
+    const parts = trimmed.split(",");
     if (parts.length > 10) {
       const detail = parts[12]?.trim();
       const status = parts[11].trim();
@@ -459,6 +498,88 @@ export default function MainTempTest() {
       }
     } catch (error) {
       console.error("Error recording data:", error);
+    }
+  };
+
+  // ======================================================
+  // อัปโหลดผลการทดสอบที่บันทึกไว้ใน EEPROM แบบออฟไลน์ขึ้น ERP
+  // ======================================================
+  const uploadOfflineRecord = async (
+    idx: string,
+    sn: string,
+    recStatus: string,
+    recDetail: string,
+    rawParts: string[]
+  ) => {
+    try {
+      const record = await window.electronAPI.fetchAPI({
+        method: "POST",
+        URL: "qc/record",
+        body: {
+          qcProjectID: qcProjectRef.current,
+          serialNumber: sn,
+          testBy: auth?.user?.data?.ID,
+        },
+      });
+
+      const qcMainTemp = qcMainsRef.current?.data?.find(
+        (d: any) => String(d?.qcMain?.qcType?.name || "").toLowerCase() === "thermostat"
+      )?.qcMain?.ID;
+
+      if (record?.data?.[0]?.ID) {
+        await window.electronAPI.fetchAPI({
+          method: "POST",
+          URL: "qc/status",
+          body: {
+            qcRecordID: record.data[0].ID,
+            qcMainID: qcMainTemp,
+            result: recStatus,
+            status: recStatus,
+            detail: `Avg:${rawParts[6] || 0}C, Tip:${rawParts[7] || 0}C, I:${rawParts[8] || 0}A, t:${rawParts[9] || 0}s, Code:${recDetail}`,
+          },
+        });
+
+        // ส่ง ACK กลับไปหา Arduino เพื่อยืนยันว่าบันทึกลงระบบ ERP เรียบร้อย
+        if (currentCOMPort) {
+          await window.electronAPI.writeData({
+            port: currentCOMPort,
+            command: `ACK_RECORD,${idx}\n`,
+          });
+        }
+      }
+    } catch (e) {
+      console.error("Upload offline record failed:", e);
+    }
+  };
+
+  // ======================================================
+  // ส่งคำสั่ง SYNC ไปยัง Arduino เพื่อดึงผลการทดสอบที่ค้างใน EEPROM
+  // ======================================================
+  const syncOfflineRecords = async () => {
+    if (!currentCOMPort) {
+      Swal.fire({
+        icon: "warning",
+        title: "เกิดข้อผิดพลาด",
+        text: "กรุณาเลือกและเชื่อมต่อพอร์ต COM ก่อนซิงค์ข้อมูล",
+      });
+      return;
+    }
+
+    try {
+      await window.electronAPI.openPort(String(currentCOMPort));
+      await window.electronAPI.writeData({
+        port: currentCOMPort,
+        command: "SYNC\n",
+      });
+      Swal.fire({
+        icon: "success",
+        title: "เริ่มการซิงค์ข้อมูล",
+        text: "ส่งคำขอประวัติการทดสอบจากเครื่อง Arduino เรียบร้อยแล้ว",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("syncOfflineRecords error:", err);
     }
   };
 
@@ -901,6 +1022,13 @@ export default function MainTempTest() {
                   onClick={() => clickTest("stop")}
                 >
                   หยุด
+                </button>
+                <button
+                  className="w-full sm:w-[70%] lg:w-[70%] xl:w-[50%] h-10 sm:h-12 lg:h-14 text-sm sm:text-base md:text-lg rounded-lg bg-emerald-600 hover:bg-emerald-700 hover:cursor-pointer text-white font-semibold 
+                  transition duration-300"
+                  onClick={syncOfflineRecords}
+                >
+                  📥 ซิงค์ผลทดสอบออฟไลน์ (Standalone)
                 </button>
               </div>
             </div>
