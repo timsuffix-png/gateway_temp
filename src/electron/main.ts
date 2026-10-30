@@ -261,7 +261,7 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
+        "API=http://localhost:3021/api/v1/"
       );
       API = null;
     }
@@ -285,7 +285,7 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
+        "API=http://localhost:3021/api/v1/"
       );
     }
   });
@@ -304,9 +304,9 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
+        "API=http://localhost:3021/api/v1/"
       );
-      API = "https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/";
+      API = "http://localhost:3021/api/v1/";
     }
     if (args.method === "POST") {
       try {
@@ -393,7 +393,7 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
+        "API=http://localhost:3021/api/v1/"
       );
       COM = null;
     }
@@ -418,7 +418,7 @@ app.on("ready", () => {
       // file not found error
       writeFileSync(
         "config.cnf",
-        "API=https://6bd1cbdf-3021.asse.devtunnels.ms/api/v1/"
+        "API=http://localhost:3021/api/v1/"
       );
     }
   });
